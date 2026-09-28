@@ -24,8 +24,10 @@ def init_db():
         if settings.seed_demo:
             from .demo import seed_demo
             from .demo2 import seed_demo_v2
+            from .demo3 import seed_demo_v3
             seed_demo(db)
             seed_demo_v2(db)
+            seed_demo_v3(db)
 
 
 @asynccontextmanager

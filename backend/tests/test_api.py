@@ -173,3 +173,23 @@ def test_studies_index_and_barrier_links(client, viewer):
     fails = client.get("/api/barriers/failures", headers=viewer).json()
     keys = {f"{b['study_id']}:{b['barrier_id']}" for b in bars}
     assert fails and all(f["link"] in keys for f in fails)
+
+
+def test_demo3_alternate_h24_case_study(client, viewer):
+    """DEMO-03 reproduces SRA/MOC/OPS/001/IX/2026: 40 hazards, 15 intolerable now, none residual; FTA 4.6e-3 → 2.9e-4."""
+    projects = client.get("/api/projects", headers=viewer).json()
+    p = next(x for x in projects if x["code"] == "DEMO-03")
+    a = client.get(f"/api/projects/{p['id']}", headers=viewer).json()["assessments"][0]
+    full = client.get(f"/api/assessments/{a['id']}", headers=viewer).json()
+    assert sorted(s["method"] for s in full["studies"]) == ["bowtie", "fta", "fta", "gsn", "hazid", "stpa"]
+    hz = [h for h in client.get("/api/hazards", headers=viewer).json() if h["ref"].startswith("ALT-")]
+    assert len(hz) == 40
+    cur = [h["initial_risk"]["region"] for h in hz]
+    res = [h["residual_risk"]["region"] for h in hz]
+    assert cur.count("intolerable") == 15
+    assert res.count("intolerable") == 0 and res.count("acceptable") == 16
+    ftas = {s["title"]: s for s in full["studies"] if s["method"] == "fta"}
+    tops = sorted(client.get(f"/api/studies/{s['id']}", headers=viewer).json()["results"]["top_probability"] for s in ftas.values())
+    assert abs(tops[0] - 2.887e-4) < 5e-7 and abs(tops[1] - 4.56e-3) < 1e-6
+    acts = [x for x in client.get("/api/actions", headers=viewer).json() if x["ref"].startswith("ALT-PK")]
+    assert len(acts) == 8

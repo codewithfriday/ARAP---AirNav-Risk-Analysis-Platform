@@ -412,6 +412,25 @@ A worksheet of threat scenarios: asset, threat, source, vulnerability, C/I/A imp
 - **HFACS** — tick categories in the four tiers and record the evidence for each.
 - **Tripod Beta** — event trios (agent, object, event) with failed or missing barriers traced to immediate cause, precondition, underlying cause and Basic Risk Factor. A BRF profile summarises them.
 
+### 13.14 Case study: H24 alternate aerodromes (DEMO-03)
+
+The project **DEMO-03** reproduces a real-format Safety Risk Assessment, *SRA/MOC/OPS/001/IX/2026 Rev 00 — Assessment Operasi 24 Jam Aerodrome Alternate*. It covers activating H24 ATS at seven alternates (WAHI, WAHH, WAHQ, WAHS, WICA, WICC, WIPP) when an eruption of Gunung Anak Krakatau closes WIII. The content is kept in Bahasa Indonesia, as in the source report.
+
+| ARAP item | What it holds |
+|---|---|
+| Assessment scope, environment, assumptions | The change, system boundary, scenarios S1–S3, demand derivation (72-aircraft design wave), feasibility-gate and capacity-model results, and the assumption register A-01 to A-12 |
+| HAZID study *Register risiko* | The 40 hazards from FHA (F1–F7), HAZOP and STPA with their current rating, existing barriers and mitigations |
+| STPA study | The four-organisation closure/reopening decision chain (VAAC → AirNav → operator bandara → KOBU → INMC), six unsafe control actions and their loss scenarios |
+| Two FTA studies | ATS power over 30 days: single untested genset 4.6 × 10⁻³, two tested gensets 2.9 × 10⁻⁴ |
+| Bowtie | *Pesawat tidak dapat mendarat dengan selamat di aerodrome alternate*. New barriers M-xx are marked *planned*, with the SPI that monitors each one |
+| GSN | Claim G0 with sub-claims G1–G7; five are *undeveloped* because they are waiting for preconditions |
+| Hazard log | `ALT-G-01` … `ALT-S-03`. The initial rating is the report's *Current* column, the residual is the *Residual* column, and the *Inherent* rating is in the context field. Mitigations M-01 to M-20 are planned controls |
+| Actions | `ALT-PK-1` … `ALT-PK-8`, the activation preconditions (PK-1, PK-3 and PK-4 are blocking) |
+
+The feasibility gate and the capacity (queue/occupancy) model have no dedicated ARAP module yet, so their results are recorded in the assessment's environment text.
+
+![DEMO-03 bowtie](screenshots/v2-alt-bowtie.png)
+
 ---
 
 ## 14. The hazard log

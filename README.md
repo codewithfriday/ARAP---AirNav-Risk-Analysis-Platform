@@ -52,7 +52,7 @@ docker compose up -d --build
 
 Open **http://localhost:8080** and sign in as `admin` with the password from `.env`.
 
-With `ARAP_SEED_DEMO=true` (the default) two demo projects (DEMO-01 for the core methods, DEMO-02 for the extended methods) with one study per method and demo users (password `demo1234`) is created: `assessor`, `reviewer`, `director`, `accexec`, `viewer`. **Set `ARAP_SEED_DEMO=false` and change all passwords for real use.**
+With `ARAP_SEED_DEMO=true` (the default) three demo projects (DEMO-01 for the core methods, DEMO-02 for the extended methods, DEMO-03 the H24 alternate-aerodrome SRA case study) with one study per method and demo users (password `demo1234`) is created: `assessor`, `reviewer`, `director`, `accexec`, `viewer`. **Set `ARAP_SEED_DEMO=false` and change all passwords for real use.**
 
 The API applies database migrations (`alembic upgrade head`) on start-up. Interactive API documentation (OpenAPI) is at `http://localhost:8080/api/docs`.
 
@@ -98,7 +98,7 @@ pytest -q                                   # SQLite
 ARAP_DATABASE_URL=postgresql+psycopg://... pytest -q -p no:cacheprovider   # PostgreSQL
 ```
 
-The suite has 47 tests. They include the **reference test cases of SRS §9**: every calculation engine must reproduce the Manual's worked examples. For example, fault-tree top event 1.22 × 10⁻⁶, LOPA 2.5 × 10⁻⁵/yr, Bayesian posterior P(fatigue | loss of separation) = 0.390, fatigue-model minimum alertness 5.18 at 05:55, RVSM vertical collision risk 1.873 × 10⁻⁹, minimum lateral route spacing 11.68 NM, CARA HEP 2.016 × 10⁻³, Markov unavailability 2.04 × 10⁻⁶ and Cooke expert weight 0.814. The Bayesian engine is also checked against brute-force enumeration. The API tests cover roles, the approval workflow, acceptance authority, locking, versioning, hazard promotion, exports and audit.
+The suite has 48 tests. They include the **reference test cases of SRS §9**: every calculation engine must reproduce the Manual's worked examples. For example, fault-tree top event 1.22 × 10⁻⁶, LOPA 2.5 × 10⁻⁵/yr, Bayesian posterior P(fatigue | loss of separation) = 0.390, fatigue-model minimum alertness 5.18 at 05:55, RVSM vertical collision risk 1.873 × 10⁻⁹, minimum lateral route spacing 11.68 NM, CARA HEP 2.016 × 10⁻³, Markov unavailability 2.04 × 10⁻⁶ and Cooke expert weight 0.814. The Bayesian engine is also checked against brute-force enumeration. The API tests cover roles, the approval workflow, acceptance authority, locking, versioning, hazard promotion, exports and audit.
 
 GitHub Actions (`.github/workflows/ci.yml`) runs the back-end tests on SQLite and PostgreSQL and builds the front end on every push and pull request.
 

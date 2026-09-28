@@ -136,3 +136,21 @@ def test_tc_sim_01():
     assert math.isclose(r["M1"]["solution"]["mean"], v.mean())
     assert r["M1"]["criterion_met"] and r["M2"]["criterion_met"] and r["M3"]["criterion_met"]
     assert r["M1"]["p_value"] < 0.001
+
+
+def test_wildlife_species_matrix_cattle_egret():
+    """Manual §31.4 / TC-WLD-01: Bubulcus ibis 62 strikes in 5 years, 7 damaging → L5 × S4 = 20, high, ranked first."""
+    from app.engines import wildlife
+    from app.seed_wildlife import WILDLIFE_MODEL
+    r = wildlife.analyse(WILDLIFE_MODEL)
+    eg = r["species"][0]
+    assert eg["scientific"] == "Bubulcus ibis" and eg["rank"] == 1
+    assert eg["per_year"] == 12.4 and abs(eg["damage_pct"] - 11.29) < 0.01
+    assert (eg["likelihood"], eg["severity"], eg["score"], eg["risk"]) == (5, 4, 20, "high")
+    assert abs(eg["rate_per_10k"] - 1.896) < 1e-3
+    by = {x["scientific"]: x for x in r["species"]}
+    # few strikes → body-mass surrogate: 1.0 kg → class 4, flocking +1 → 5
+    assert by["Pteropus vampyrus"]["severity"] == 5 and by["Pteropus vampyrus"]["severity_basis"].startswith("surrogate")
+    assert by["Hirundo rustica"]["risk"] == "low" and by["Ardeola speciosa"]["score"] == 8
+    assert r["counts"] == {"high": 1, "moderate": 3, "low": 2}
+    assert abs(r["rate_per_10k"] - 6.972) < 1e-3

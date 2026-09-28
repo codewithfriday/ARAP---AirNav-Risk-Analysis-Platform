@@ -133,8 +133,8 @@ def test_v2_demo_and_calc_endpoints(client, viewer):
     demo2 = next(p for p in projects if p["code"] == "DEMO-02")
     a = client.get(f"/api/projects/{demo2['id']}", headers=viewer).json()["assessments"][0]
     full = client.get(f"/api/assessments/{a['id']}", headers=viewer).json()
-    assert {s["method"] for s in full["studies"]} == {"crm", "eta", "hra", "orc", "gsn", "cca", "rbd", "swift", "hta", "sim", "sej", "sec", "inv"}
-    assert len(client.get("/api/meta/methods", headers=viewer).json()) == 25
+    assert {s["method"] for s in full["studies"]} == {"crm", "eta", "hra", "orc", "gsn", "cca", "rbd", "swift", "hta", "sim", "sej", "sec", "inv", "wildlife"}
+    assert len(client.get("/api/meta/methods", headers=viewer).json()) == 26
     v = client.post("/api/calc/crm", json={"dimension": "vertical", "params": S.CRM_VERTICAL}, headers=viewer).json()
     assert abs(v["total"] - 1.873e-9) < 1e-11
     L, m = S.CRM_LATERAL, S.CRM_LAT_MODEL
@@ -193,3 +193,12 @@ def test_demo3_alternate_h24_case_study(client, viewer):
     assert abs(tops[0] - 2.887e-4) < 5e-7 and abs(tops[1] - 4.56e-3) < 1e-6
     acts = [x for x in client.get("/api/actions", headers=viewer).json() if x["ref"].startswith("ALT-PK")]
     assert len(acts) == 8
+
+
+def test_wildlife_calc_endpoint(client, viewer):
+    from app.seed_wildlife import WILDLIFE_MODEL
+    r = client.post("/api/calc/wildlife", json=WILDLIFE_MODEL, headers=viewer).json()
+    top = r["species"][0]
+    assert top["scientific"] == "Bubulcus ibis" and top["risk"] == "high" and top["score"] == 20
+    bad = dict(WILDLIFE_MODEL, species=[dict(WILDLIFE_MODEL["species"][0], damaging={"2021": 99})])
+    assert client.post("/api/calc/wildlife", json=bad, headers=viewer).status_code == 422

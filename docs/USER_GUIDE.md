@@ -1,8 +1,8 @@
 # ARAP User Guide
 
-**AirNav Risk Analysis Platform — version 0.2**
+**AirNav Risk Analysis Platform — version 0.3**
 
-ARAP is the web application that implements the *AirNav Risk Analysis Manual*. It lets AirNav staff plan, run, review and approve safety risk assessments with twenty-five methods, keeps every hazard in one hazard log, and produces the Safety Assessment Report.
+ARAP is the web application that implements the *AirNav Risk Analysis Manual*. It lets AirNav staff plan, run, review and approve safety risk assessments with twenty-six methods, keeps every hazard in one hazard log, and produces the Safety Assessment Report.
 
 This guide explains how to use the application. For *why* and *when* to use each method, see the Manual (`docs/AirNav_Risk_Analysis_Manual.pdf`). For the formal requirements, see the SRS (`docs/AirNav_Risk_Analysis_Software_Requirements.pdf`).
 
@@ -22,14 +22,14 @@ This guide explains how to use the application. For *why* and *when* to use each
 10. [Bayesian belief networks](#10-bayesian-belief-networks)
 11. [STPA](#11-stpa)
 12. [FRAM](#12-fram)
-13. [Extended methods: CRM, ETA, HRA, ERC/RAT, GSN, CCA, RBD/Markov, SWIFT, HTA, simulation, expert judgement, security, investigation](#13-extended-methods-manual-chapters-1830)
+13. [Extended methods: CRM, ETA, HRA, ERC/RAT, GSN, CCA, RBD/Markov, SWIFT, HTA, simulation, expert judgement, security, investigation, wildlife](#13-extended-methods-manual-chapters-1831)
 14. [The hazard log](#14-the-hazard-log)
 15. [Actions](#15-actions)
 16. [Review, approval and locking](#16-review-approval-and-locking)
 17. [Reports and exports](#17-reports-and-exports)
 18. [Administration](#18-administration)
 19. [Troubleshooting and FAQ](#19-troubleshooting-and-faq)
-20. [What version 0.2 does not do yet](#20-what-version-02-does-not-do-yet)
+20. [What version 0.3 does not do yet](#20-what-version-03-does-not-do-yet)
 
 ---
 
@@ -304,9 +304,9 @@ The STPA study follows the four steps of the STPA Handbook, one tab each.
 
 ---
 
-## 13. Extended methods (Manual chapters 18–30)
+## 13. Extended methods (Manual chapters 18–31)
 
-Version 0.2 adds thirteen methods. They all work like the others: open the study, edit, press **Calculate** where there is one, and **Save**. The demo project **DEMO-02** has one worked example of each, matching the Manual.
+Version 0.2 adds thirteen methods, and version 0.3 adds the wildlife strike module. They all work like the others: open the study, edit, press **Calculate** where there is one, and **Save**. The demo project **DEMO-02** has one worked example of each, matching the Manual.
 
 ### 13.1 Collision risk — CRM (Manual §18)
 
@@ -412,7 +412,20 @@ A worksheet of threat scenarios: asset, threat, source, vulnerability, C/I/A imp
 - **HFACS** — tick categories in the four tiers and record the evidence for each.
 - **Tripod Beta** — event trios (agent, object, event) with failed or missing barriers traced to immediate cause, precondition, underlying cause and Basic Risk Factor. A BRF profile summarises them.
 
-### 13.14 Case study: H24 alternate aerodromes (DEMO-03)
+### 13.14 Wildlife strike risk — species matrix (Manual §31)
+
+![Wildlife species risk matrix](screenshots/v2-wildlife-matrix.png)
+
+- **Species and strikes.** Enter the review years and the aircraft movements for each year. Then add one row per species, or per group of similar species: common and scientific name, body mass, whether it flocks, and the strikes and damaging strikes for each year. Press **Calculate risk**.
+- **Risk matrix.** Each species is placed on a 5 × 5 grid. Rows are likelihood (mean strikes per year) and columns are severity (share of strikes that caused damage or had an effect on flight). The ranking table adds the rate per 10,000 movements and its trend. A species with fewer than 5 strikes gets its severity from body mass, plus one class if it flocks; ARAP marks this with \*. Use **Send high and moderate species to hazard log** to create hazard entries, with the species' attractants and measures.
+- **Species profile.** For the selected species: ecology notes, time of day of strikes, a year-by-year chart of strikes and strike rate, a monthly chart of survey counts and strikes (use **Edit** to enter counts), and the species management measures with type, owner and status.
+- **Attractants within 13 km.** A register of wildlife attractants: landfills, tambak, rice fields, roosts, grazing land and so on. Each entry has a distance, the species it attracts, an action and an owner. Sites inside the 13 km circle are flagged.
+
+The worked example in **DEMO-02** uses the cattle egret, *Bubulcus ibis*. It has 62 strikes in five years, 7 of them damaging, which gives 5 × 4 = 20 (high). It ranks above the barn swallow, which is struck more often but almost never causes damage.
+
+![Species profile](screenshots/v2-wildlife-profile.png)
+
+### 13.15 Case study: H24 alternate aerodromes (DEMO-03)
 
 The project **DEMO-03** reproduces a real-format Safety Risk Assessment, *SRA/MOC/OPS/001/IX/2026 Rev 00 — Assessment Operasi 24 Jam Aerodrome Alternate*. It covers activating H24 ATS at seven alternates (WAHI, WAHH, WAHQ, WAHS, WICA, WICC, WIPP) when an eruption of Gunung Anak Krakatau closes WIII. The content is kept in Bahasa Indonesia, as in the source report.
 
@@ -437,7 +450,7 @@ The feasibility gate and the capacity (queue/occupancy) model have no dedicated 
 
 ![Hazard log](screenshots/05-hazard-log.png)
 
-The hazard log is the single register of hazards from all studies (Manual §31.2). Search, filter by risk region, sort, and export to **CSV**. Overdue review dates are shown in red.
+The hazard log is the single register of hazards from all studies (Manual §32.2). Search, filter by risk region, sort, and export to **CSV**. Overdue review dates are shown in red.
 
 Click a hazard to open it:
 
@@ -487,7 +500,7 @@ Every transition is recorded in the **review and approval history** and the audi
 
 | What | Where | Format |
 |---|---|---|
-| Safety Assessment Report (Manual §31.3) | Assessment page → **Report (.docx)** | Word |
+| Safety Assessment Report (Manual §32.3) | Assessment page → **Report (.docx)** | Word |
 | Hazard log | Hazard log → **CSV** | CSV (opens in Excel) |
 | Bowtie diagram | Bowtie editor → **PNG** / **SVG** | Image |
 
@@ -531,9 +544,9 @@ Administrators can reassign cells: choose a region under **Paint region**, click
 
 ---
 
-## 20. What version 0.2 does not do yet
+## 20. What version 0.3 does not do yet
 
-Version 0.2 covers the core workflow and all twenty-five methods. The following SRS items are planned for later releases:
+Version 0.3 covers the core workflow and all twenty-six methods. The following SRS items are planned for later releases:
 
 - Single sign-on through Keycloak / SAML / OIDC with MFA. Version 0.2 uses local accounts with JWT tokens.
 - Real-time co-editing of a diagram by several users, and the offline workshop pack.
@@ -542,4 +555,5 @@ Version 0.2 covers the core workflow and all twenty-five methods. The following 
 - Integrations with the occurrence reporting, rostering and maintenance systems.
 - CAST (STPA for accident analysis), noisy-OR helpers for Bayesian networks, Monte Carlo uncertainty, and the full “braked” sleep-recovery form of the fatigue model.
 - An Apache Superset / Metabase reporting database.
+- For the wildlife module: import of strike records from the occurrence system and in ICAO IBIS format.
 - For the extended methods: import of occurrences from the reporting system into the ERC/RAT module, CRM sensitivity cases, administrator editing of the CARA/HEART libraries, and restricted (need-to-know) access to security studies (SRS SRA-04).

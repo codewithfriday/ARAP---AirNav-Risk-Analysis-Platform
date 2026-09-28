@@ -139,4 +139,10 @@ METHODS = {
                       "Organisational influences": ["Resource management", "Organisational climate", "Organisational process"]},
             "tripod_brf": ["Design (DE)", "Hardware (HW)", "Maintenance management (MM)", "Housekeeping (HK)", "Error-enforcing conditions (EC)",
                            "Procedures (PR)", "Communication (CO)", "Organisation (OR)", "Training (TR)", "Incompatible goals (IG)", "Defences (DF)"]},
+    "wildlife": {"name": "Wildlife strike risk (species)", "chapter": 31, "kind": "calculator", "template_version": "1.0",
+                 "summary": "Species-by-species strike likelihood × severity matrix from strike data; profiles, surveys and attractants within 13 km.",
+                 "land_uses": ["Grass (short after mowing)", "Cattle grazing", "Rice fields (sawah)", "Tambak (aquaculture)", "Wetland / river mouth",
+                               "Roost / nesting colony", "Landfill", "Orchard (fruit)", "Food waste / market", "Standing water / drains", "Other"],
+                 "mitigation_types": ["Habitat", "Dispersal", "Land use", "Detection", "ATS", "Reporting", "Exclusion"],
+                 "circle_km": 13},
 }

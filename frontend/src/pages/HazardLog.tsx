@@ -27,7 +27,7 @@ export default function HazardLog() {
 
   return (
     <div>
-      <PageHeader title={t('nav.hazards')} sub="Single register of hazards from every method study, with current and residual risk, controls and owners (Manual §31.2)."
+      <PageHeader title={t('nav.hazards')} sub="Single register of hazards from every method study, with current and residual risk, controls and owners (Manual §32.2)."
         extra={<Space>
           {canEdit(user) && <Button type="primary" icon={<PlusOutlined />} onClick={() => setParams({ open: 'new' })}>New hazard</Button>}
           <Button icon={<DownloadOutlined />} onClick={() => download('/hazards/export.csv', 'hazard-log.csv')}>CSV</Button>

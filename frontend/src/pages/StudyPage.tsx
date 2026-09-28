@@ -28,6 +28,7 @@ const EDITORS: Record<string, any> = {
   sim: lazy(() => import('../methods/SimEditor')),
   sej: lazy(() => import('../methods/SejEditor')),
   inv: lazy(() => import('../methods/InvEditor')),
+  wildlife: lazy(() => import('../methods/WildlifeEditor')),
 }
 const Worksheet = lazy(() => import('../methods/WorksheetEditor'))
 

@@ -1,4 +1,4 @@
-"""Safety Assessment Report (DOCX) following Manual §31.3 (REP-01, REP-02)."""
+"""Safety Assessment Report (DOCX) following Manual §32.3 (REP-01, REP-02)."""
 import io
 from datetime import date
 
@@ -102,6 +102,13 @@ def assessment_docx(a: dict, studies: list[dict], engines: dict) -> bytes:
                               f"{sum(1 for n in m['nodes'] if n['type'] == 'solution')} solutions.")
         elif s["method"] == "inv" and m.get("occurrence"):
             doc.add_paragraph(f"Investigation {m['occurrence'].get('ref', '')}: {m['occurrence'].get('summary', '')}")
+        elif s["method"] == "wildlife" and res.get("species"):
+            doc.add_paragraph(f"Wildlife strike risk by species ({res['years'][0]}–{res['years'][-1]}): {res['total_strikes']:.0f} strikes, "
+                              f"{res['rate_per_10k']:.2f} per 10,000 movements.")
+            _table(doc, ["Rank", "Species", "Strikes/yr", "Damaging %", "L × S", "Risk"],
+                   [[str(x["rank"]), f"{x['common']} ({x['scientific']})", f"{x['per_year']:.1f}",
+                     "—" if x["damage_pct"] is None else f"{x['damage_pct']:.1f}", f"{x['likelihood']} × {x['severity']} = {x['score']}",
+                     x["risk"]] for x in res["species"]])
         elif m.get("rows"):
             doc.add_paragraph(f"{len(m['rows'])} worksheet rows recorded (see ARAP for the full worksheet).")
         else:

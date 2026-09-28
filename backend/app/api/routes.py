@@ -15,7 +15,7 @@ from sqlalchemy.orm import Session
 
 from .. import audit
 from ..db import get_db
-from ..engines import bbn, crm, eta, fatigue, fmea, fta, hra, lopa, orc, rbd, security, sej, sim
+from ..engines import bbn, crm, eta, fatigue, fmea, fta, hra, lopa, orc, rbd, security, sej, sim, wildlife
 from ..engines import risk as risk_engine
 from ..models import (ASSESSMENT_STATES, METHODS, ROLES, Action, Approval, Assessment, AuditLog, Control, Hazard,
                       Project, RiskScheme, Study, User)
@@ -882,6 +882,11 @@ class SecIn(BaseModel):
     c: int
     i: int
     a: int
+
+
+@router.post("/calc/wildlife")
+def calc_wildlife(model: dict, _: User = Depends(current_user)):
+    return _calc(wildlife.analyse, model)
 
 
 @router.post("/calc/security")

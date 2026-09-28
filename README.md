@@ -1,10 +1,10 @@
 # ARAP — AirNav Risk Analysis Platform
 
-ARAP is a web application for conducting air navigation safety risk assessments with the 25 methods of the **AirNav Risk Analysis Manual** (edition 0.2):
+ARAP is a web application for conducting air navigation safety risk assessments with the 26 methods of the **AirNav Risk Analysis Manual** (edition 0.3):
 
 **Core (Manual ch. 6–17):** Bowtie · HAZID · HAZOP · JHA · FMEA/FMECA · LOPA · FHA · STPA · FTA · bio-mathematical fatigue modelling (three-process model) · FRAM · Bayesian belief networks
 
-**Extended (Manual ch. 18–30):** collision risk modelling (Reich) · event tree analysis · human reliability (HEART/CARA) · occurrence risk classification (ARMS ERC / EUROCONTROL RAT) · GSN safety arguments · common cause analysis (ZSA/PRA/CMA) · RBD and Markov availability · SWIFT · hierarchical task analysis · real-/fast-time simulation evidence · structured expert judgement (Cooke, Delphi) · security risk with safety impact (ISO/IEC 27005, ED-205) · occurrence investigation (SOAM, HFACS, Tripod Beta)
+**Extended (Manual ch. 18–30):** collision risk modelling (Reich) · event tree analysis · human reliability (HEART/CARA) · occurrence risk classification (ARMS ERC / EUROCONTROL RAT) · GSN safety arguments · common cause analysis (ZSA/PRA/CMA) · RBD and Markov availability · SWIFT · hierarchical task analysis · real-/fast-time simulation evidence · structured expert judgement (Cooke, Delphi) · security risk with safety impact (ISO/IEC 27005, ED-205) · occurrence investigation (SOAM, HFACS, Tripod Beta) · species-based wildlife strike risk (ch. 31)
 
 It provides one hazard log and one risk classification scheme across all methods, a review/endorse/accept workflow with locking and versioning, an audit trail, a dashboard, and a Word Safety Assessment Report.
 
@@ -17,7 +17,7 @@ It provides one hazard log and one risk classification scheme across all methods
 | [Software Requirements Specification](docs/AirNav_Risk_Analysis_Software_Requirements.pdf) | Requirements, calculation specs, reference tests, recommended stack (App. C) |
 | [Architecture notes](docs/ARCHITECTURE.md) | Code structure, data model, engines |
 
-> **Status: version 0.2 (pilot).** Numbers in the demo data are the Manual's illustrative worked examples, not AirNav data. See [User guide §20](docs/USER_GUIDE.md#20-what-version-02-does-not-do-yet) for what is not yet implemented.
+> **Status: version 0.3 (pilot).** Numbers in the demo data are the Manual's illustrative worked examples, not AirNav data. See [User guide §20](docs/USER_GUIDE.md#20-what-version-03-does-not-do-yet) for what is not yet implemented.
 
 ---
 
@@ -32,7 +32,7 @@ Follows SRS Appendix C:
 | Worksheets | AG Grid Community |
 | Charts | Apache ECharts |
 | Back end | Python 3.12, FastAPI, Pydantic, SQLAlchemy 2, Alembic |
-| Engines | In-house, versioned: BDD fault-tree engine, exact Bayesian variable elimination, three-process fatigue model, LOPA, FMEA/FMECA, risk matrix; Reich collision risk, event trees, HEART/CARA, ARMS ERC / RAT, RBD and Markov, Cooke's classical model and Delphi, simulation statistics, security scoring (NumPy, SciPy) |
+| Engines | In-house, versioned: BDD fault-tree engine, exact Bayesian variable elimination, three-process fatigue model, LOPA, FMEA/FMECA, risk matrix; Reich collision risk, event trees, HEART/CARA, ARMS ERC / RAT, RBD and Markov, Cooke's classical model and Delphi, simulation statistics, security scoring, wildlife species risk (NumPy, SciPy) |
 | Database | PostgreSQL 16 (SQLite for local development and tests) |
 | Reports | python-docx |
 | Packaging | Docker Compose (PostgreSQL + API + nginx); GitHub Actions CI in `.github/workflows/` |
@@ -52,7 +52,7 @@ docker compose up -d --build
 
 Open **http://localhost:8080** and sign in as `admin` with the password from `.env`.
 
-With `ARAP_SEED_DEMO=true` (the default) three demo projects (DEMO-01 for the core methods, DEMO-02 for the extended methods, DEMO-03 the H24 alternate-aerodrome SRA case study) with one study per method and demo users (password `demo1234`) is created: `assessor`, `reviewer`, `director`, `accexec`, `viewer`. **Set `ARAP_SEED_DEMO=false` and change all passwords for real use.**
+With `ARAP_SEED_DEMO=true` (the default) three demo projects (DEMO-01 for the core methods, DEMO-02 for the extended methods including the cattle-egret wildlife example, DEMO-03 the H24 alternate-aerodrome SRA case study) with one study per method and demo users (password `demo1234`) is created: `assessor`, `reviewer`, `director`, `accexec`, `viewer`. **Set `ARAP_SEED_DEMO=false` and change all passwords for real use.**
 
 The API applies database migrations (`alembic upgrade head`) on start-up. Interactive API documentation (OpenAPI) is at `http://localhost:8080/api/docs`.
 
@@ -98,7 +98,7 @@ pytest -q                                   # SQLite
 ARAP_DATABASE_URL=postgresql+psycopg://... pytest -q -p no:cacheprovider   # PostgreSQL
 ```
 
-The suite has 48 tests. They include the **reference test cases of SRS §9**: every calculation engine must reproduce the Manual's worked examples. For example, fault-tree top event 1.22 × 10⁻⁶, LOPA 2.5 × 10⁻⁵/yr, Bayesian posterior P(fatigue | loss of separation) = 0.390, fatigue-model minimum alertness 5.18 at 05:55, RVSM vertical collision risk 1.873 × 10⁻⁹, minimum lateral route spacing 11.68 NM, CARA HEP 2.016 × 10⁻³, Markov unavailability 2.04 × 10⁻⁶ and Cooke expert weight 0.814. The Bayesian engine is also checked against brute-force enumeration. The API tests cover roles, the approval workflow, acceptance authority, locking, versioning, hazard promotion, exports and audit.
+The suite has 50 tests. They include the **reference test cases of SRS §9**: every calculation engine must reproduce the Manual's worked examples. For example, fault-tree top event 1.22 × 10⁻⁶, LOPA 2.5 × 10⁻⁵/yr, Bayesian posterior P(fatigue | loss of separation) = 0.390, fatigue-model minimum alertness 5.18 at 05:55, RVSM vertical collision risk 1.873 × 10⁻⁹, minimum lateral route spacing 11.68 NM, CARA HEP 2.016 × 10⁻³, Markov unavailability 2.04 × 10⁻⁶ and Cooke expert weight 0.814. The Bayesian engine is also checked against brute-force enumeration. The API tests cover roles, the approval workflow, acceptance authority, locking, versioning, hazard promotion, exports and audit.
 
 GitHub Actions (`.github/workflows/ci.yml`) runs the back-end tests on SQLite and PostgreSQL and builds the front end on every push and pull request.
 

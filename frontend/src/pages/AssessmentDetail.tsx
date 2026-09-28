@@ -16,7 +16,7 @@ const RECOMMEND: Record<string, string[]> = {
   procedure: ['hazid', 'hazop', 'hta', 'hra', 'stpa', 'bowtie', 'lopa', 'sim', 'gsn'],
   airspace: ['hazid', 'hazop', 'crm', 'eta', 'hra', 'bowtie', 'lopa', 'sim', 'gsn'],
   organisational: ['hazid', 'fatigue', 'jha', 'bowtie'],
-  temporary: ['swift', 'hazid', 'jha', 'bowtie'],
+  temporary: ['swift', 'hazid', 'jha', 'bowtie', 'wildlife'],
 }
 
 const ACTIONS: Record<string, { label: string; from: string[]; roles: string[]; danger?: boolean; comment?: boolean }> = {

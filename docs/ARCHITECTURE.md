@@ -1,4 +1,4 @@
-# ARAP architecture notes (v0.2)
+# ARAP architecture notes (v0.3)
 
 ## Overview
 
@@ -23,8 +23,9 @@ The back end is a single modular application (a "modular monolith", as recommend
 | `reports.py` | Safety Assessment Report (DOCX) |
 | `templates.py` | Method catalogue and worksheet templates (guidewords, columns, UCA types, FRAM aspects) |
 | `demo.py`, `seed.py` | The Manual's worked examples (chapters 6–17) as demo data and test oracles |
-| `demo2.py`, `seed2.py` | Worked examples of chapters 18–30 (project DEMO-02) and their reference inputs |
-| `engines/` | `risk`, `fta`, `lopa`, `fmea`, `bbn`, `fatigue`; v0.2: `crm`, `eta`, `hra`, `orc`, `rbd`, `sej`, `sim`, `security` |
+| `demo2.py`, `seed2.py`, `seed_wildlife.py` | Worked examples of chapters 18–31 (project DEMO-02) and their reference inputs; the wildlife study is also added to existing databases on start-up |
+| `demo3.py` | DEMO-03: the H24 alternate-aerodrome SRA case study |
+| `engines/` | `risk`, `fta`, `lopa`, `fmea`, `bbn`, `fatigue`; v0.2: `crm`, `eta`, `hra`, `orc`, `rbd`, `sej`, `sim`, `security`; v0.3: `wildlife` |
 
 ### Data model
 
@@ -62,6 +63,7 @@ Method-specific objects (bowtie paths and barriers, HAZOP nodes, fault-tree gate
 | `sej` | Cooke's classical model (calibration by χ², information, α cut-off, performance- and equal-weight decision makers); Delphi round statistics. |
 | `sim` | Descriptive statistics, 95% CI, Welch's t-test, success criteria. |
 | `security` | L × max(C, I, A) scoring and levels. |
+| `wildlife` | Species strike risk: likelihood from strikes per year, severity from damaging share or body-mass/flocking surrogate, L × S banding, rate per 10,000 movements and trend. |
 
 ## Front end (`frontend/src`)
 
@@ -73,7 +75,7 @@ Method-specific objects (bowtie paths and barriers, HAZOP nodes, fault-tree gate
 | `risk.ts` | Client-side mirror of matrix classification for display (the server stays authoritative) |
 | `pages/` | Dashboard, projects, assessment, study host, hazard log, actions, risk scheme, users, audit, guide |
 | `components/` | Risk matrix picker, risk tags, generic AG Grid worksheet (incl. SWIFT and security kinds), `EditableTable` for small inline lists |
-| `methods/` | One editor per method: `BowtieEditor` + `bowtieLayout`, `WorksheetEditor` (HAZID, HAZOP, JHA, FMEA, FHA), `LopaEditor`, `FtaEditor` (ELK layout), `FatigueEditor`, `BbnEditor`, `StpaEditor`, `FramEditor`; v0.2: `CrmEditor`, `EtaEditor`, `HraEditor`, `OrcEditor`, `GsnEditor` (ELK), `CcaEditor`, `RbdEditor`, `HtaEditor` (ELK), `SimEditor`, `SejEditor`, `InvEditor`; SWIFT and security use `WorksheetEditor` |
+| `methods/` | One editor per method: `BowtieEditor` + `bowtieLayout`, `WorksheetEditor` (HAZID, HAZOP, JHA, FMEA, FHA), `LopaEditor`, `FtaEditor` (ELK layout), `FatigueEditor`, `BbnEditor`, `StpaEditor`, `FramEditor`; v0.2: `CrmEditor`, `EtaEditor`, `HraEditor`, `OrcEditor`, `GsnEditor` (ELK), `CcaEditor`, `RbdEditor`, `HtaEditor` (ELK), `SimEditor`, `SejEditor`, `InvEditor`, `WildlifeEditor`; SWIFT and security use `WorksheetEditor` |
 
 Method editors are lazy-loaded. Each receives `{model, setModel, results, setResults, readOnly, scheme, template, promote}` from `StudyPage`, which owns saving and hazard-log promotion.
 

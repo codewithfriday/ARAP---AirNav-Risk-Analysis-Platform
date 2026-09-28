@@ -7,6 +7,15 @@ import { classify, fmtSci, objective } from '../risk'
 
 const theme = themeQuartz.withParams({ headerBackgroundColor: '#1F3A5F', headerTextColor: '#ffffff', fontSize: 12.5, rowHeight: 34, headerHeight: 36, wrapperBorderRadius: 8 })
 
+/** Security risk = likelihood × max(C, I, A) on 1–5 scales (Manual §29.3). */
+export function secRisk(r: any) {
+  const imp = Math.max(Number(r?.c) || 0, Number(r?.i) || 0, Number(r?.a) || 0), l = Number(r?.likelihood) || 0
+  if (!imp || !l) return null
+  const score = imp * l
+  const [level, color] = score >= 15 ? ['Very high', '#B23A3A'] : score >= 10 ? ['High', '#D98E04'] : score >= 5 ? ['Medium', '#C9A227'] : ['Low', '#3C8D5A']
+  return { score, level, color }
+}
+
 export type ColSpec = [string, string, number, string?]
 
 /** Generic spreadsheet-style worksheet driven by the method template columns (SRS HZD/HZP/JHA/FME/FHA). */
@@ -21,6 +30,9 @@ export function Worksheet({ columns, rows, onChange, scheme, readOnly, options, 
     if (field === 'id') { base.pinned = 'left' }
     if (kind === 'severity') return { ...base, cellEditor: 'agSelectCellEditor', cellEditorParams: { values: ['', 'A', 'B', 'C', 'D', 'E'] } }
     if (kind === 'likelihood') return { ...base, cellEditor: 'agSelectCellEditor', cellEditorParams: { values: ['', 5, 4, 3, 2, 1] }, valueParser: (p) => (p.newValue === '' ? null : Number(p.newValue)) }
+    if (kind === 'int5') return { ...base, cellEditor: 'agNumberCellEditor', cellEditorParams: { min: 1, max: 5, precision: 0 } }
+    if (kind === 'computed' && field === 'sec_risk') return { ...base, filter: false, valueGetter: (p) => secRisk(p.data)?.score ?? null,
+      cellRenderer: (p: any) => { const r = secRisk(p.data); return r ? <span className="risk-cell" style={{ background: r.color }}>{r.score} {r.level}</span> : '' } }
     if (kind === 'int10') return { ...base, cellEditor: 'agNumberCellEditor', cellEditorParams: { min: 1, max: 10, precision: 0 } }
     if (kind === 'number') return { ...base, cellEditor: 'agNumberCellEditor', valueFormatter: (p) => (p.value === null || p.value === undefined || p.value === '' ? '' : fmtSci(Number(p.value))) }
     if (kind === 'bool') return { ...base, cellDataType: 'boolean', cellEditor: 'agCheckboxCellEditor', cellRenderer: 'agCheckboxCellRenderer' }

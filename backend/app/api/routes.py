@@ -15,7 +15,7 @@ from sqlalchemy.orm import Session
 
 from .. import audit
 from ..db import get_db
-from ..engines import bbn, fatigue, fmea, fta, lopa
+from ..engines import bbn, crm, eta, fatigue, fmea, fta, hra, lopa, orc, rbd, security, sej, sim
 from ..engines import risk as risk_engine
 from ..models import (ASSESSMENT_STATES, METHODS, ROLES, Action, Approval, Assessment, AuditLog, Control, Hazard,
                       Project, RiskScheme, Study, User)
@@ -96,7 +96,9 @@ def methods(_: User = Depends(current_user)):
 @router.get("/meta/engines")
 def engines(_: User = Depends(current_user)):
     return {"risk": risk_engine.ENGINE_VERSION, "fta": fta.ENGINE_VERSION, "lopa": lopa.ENGINE_VERSION,
-            "fmea": fmea.ENGINE_VERSION, "bbn": bbn.ENGINE_VERSION, "fatigue": fatigue.ENGINE_VERSION}
+            "fmea": fmea.ENGINE_VERSION, "bbn": bbn.ENGINE_VERSION, "fatigue": fatigue.ENGINE_VERSION,
+            "crm": crm.ENGINE_VERSION, "eta": eta.ENGINE_VERSION, "hra": hra.ENGINE_VERSION, "orc": orc.ENGINE_VERSION,
+            "rbd": rbd.ENGINE_VERSION, "sej": sej.ENGINE_VERSION, "sim": sim.ENGINE_VERSION, "security": security.ENGINE_VERSION}
 
 
 @router.get("/risk/scheme")
@@ -344,6 +346,17 @@ def create_study(body: StudyIn, db: Session = Depends(get_db), u: User = Depends
     db.add(s); db.flush()
     audit.record(db, u.username, "study", s.id, "create", after={"method": s.method, "title": s.title}); db.commit()
     return to_dict(s)
+
+
+@router.get("/studies")
+def list_studies(method: str | None = None, db: Session = Depends(get_db), _: User = Depends(current_user)):
+    """Index of all studies (id, method, title, status, assessment) — used to link GSN solutions to evidence."""
+    q = db.query(Study)
+    if method:
+        q = q.filter_by(method=method)
+    return [{"id": s.id, "method": s.method, "title": s.title, "status": s.status,
+             "assessment": {"id": s.assessment.id, "title": s.assessment.title, "status": s.assessment.status}}
+            for s in q.order_by(Study.id)]
 
 
 @router.get("/studies/{sid}")
@@ -739,3 +752,162 @@ def audit_log(entity: str | None = None, limit: int = Query(200, le=2000), db: S
     if entity:
         q = q.filter_by(entity=entity)
     return [to_dict(x) for x in q.order_by(AuditLog.at.desc()).limit(limit)]
+
+
+# ================================================================ v0.2 calculation endpoints
+def _calc(fn, *a, **k):
+    try:
+        return fn(*a, **k)
+    except (ValueError, KeyError, TypeError) as e:
+        raise HTTPException(422, f"{type(e).__name__}: {e}")
+
+
+class CRMIn(BaseModel):
+    dimension: str = "vertical"          # vertical | lateral
+    params: dict
+    curve: dict | None = None            # {"model","scale","lam_y","spacings":[...]} for lateral
+
+
+@router.post("/calc/crm")
+def calc_crm(body: CRMIn, _: User = Depends(current_user)):
+    p = body.params
+    if body.dimension == "vertical":
+        return _calc(crm.vertical, **p)
+    res = _calc(crm.lateral, **p)
+    if body.curve:
+        c = body.curve
+        other = {k: p[k] for k in ("lx", "lz", "sx", "dv", "v", "zdot", "ydot_sy")} | {"pz0": p["pz0"], "ey_same": p["ey_same"], "ey_opp": p["ey_opp"], "tls": p.get("tls", 5e-9)}
+        res["curve"] = _calc(crm.spacing_curve, c["lam_y"], c["model"], c["scale"], c["spacings"], other)
+        res["minimum_spacing"] = _calc(crm.minimum_spacing, c["lam_y"], c["model"], c["scale"], other)
+    return res
+
+
+class OverlapIn(BaseModel):
+    spacing: float
+    lam_y: float
+    model: str = "laplace"
+    scale: float
+
+
+@router.post("/calc/crm/overlap")
+def calc_overlap(body: OverlapIn, _: User = Depends(current_user)):
+    return {"py_sy": _calc(crm.lateral_overlap, body.spacing, body.lam_y, body.model, body.scale)}
+
+
+@router.post("/calc/eta")
+def calc_eta(model: dict, _: User = Depends(current_user)):
+    return _calc(eta.analyse, model)
+
+
+class HRAIn(BaseModel):
+    library: str
+    gtt: str
+    epcs: list[dict] = []
+
+
+@router.post("/calc/hra")
+def calc_hra(body: HRAIn, _: User = Depends(current_user)):
+    return _calc(hra.assess, body.library, body.gtt, body.epcs)
+
+
+@router.get("/meta/hra")
+def hra_libraries(_: User = Depends(current_user)):
+    return {k: {"gtt": {c: {"description": d, "hep": v} for c, (d, v) in lib["gtt"].items()},
+                "epc": {c: {"description": d, "max_effect": v} for c, (d, v) in lib["epc"].items()}} for k, lib in hra.LIBRARIES.items()}
+
+
+class ERCIn(BaseModel):
+    outcome: str
+    barriers: str
+
+
+@router.post("/calc/erc")
+def calc_erc(body: ERCIn, _: User = Depends(current_user)):
+    return _calc(orc.erc, body.outcome, body.barriers)
+
+
+@router.post("/calc/rat")
+def calc_rat(answers: dict, _: User = Depends(current_user)):
+    return _calc(orc.rat, answers)
+
+
+@router.get("/meta/orc")
+def orc_meta(_: User = Depends(current_user)):
+    return {"erc": {"outcomes": orc.ERC_OUTCOMES, "barriers": orc.ERC_BARRIERS, "matrix": orc.ERC_MATRIX,
+                    "bands": [{"threshold": t, "band": b, "meaning": m} for t, b, m in orc.ERC_BANDS]},
+            "rat": {k: {"label": v["label"], "options": {o: {"label": l, "points": p} for o, (l, p) in v["options"].items()}}
+                    for k, v in orc.RAT_ITEMS.items()}}
+
+
+@router.post("/calc/rbd")
+def calc_rbd(structure: dict, _: User = Depends(current_user)):
+    return _calc(rbd.rbd, structure)
+
+
+class MarkovIn(BaseModel):
+    states: list[dict]
+    transitions: list[dict]
+    initial: str | None = None
+
+
+@router.post("/calc/markov")
+def calc_markov(body: MarkovIn, _: User = Depends(current_user)):
+    return _calc(rbd.markov, body.states, body.transitions, body.initial)
+
+
+class SEJIn(BaseModel):
+    experts: list[str]
+    items: list[dict]
+    alpha: float = 0.0
+    overshoot: float = 0.1
+
+
+@router.post("/calc/sej")
+def calc_sej(body: SEJIn, _: User = Depends(current_user)):
+    return _calc(sej.classical, body.experts, body.items, body.alpha, body.overshoot)
+
+
+@router.post("/calc/delphi")
+def calc_delphi(rounds: list[dict], _: User = Depends(current_user)):
+    return _calc(sej.delphi, rounds)
+
+
+@router.post("/calc/sim")
+def calc_sim(measures: list[dict], _: User = Depends(current_user)):
+    return _calc(sim.analyse, measures)
+
+
+class SecIn(BaseModel):
+    likelihood: int
+    c: int
+    i: int
+    a: int
+
+
+@router.post("/calc/security")
+def calc_security(body: SecIn, _: User = Depends(current_user)):
+    return _calc(security.score, body.likelihood, body.c, body.i, body.a)
+
+
+@router.get("/barriers")
+def list_barriers(db: Session = Depends(get_db), _: User = Depends(current_user)):
+    """All bowtie barriers across studies — used to link failed barriers in investigations (HZL-05)."""
+    out = []
+    for s in db.query(Study).filter_by(method="bowtie"):
+        for b in (s.model or {}).get("barriers", {}).values():
+            out.append({"study_id": s.id, "study_title": s.title, "barrier_id": b["id"], "text": b["text"],
+                        "top_event": (s.model or {}).get("top_event", "")})
+    return out
+
+
+@router.get("/barriers/failures")
+def barrier_failures(db: Session = Depends(get_db), _: User = Depends(current_user)):
+    """Count, per bowtie barrier, how many investigations recorded it as failed or absent."""
+    counts: dict[str, dict] = {}
+    for s in db.query(Study).filter_by(method="inv"):
+        for fb in (s.model or {}).get("soam", {}).get("barriers", []):
+            link = fb.get("bowtie_link")
+            if link:
+                c = counts.setdefault(link, {"link": link, "count": 0, "investigations": []})
+                c["count"] += 1; c["investigations"].append(s.title)
+    return list(counts.values())

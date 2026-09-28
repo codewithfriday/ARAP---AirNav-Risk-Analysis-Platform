@@ -17,6 +17,17 @@ const EDITORS: Record<string, any> = {
   bbn: lazy(() => import('../methods/BbnEditor')),
   stpa: lazy(() => import('../methods/StpaEditor')),
   fram: lazy(() => import('../methods/FramEditor')),
+  crm: lazy(() => import('../methods/CrmEditor')),
+  eta: lazy(() => import('../methods/EtaEditor')),
+  hra: lazy(() => import('../methods/HraEditor')),
+  orc: lazy(() => import('../methods/OrcEditor')),
+  gsn: lazy(() => import('../methods/GsnEditor')),
+  cca: lazy(() => import('../methods/CcaEditor')),
+  rbd: lazy(() => import('../methods/RbdEditor')),
+  hta: lazy(() => import('../methods/HtaEditor')),
+  sim: lazy(() => import('../methods/SimEditor')),
+  sej: lazy(() => import('../methods/SejEditor')),
+  inv: lazy(() => import('../methods/InvEditor')),
 }
 const Worksheet = lazy(() => import('../methods/WorksheetEditor'))
 

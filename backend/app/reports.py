@@ -1,4 +1,4 @@
-"""Safety Assessment Report (DOCX) following Manual §18.3 (REP-01, REP-02)."""
+"""Safety Assessment Report (DOCX) following Manual §31.3 (REP-01, REP-02)."""
 import io
 from datetime import date
 
@@ -75,6 +75,33 @@ def assessment_docx(a: dict, studies: list[dict], engines: dict) -> bytes:
             doc.add_paragraph(f"Hazard: {m.get('hazard', '')}. Top event: {m.get('top_event', '')}. "
                               f"{len(m.get('threats', []))} threats, {len(m.get('consequences', []))} consequences, "
                               f"{len(m.get('barriers', {}))} barriers.")
+        elif s["method"] == "eta" and res.get("sequences"):
+            _table(doc, ["Sequence", "Outcome", "Severity", "Frequency"],
+                   [[x["sequence"], x["label"], x.get("severity") or "", f"{x['frequency']:.2e}"] for x in res["sequences"]])
+        elif s["method"] == "crm" and res.get("vertical"):
+            v = res["vertical"]
+            doc.add_paragraph(f"Vertical collision risk {v['total']:.2e} per flight hour against TLS {v['tls']:.1e}: "
+                              f"{'meets' if v['meets_tls'] else 'does not meet'} the TLS.")
+        elif s["method"] == "hra" and res.get("tasks"):
+            _table(doc, ["Task", "Library / GTT", "Nominal HEP", "Assessed HEP"],
+                   [[t["id"], f"{t['library'].upper()} {t['gtt']}", f"{t['nominal_hep']:.2g}", f"{t['hep']:.3g}"] for t in res["tasks"]])
+        elif s["method"] == "rbd" and res.get("rbd"):
+            doc.add_paragraph(f"RBD availability {res['rbd']['availability']:.6f} ({res['rbd']['downtime_hours_per_year']:.2f} h/year downtime). "
+                              + (f"Markov unavailability {res['markov']['unavailability']:.2e}." if res.get("markov") else ""))
+        elif s["method"] == "sim" and res.get("measures"):
+            _table(doc, ["Measure", "Baseline mean", "Solution mean", "p", "Criterion met"],
+                   [[x["label"], f"{x['baseline'].get('mean', 0):.3g}", f"{x['solution'].get('mean', 0):.3g}",
+                     f"{x.get('p_value', float('nan')):.2g}", str(x.get("criterion_met"))] for x in res["measures"]])
+        elif s["method"] == "sej" and res.get("classical"):
+            _table(doc, ["Expert", "Calibration", "Information", "Weight"],
+                   [[k, f"{v['calibration']:.3f}", f"{v['information']:.3f}", f"{v['weight']:.3f}"] for k, v in res["classical"]["experts"].items()])
+        elif s["method"] == "orc" and m.get("occurrences"):
+            doc.add_paragraph(f"{len(m['occurrences'])} occurrences classified (ERC / RAT).")
+        elif s["method"] == "gsn" and m.get("nodes"):
+            doc.add_paragraph(f"Safety argument with {sum(1 for n in m['nodes'] if n['type'] == 'goal')} goals and "
+                              f"{sum(1 for n in m['nodes'] if n['type'] == 'solution')} solutions.")
+        elif s["method"] == "inv" and m.get("occurrence"):
+            doc.add_paragraph(f"Investigation {m['occurrence'].get('ref', '')}: {m['occurrence'].get('summary', '')}")
         elif m.get("rows"):
             doc.add_paragraph(f"{len(m['rows'])} worksheet rows recorded (see ARAP for the full worksheet).")
         else:

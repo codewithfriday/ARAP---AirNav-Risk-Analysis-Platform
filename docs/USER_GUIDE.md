@@ -1,8 +1,8 @@
 # ARAP User Guide
 
-**AirNav Risk Analysis Platform — version 0.1**
+**AirNav Risk Analysis Platform — version 0.2**
 
-ARAP is the web application that implements the *AirNav Risk Analysis Manual*. It lets AirNav staff plan, run, review and approve safety risk assessments with twelve methods, keeps every hazard in one hazard log, and produces the Safety Assessment Report.
+ARAP is the web application that implements the *AirNav Risk Analysis Manual*. It lets AirNav staff plan, run, review and approve safety risk assessments with twenty-five methods, keeps every hazard in one hazard log, and produces the Safety Assessment Report.
 
 This guide explains how to use the application. For *why* and *when* to use each method, see the Manual (`docs/AirNav_Risk_Analysis_Manual.pdf`). For the formal requirements, see the SRS (`docs/AirNav_Risk_Analysis_Software_Requirements.pdf`).
 
@@ -22,13 +22,14 @@ This guide explains how to use the application. For *why* and *when* to use each
 10. [Bayesian belief networks](#10-bayesian-belief-networks)
 11. [STPA](#11-stpa)
 12. [FRAM](#12-fram)
-13. [The hazard log](#13-the-hazard-log)
-14. [Actions](#14-actions)
-15. [Review, approval and locking](#15-review-approval-and-locking)
-16. [Reports and exports](#16-reports-and-exports)
-17. [Administration](#17-administration)
-18. [Troubleshooting and FAQ](#18-troubleshooting-and-faq)
-19. [What version 0.1 does not do yet](#19-what-version-01-does-not-do-yet)
+13. [Extended methods: CRM, ETA, HRA, ERC/RAT, GSN, CCA, RBD/Markov, SWIFT, HTA, simulation, expert judgement, security, investigation](#13-extended-methods-manual-chapters-1830)
+14. [The hazard log](#14-the-hazard-log)
+15. [Actions](#15-actions)
+16. [Review, approval and locking](#16-review-approval-and-locking)
+17. [Reports and exports](#17-reports-and-exports)
+18. [Administration](#18-administration)
+19. [Troubleshooting and FAQ](#19-troubleshooting-and-faq)
+20. [What version 0.2 does not do yet](#20-what-version-02-does-not-do-yet)
 
 ---
 
@@ -303,11 +304,121 @@ The STPA study follows the four steps of the STPA Handbook, one tab each.
 
 ---
 
-## 13. The hazard log
+## 13. Extended methods (Manual chapters 18–30)
+
+Version 0.2 adds thirteen methods. They all work like the others: open the study, edit, press **Calculate** where there is one, and **Save**. The demo project **DEMO-02** has one worked example of each, matching the Manual.
+
+### 13.1 Collision risk — CRM (Manual §18)
+
+![CRM lateral spacing](screenshots/v2-crm-lateral.png)
+
+Two tabs. **Vertical (RVSM)** takes the Reich-model parameters: overlap probabilities, occupancies, speeds and aircraft dimensions (entered in feet). **Calculate** shows the same- and opposite-direction risk, the total and whether it meets the target level of safety (TLS). **Lateral (route spacing)** also asks for the lateral-deviation model (double exponential or Gaussian) and its scale. It plots risk against route spacing on a log scale and gives the **minimum spacing** that meets the TLS. The demo gives 1.87 × 10⁻⁹ (vertical) and 11.7 NM (lateral).
+
+### 13.2 Event tree analysis — ETA (Manual §19)
+
+![Event tree](screenshots/v2-eta.png)
+
+1. Enter the initiating event and its frequency.
+2. List the barriers **in the order they act**, with their probability of success.
+3. Under **Conditional probabilities**, enter any dependence as a path prefix. For example, `F` / `B2` / 0.8 means "STCA succeeds 80% of the time when the controller has already failed".
+4. Press **Calculate**. ARAP draws the tree and lists each sequence with its probability and frequency.
+5. Name each outcome and give it a severity, then recalculate. The totals by severity appear under the table.
+
+### 13.3 Human reliability — HRA (Manual §20)
+
+![HRA](screenshots/v2-hra.png)
+
+Add a task and choose **CARA** (controller tasks) or **HEART** (other tasks) and the generic task type. Add error-producing conditions from the list. For each one, set the **APOA** slider (0–1) and write a justification. The HEP updates as you edit. **Calculate all** runs the server engine for the record.
+
+### 13.4 Occurrence risk classification — ERC and RAT (Manual §21)
+
+![ERC](screenshots/v2-orc.png)
+
+- **Add an occurrence.** Add a short description, date and occurrence ID.
+- **ARMS ERC.** Click the matrix cell that answers Q1 (most credible accident outcome) and Q2 (effectiveness of the remaining barriers). The band and recommended response are shown.
+- **RAT scoring.** Pick one answer per item. ARAP adds the points for risk of collision and controllability. Record the ESARR 2 severity class that you read from the EUROCONTROL RAT table.
+- **Send red-band occurrences to hazard log.** Creates hazard entries for the red-band occurrences.
+
+### 13.5 Safety argument — GSN (Manual §22)
+
+![GSN](screenshots/v2-gsn.png)
+
+- **Build the argument.** Click an element to edit it. Use **+ goal / + strategy / + solution / + context / + assumption / + justification** to add elements below it. ARAP lays out the diagram automatically.
+- **Link evidence.** For a **solution**, link the evidence: an ARAP study, a hazard log entry or an external document. The solution shows the evidence status in green (complete or accepted) or red (still provisional).
+- **Argument checks.** This panel lists structural problems: more than one top goal, unsupported goals, strategies supported by something other than goals, solutions without evidence, and cycles. Mark a goal **undeveloped** when its support is still to come.
+
+### 13.6 Common cause analysis — CCA (Manual §23)
+
+![CCA](screenshots/v2-cca.png)
+
+Three worksheets: **Zonal safety analysis**, **Particular risks** and **Common mode analysis**. On the common-mode tab, **Import claims from FTA** creates one independence claim for every AND or k-out-of-n gate in a chosen fault tree. For each claim, record the common-mode source and whether independence holds. The tags at the top count unsupported claims and particular risks that defeat redundancy. **Send failures of independence to hazard log** passes them on.
+
+### 13.7 RBD and Markov (Manual §24)
+
+![RBD](screenshots/v2-rbd.png)
+
+- **RBD tab.** Click a group or block to edit it. Groups can be **series**, **parallel** or **k-out-of-n**. Blocks have MTBF and MTTR. Add elements inside a group with the **+** buttons.
+- **Calculate availability.** Gives availability, unavailability and downtime per year, plus a chart of how many minutes a year each block would save if it were perfect.
+- **Markov model tab.** Define states (tick *Service up?*) and transitions with rates per hour, then press **Solve**. You get steady-state probabilities, availability, failure frequency, system MTBF, mean down time and mean time to first failure.
+
+![Markov](screenshots/v2-markov.png)
+
+### 13.8 SWIFT (Manual §25)
+
+A worksheet like HAZID. Each row is a *what if…?* question under a prompt category, with consequence, safeguards, severity, likelihood and recommendation. **Prompt category coverage** shows which categories have been considered. Use it to record "considered — nothing credible" for the rest. Rows with a consequence can be sent to the hazard log.
+
+### 13.9 Hierarchical task analysis — HTA (Manual §26)
+
+![HTA](screenshots/v2-hta.png)
+
+- **Build the hierarchy.** Select a task and press **Sub-task** to add a step below it. Numbering is automatic (1, 1.1, 1.2 …).
+- **Add plans.** Write a **plan** for every task that has sub-tasks. Tasks without one are flagged in red.
+- **Record error modes.** Add error modes to bottom-level tasks.
+- **Link to HRA.** Choose a **linked HRA study** at the top, then link a task to one of its HRA tasks to show the HEP.
+- **Change the view.** The **Outline** tab shows the same content as an indented table.
+
+### 13.10 Simulation (Manual §27)
+
+![Simulation](screenshots/v2-sim.png)
+
+- **Plan the exercise.** Record the exercise plan: objectives, scenarios, participants and limitations.
+- **Define the measures.** For each measure, set whether lower or higher is better and a **criterion**. Use *threshold* (e.g. ≤ 3.5), or *no worse than baseline*, which takes an optional margin. Set the criteria **before** entering results.
+- **Enter the run results.** Enter them as comma-separated numbers for the baseline and the solution.
+- **Analyse.** You get the mean, standard deviation, 95% confidence interval, Welch's t-test and whether each criterion is met. You can send failed criteria to the hazard log.
+
+### 13.11 Expert judgement (Manual §28)
+
+![Expert judgement](screenshots/v2-sej.png)
+
+- **Classical model (Cooke).**
+  1. Add experts and questions.
+  2. Tick **Seed?** for calibration questions and enter the true value.
+  3. Enter each expert's 5%, 50% and 95% values. Quantiles that are incomplete or not increasing are flagged.
+  4. Press **Calculate weights** to get calibration, information and weight per expert, and the combined (decision-maker) distribution for every question.
+- **Delphi.** Add panellists and rounds and enter the estimates, then press **Summarise rounds** to see the median, quartiles and convergence per round.
+
+### 13.12 Security risk (Manual §29)
+
+![Security risk](screenshots/v2-sec.png)
+
+A worksheet of threat scenarios: asset, threat, source, vulnerability, C/I/A impact (1–5), likelihood (1–5), controls, treatment and owner. **Security risk** = likelihood × the highest of C, I and A, shown as Low / Medium / High / Very high. Give each scenario a **safety effect** (severity A–E) where it has one. Only those rows are sent to the safety hazard log, so exploit details stay in the security study.
+
+### 13.13 Occurrence investigation — SOAM, HFACS, Tripod Beta (Manual §30)
+
+![SOAM](screenshots/v2-soam.png)
+
+- **Occurrence** — the facts, the counts of failed barriers, HFACS categories and actions, and **Send occurrence to hazard log**.
+- **SOAM** — barriers (type and status), human involvement, contextual conditions, organisational factors and safety actions. The SOAM chart updates as you type. Link each failed or absent barrier to the **bowtie barrier** it corresponds to. The bowtie then shows "recorded as failed in N investigation(s)" when you select that barrier.
+- **HFACS** — tick categories in the four tiers and record the evidence for each.
+- **Tripod Beta** — event trios (agent, object, event) with failed or missing barriers traced to immediate cause, precondition, underlying cause and Basic Risk Factor. A BRF profile summarises them.
+
+---
+
+## 14. The hazard log
 
 ![Hazard log](screenshots/05-hazard-log.png)
 
-The hazard log is the single register of hazards from all studies (Manual §18.2). Search, filter by risk region, sort, and export to **CSV**. Overdue review dates are shown in red.
+The hazard log is the single register of hazards from all studies (Manual §31.2). Search, filter by risk region, sort, and export to **CSV**. Overdue review dates are shown in red.
 
 Click a hazard to open it:
 
@@ -321,7 +432,7 @@ Click a hazard to open it:
 
 ---
 
-## 14. Actions
+## 15. Actions
 
 ![Actions](screenshots/07-actions.png)
 
@@ -329,7 +440,7 @@ Actions have an owner, a due date, a status (open, in progress, closed) and an o
 
 ---
 
-## 15. Review, approval and locking
+## 16. Review, approval and locking
 
 | Status | Meaning | Next step and who does it |
 |---|---|---|
@@ -353,21 +464,21 @@ Every transition is recorded in the **review and approval history** and the audi
 
 ---
 
-## 16. Reports and exports
+## 17. Reports and exports
 
 | What | Where | Format |
 |---|---|---|
-| Safety Assessment Report (Manual §18.3) | Assessment page → **Report (.docx)** | Word |
+| Safety Assessment Report (Manual §31.3) | Assessment page → **Report (.docx)** | Word |
 | Hazard log | Hazard log → **CSV** | CSV (opens in Excel) |
 | Bowtie diagram | Bowtie editor → **PNG** / **SVG** | Image |
 
-The report includes scope, methods used, hazards and their risk ratings, study results (fault tree cut sets, LOPA verdict, fatigue indicators, Bayesian network probabilities), actions, the approval history, and the versions of the risk scheme and calculation engines used.
+The report includes scope, methods used, hazards and their risk ratings, study results (fault tree cut sets, LOPA verdict, fatigue indicators, Bayesian network probabilities, and for the extended methods the event-tree outcomes, collision risk, HEPs, availability, simulation statistics, expert weights, occurrence classifications, the GSN argument and the investigation findings), actions, the approval history, and the versions of the risk scheme and calculation engines used.
 
 ---
 
-## 17. Administration
+## 18. Administration
 
-### 17.1 Risk scheme
+### 18.1 Risk scheme
 
 **Risk scheme** shows the matrix, the tolerability regions with their required action and acceptance authority, and the likelihood levels with their quantitative bands.
 
@@ -375,17 +486,17 @@ The report includes scope, methods used, hazards and their risk ratings, study r
 
 Administrators can reassign cells: choose a region under **Paint region**, click the cells, then **Save as new version**. ARAP checks that every cell belongs to exactly one region. Existing assessments keep the version they were created with.
 
-### 17.2 Users
+### 18.2 Users
 
 **Users** (administrators only) lists accounts. Click one to edit, or **New user** to add one. Set the role, unit and — for authorities — the risk regions they may accept. Deactivate rather than delete leavers.
 
-### 17.3 Audit trail
+### 18.3 Audit trail
 
 **Audit trail** (reviewers and administrators) lists every create, change, approval and export with the user, time and changed fields. Filter by entity.
 
 ---
 
-## 18. Troubleshooting and FAQ
+## 19. Troubleshooting and FAQ
 
 **I can't edit a study or hazard.** Either your role is Viewer or Authority, or the assessment is endorsed/accepted/closed. Use **New version** on the assessment page (assessor or reviewer).
 
@@ -401,14 +512,15 @@ Administrators can reassign cells: choose a region under **Paint region**, click
 
 ---
 
-## 19. What version 0.1 does not do yet
+## 20. What version 0.2 does not do yet
 
-Version 0.1 covers the core workflow and all twelve methods. The following SRS items are planned for later releases:
+Version 0.2 covers the core workflow and all twenty-five methods. The following SRS items are planned for later releases:
 
-- Single sign-on through Keycloak / SAML / OIDC with MFA. Version 0.1 uses local accounts with JWT tokens.
+- Single sign-on through Keycloak / SAML / OIDC with MFA. Version 0.2 uses local accounts with JWT tokens.
 - Real-time co-editing of a diagram by several users, and the offline workshop pack.
 - Imports and exports in BowTieXP XML, Open-PSA MEF, XMLBIF, GeNIe and FRAM Model Visualiser formats.
 - File attachments (MinIO), e-mail notifications and reminders.
 - Integrations with the occurrence reporting, rostering and maintenance systems.
 - CAST (STPA for accident analysis), noisy-OR helpers for Bayesian networks, Monte Carlo uncertainty, and the full “braked” sleep-recovery form of the fatigue model.
 - An Apache Superset / Metabase reporting database.
+- For the extended methods: import of occurrences from the reporting system into the ERC/RAT module, CRM sensitivity cases, administrator editing of the CARA/HEART libraries, and restricted (need-to-know) access to security studies (SRS SRA-04).

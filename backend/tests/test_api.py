@@ -125,3 +125,51 @@ def test_empty_assessment_cannot_be_accepted(client, assessor, reviewer, admin):
     client.post(f"/api/assessments/{a['id']}/transition", json={"action": "endorse"}, headers=reviewer)
     r = client.post(f"/api/assessments/{a['id']}/transition", json={"action": "accept"}, headers=admin)
     assert r.status_code == 409 and "no hazards" in r.json()["detail"]
+
+
+def test_v2_demo_and_calc_endpoints(client, viewer):
+    from app import seed2 as S
+    projects = client.get("/api/projects", headers=viewer).json()
+    demo2 = next(p for p in projects if p["code"] == "DEMO-02")
+    a = client.get(f"/api/projects/{demo2['id']}", headers=viewer).json()["assessments"][0]
+    full = client.get(f"/api/assessments/{a['id']}", headers=viewer).json()
+    assert {s["method"] for s in full["studies"]} == {"crm", "eta", "hra", "orc", "gsn", "cca", "rbd", "swift", "hta", "sim", "sej", "sec", "inv"}
+    assert len(client.get("/api/meta/methods", headers=viewer).json()) == 25
+    v = client.post("/api/calc/crm", json={"dimension": "vertical", "params": S.CRM_VERTICAL}, headers=viewer).json()
+    assert abs(v["total"] - 1.873e-9) < 1e-11
+    L, m = S.CRM_LATERAL, S.CRM_LAT_MODEL
+    params = {k: L[k] for k in ("pz0", "lx", "lz", "sx", "dv", "v", "zdot", "ydot_sy", "tls")} | {"ey_same": L["ey_same"], "ey_opp": L["ey_opp"], "ly": m["lam_y"], "py_sy": 1e-6}
+    lat = client.post("/api/calc/crm", headers=viewer, json={"dimension": "lateral", "params": params,
+                      "curve": {"lam_y": m["lam_y"], "model": m["model"], "scale": m["scale"], "spacings": [10, 15]}}).json()
+    assert abs(lat["minimum_spacing"]["minimum_spacing"] - 11.68) < 0.01
+    assert abs(client.post("/api/calc/eta", json=S.ETA_MODEL, headers=viewer).json()["sequences"][-1]["frequency"] - 5e-5) < 1e-12
+    assert abs(client.post("/api/calc/hra", json=S.HRA_TASKS[0], headers=viewer).json()["hep"] - 0.002016) < 1e-9
+    assert client.post("/api/calc/hra", json={"library": "cara", "gtt": "ZZ"}, headers=viewer).status_code == 422
+    assert client.post("/api/calc/erc", json={"outcome": "Major accident", "barriers": "Limited"}, headers=viewer).json()["risk_index"] == 21
+    assert client.post("/api/calc/rat", json=S.RAT_CASE, headers=viewer).json()["severity_score"] == 7
+    assert abs(client.post("/api/calc/rbd", json=S.RBD_VHF, headers=viewer).json()["downtime_hours_per_year"] - 0.423) < 0.001
+    assert abs(client.post("/api/calc/markov", json=S.MARKOV_STANDBY, headers=viewer).json()["unavailability"] - 2.0396e-6) < 1e-9
+    sej = client.post("/api/calc/sej", json={"experts": S.SEJ_EXPERTS, "items": S.SEJ_ITEMS}, headers=viewer).json()
+    assert sej["experts"]["Expert C"]["weight"] < 1e-4
+    assert client.post("/api/calc/delphi", json=S.DELPHI_ROUNDS, headers=viewer).json()[2]["converging"]
+    assert all(x["criterion_met"] for x in client.post("/api/calc/sim", json=S.SIM_MEASURES, headers=viewer).json())
+    assert client.post("/api/calc/security", json={"likelihood": 3, "c": 1, "i": 5, "a": 3}, headers=viewer).json()["level"] == "Very high"
+    bars = client.get("/api/barriers", headers=viewer).json()
+    assert any(b["barrier_id"] == "PB2" for b in bars)
+    fails = client.get("/api/barriers/failures", headers=viewer).json()
+    assert any(f["link"].endswith(":PB3") for f in fails)
+    assert "cara" in client.get("/api/meta/hra", headers=viewer).json()
+    assert client.get("/api/meta/orc", headers=viewer).json()["erc"]["matrix"][0][3] == 2500
+    rep = client.get(f"/api/assessments/{a['id']}/report.docx", headers=viewer)
+    assert rep.status_code == 200
+
+
+def test_studies_index_and_barrier_links(client, viewer):
+    idx = client.get("/api/studies", headers=viewer).json()
+    assert len(idx) >= 25 and {"id", "method", "title", "assessment"} <= set(idx[0])
+    ftas = client.get("/api/studies?method=fta", headers=viewer).json()
+    assert ftas and all(s["method"] == "fta" for s in ftas)
+    bars = client.get("/api/barriers", headers=viewer).json()
+    fails = client.get("/api/barriers/failures", headers=viewer).json()
+    keys = {f"{b['study_id']}:{b['barrier_id']}" for b in bars}
+    assert fails and all(f["link"] in keys for f in fails)

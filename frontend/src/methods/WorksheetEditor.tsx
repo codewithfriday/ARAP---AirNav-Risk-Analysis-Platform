@@ -1,11 +1,11 @@
 import { useMemo, useState } from 'react'
 import { Alert, Button, Card, Checkbox, Col, Input, Modal, Row, Select, Space, Table, Tag, Typography } from 'antd'
 import { PlusOutlined, DeleteOutlined, ThunderboltOutlined } from '@ant-design/icons'
-import { Worksheet, type ColSpec } from '../components/Worksheet'
+import { Worksheet, secRisk, type ColSpec } from '../components/Worksheet'
 import { uid } from '../hooks'
 import type { EditorProps } from './types'
 
-const PREFIX: Record<string, string> = { hazid: 'HZ', hazop: 'HP', jha: 'S', fmea: 'FM', fha: 'FC' }
+const PREFIX: Record<string, string> = { hazid: 'HZ', hazop: 'HP', jha: 'S', fmea: 'FM', fha: 'FC', swift: 'W', sec: 'SR' }
 
 export default function WorksheetEditor({ method, model, setModel, readOnly, scheme, template, promote }: EditorProps & { method: string }) {
   const rows: any[] = model.rows ?? []
@@ -20,15 +20,17 @@ export default function WorksheetEditor({ method, model, setModel, readOnly, sch
 
   const options = useMemo(() => ({
     guideword: template.guidewords ?? [], method: ['bowtie', 'hazop', 'fmea', 'fta', 'lopa', 'stpa', 'fram', 'bbn', 'fatigue', 'jha'],
-    hierarchy: template.hierarchy ?? [], failure_type: template.failure_types ?? [],
+    hierarchy: template.hierarchy ?? [], failure_type: template.failure_types ?? [], threat_source: template.threat_sources ?? [],
   }), [template])
 
   const doPromote = () => {
-    const src = selected.length ? selected : rows
+    const src = (selected.length ? selected : rows).filter((r) => (method !== 'sec' || r.safety_severity) && (method !== 'swift' || r.consequence))
     const mapped = src.map((r) => {
       if (method === 'hazid') return { row_id: r.id, title: r.hazard, causes: r.causes, consequences: r.consequences, controls: String(r.controls ?? '').split(/;\s*/), severity: r.severity || null, likelihood: r.likelihood || null, owner: r.owner }
       if (method === 'hazop') return { row_id: r.id, title: `${r.deviation} (${r.parameter} — ${r.guideword})`, causes: r.causes, consequences: r.consequences, controls: String(r.safeguards ?? '').split(/;\s*/), severity: r.severity || null, likelihood: r.likelihood || null }
       if (method === 'fmea') return { row_id: r.id, title: `${r.item}: ${r.failure_mode}`, causes: r.cause, consequences: r.end_effect, controls: [r.compensation, r.detection_method].filter(Boolean) }
+      if (method === 'swift') return { row_id: r.id, title: r.consequence || r.what_if, causes: r.what_if, consequences: r.consequence, controls: [...String(r.safeguards ?? '').split(/;\s*/), r.recommendation].filter(Boolean), severity: r.severity || null, likelihood: r.likelihood || null, owner: r.owner }
+      if (method === 'sec') return { row_id: r.id, title: `Security: ${r.threat} (${r.asset})`, causes: `${r.source ?? ''} — ${r.vulnerability ?? ''}`, consequences: `Security risk ${secRisk(r)?.score ?? '-'} (${secRisk(r)?.level ?? 'n/a'})`, controls: [...String(r.controls ?? '').split(/;\s*/), r.treatment].filter(Boolean), severity: r.safety_severity || null, owner: r.owner }
       if (method === 'fha') return { row_id: r.id, title: r.condition, consequences: r.effect, controls: String(r.requirements ?? '').split(/;\s*/) }
       return { row_id: r.id, title: `${r.step}: ${r.hazards}`, controls: [r.controls] }
     }).filter((x) => x.title && !String(x.title).startsWith('undefined') && !(method === 'hazop' && src.find((r) => r.id === x.row_id)?.not_meaningful))
@@ -39,8 +41,11 @@ export default function WorksheetEditor({ method, model, setModel, readOnly, sch
   const jhaWarn = method === 'jha' ? rows.filter((r) => ['Administrative', 'PPE'].includes(r.hierarchy)).map((r) => r.id) : []
   // FMEA: high severity rows regardless of RPN
   const fmeaHigh = method === 'fmea' ? rows.filter((r) => Number(r.s) >= 8).map((r) => `${r.id} (S=${r.s})`) : []
-  // HAZID guideword coverage
-  const coverage = method === 'hazid' ? (template.guidewords as string[]).map((g) => ({ g, n: rows.filter((r) => r.guideword === g).length })) : []
+  // SEC: promote only rows with a safety effect (ED-205 safety impact)
+  const secSafety = method === 'sec' ? rows.filter((r) => r.safety_severity) : []
+  const secHigh = method === 'sec' ? rows.filter((r) => (secRisk(r)?.score ?? 0) >= 10).map((r) => r.id) : []
+  // HAZID / SWIFT guideword coverage
+  const coverage = method === 'hazid' || method === 'swift' ? (template.guidewords as string[]).map((g) => ({ g, n: rows.filter((r) => r.guideword === g).length })) : []
 
   return (
     <div>
@@ -55,11 +60,12 @@ export default function WorksheetEditor({ method, model, setModel, readOnly, sch
       {jhaWarn.length > 0 && <Alert type="warning" showIcon style={{ marginBottom: 8 }} title={`Steps ${jhaWarn.join(', ')} rely only on administrative controls or PPE — look higher up the hierarchy of controls (Manual §9.4).`} />}
       {fmeaHigh.length > 0 && <Alert type="info" showIcon style={{ marginBottom: 8 }} title={`High-severity failure modes to review regardless of RPN: ${fmeaHigh.join(', ')}`} />}
       <Worksheet columns={template.columns as ColSpec[]} rows={rows} onChange={setRows} scheme={scheme} readOnly={readOnly} options={options} onSelect={setSelected} />
-      {method === 'hazid' && (
-        <Card size="small" title="Guideword coverage" style={{ marginTop: 12 }}>
+      {method === 'sec' && <Alert type="info" showIcon style={{ marginBottom: 8 }} title={`Security risk = L × max(C, I, A). ${secHigh.length ? `High / very high: ${secHigh.join(', ')}. ` : ''}${secSafety.length} threat scenario(s) have a safety effect — send those to the safety hazard log (ED-205 / Manual §29.3).`} />}
+      {(method === 'hazid' || method === 'swift') && (
+        <Card size="small" title={method === 'swift' ? 'Prompt category coverage' : 'Guideword coverage'} style={{ marginTop: 12 }}>
           <Space wrap>{coverage.map(({ g, n }) => <Tag key={g} color={n ? 'green' : 'default'}>{g}: {n}</Tag>)}</Space>
           {!readOnly && <div style={{ marginTop: 8 }}><Select size="small" placeholder="Record “no hazard identified” for a guideword" style={{ width: 360 }} value={null as any}
-            onChange={(g) => addRow({ guideword: g, hazard: 'No hazard identified' })} options={coverage.filter((c) => !c.n).map((c) => ({ value: c.g, label: c.g }))} /></div>}
+            onChange={(g) => addRow(method === 'swift' ? { guideword: g, what_if: 'Considered — no credible what-if identified' } : { guideword: g, hazard: 'No hazard identified' })} options={coverage.filter((c) => !c.n).map((c) => ({ value: c.g, label: c.g }))} /></div>}
         </Card>
       )}
     </div>

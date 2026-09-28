@@ -12,11 +12,11 @@ import { METHOD_COLORS } from '../risk'
 
 // Manual §4.1 recommended combinations (COM-03, advisory)
 const RECOMMEND: Record<string, string[]> = {
-  system: ['hazid', 'fha', 'fmea', 'fta', 'bowtie'],
-  procedure: ['hazid', 'hazop', 'stpa', 'bowtie', 'lopa'],
-  airspace: ['hazid', 'hazop', 'bowtie', 'lopa'],
+  system: ['hazid', 'fha', 'fmea', 'fta', 'cca', 'rbd', 'bowtie', 'sec', 'gsn'],
+  procedure: ['hazid', 'hazop', 'hta', 'hra', 'stpa', 'bowtie', 'lopa', 'sim', 'gsn'],
+  airspace: ['hazid', 'hazop', 'crm', 'eta', 'hra', 'bowtie', 'lopa', 'sim', 'gsn'],
   organisational: ['hazid', 'fatigue', 'jha', 'bowtie'],
-  temporary: ['hazid', 'jha', 'bowtie'],
+  temporary: ['swift', 'hazid', 'jha', 'bowtie'],
 }
 
 const ACTIONS: Record<string, { label: string; from: string[]; roles: string[]; danger?: boolean; comment?: boolean }> = {

@@ -4,6 +4,9 @@ import type { NodeProps } from '@xyflow/react'
 import { toPng, toSvg } from 'html-to-image'
 import { Alert, Button, Card, Col, Divider, Empty, Input, Row, Segmented, Select, Space, Switch, Table, Tabs, Tag, Tooltip, Typography } from 'antd'
 import { PlusOutlined, DeleteOutlined, ArrowUpOutlined, ArrowDownOutlined, PictureOutlined, WarningOutlined } from '@ant-design/icons'
+import { useQuery } from '@tanstack/react-query'
+import { useParams } from 'react-router-dom'
+import { api } from '../api'
 import { uid } from '../hooks'
 import type { BowtieModel, Barrier, Path } from './bowtieLayout'
 import { layoutBowtie, bowtieChecks, EFFECTIVENESS_COLORS, emptyBowtie } from './bowtieLayout'
@@ -80,6 +83,9 @@ export default function BowtieEditor({ model, setModel, readOnly, promote }: Edi
   const [sel, setSel] = useState<string | null>(null)
   const set = useCallback((f: (x: BowtieModel) => BowtieModel) => setModel(f(structuredClone(m))), [m, setModel])
   const warnings = bowtieChecks(m)
+  const { id: studyId } = useParams()
+  const { data: failures = [] } = useQuery({ queryKey: ['barrier-failures'], queryFn: () => api.get('/barriers/failures') })
+  const failOf = (bid: string) => failures.find((f: any) => f.link === `${studyId}:${bid}`)
 
   const findPath = (id: string) => m.threats.find((p) => p.id === id) ?? m.consequences.find((p) => p.id === id)
   const selPath = sel ? findPath(sel) : undefined
@@ -174,6 +180,7 @@ export default function BowtieEditor({ model, setModel, readOnly, promote }: Edi
           <Input prefix="SPI / audit" value={selBarrier.spi ?? ''} disabled={readOnly} onChange={(e) => updBarrier('spi', e.target.value)} />
           <Space><Switch checked={selBarrier.critical} disabled={readOnly} onChange={(v) => updBarrier('critical', v)} /> Safety-critical barrier</Space>
           <div className="small muted">On {on.length} path(s): {on.map((p) => p.text).join('; ')}</div>
+          {failOf(selBarrier.id) && <Alert type="warning" showIcon title={`Recorded as failed or absent in ${failOf(selBarrier.id).count} investigation(s)`} description={failOf(selBarrier.id).investigations.join('; ')} />}
           {!readOnly && <Space><Button size="small" icon={<WarningOutlined />} onClick={addEf}>Add escalation factor</Button>
             <Button size="small" danger icon={<DeleteOutlined />} onClick={deleteSelected}>Delete barrier</Button></Space>}
         </Space>)

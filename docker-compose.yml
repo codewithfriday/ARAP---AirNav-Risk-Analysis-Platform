@@ -1,0 +1,35 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: arap
+      POSTGRES_USER: arap
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-arap}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U arap -d arap"]
+      interval: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    environment:
+      ARAP_DATABASE_URL: postgresql+psycopg://arap:${POSTGRES_PASSWORD:-arap}@db:5432/arap
+      ARAP_SECRET_KEY: ${ARAP_SECRET_KEY:?set ARAP_SECRET_KEY in .env}
+      ARAP_ADMIN_PASSWORD: ${ARAP_ADMIN_PASSWORD:?set ARAP_ADMIN_PASSWORD in .env}
+      ARAP_SEED_DEMO: ${ARAP_SEED_DEMO:-true}
+      ARAP_CORS_ORIGINS: http://localhost:8080
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:

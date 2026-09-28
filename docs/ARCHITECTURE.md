@@ -1,4 +1,4 @@
-# ARAP architecture notes (v0.3)
+# ARAP architecture notes (v0.4)
 
 ## Overview
 
@@ -25,6 +25,7 @@ The back end is a single modular application (a "modular monolith", as recommend
 | `demo.py`, `seed.py` | The Manual's worked examples (chapters 6–17) as demo data and test oracles |
 | `demo2.py`, `seed2.py`, `seed_wildlife.py` | Worked examples of chapters 18–31 (project DEMO-02) and their reference inputs; the wildlife study is also added to existing databases on start-up |
 | `demo3.py` | DEMO-03: the H24 alternate-aerodrome SRA case study |
+| `assessment_templates.py` | Assessment templates (catalogue, builders). `build_aim(db, assessment, filled)` creates the 14 AIM studies; `filled=True` adds illustrative ratings, results, hazards and actions (DEMO-04). Exposed by `GET /assessment-templates` and `POST /assessments {template}` |
 | `engines/` | `risk`, `fta`, `lopa`, `fmea`, `bbn`, `fatigue`; v0.2: `crm`, `eta`, `hra`, `orc`, `rbd`, `sej`, `sim`, `security`; v0.3: `wildlife` |
 
 ### Data model

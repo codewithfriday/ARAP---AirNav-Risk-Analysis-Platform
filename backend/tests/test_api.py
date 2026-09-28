@@ -202,3 +202,35 @@ def test_wildlife_calc_endpoint(client, viewer):
     assert top["scientific"] == "Bubulcus ibis" and top["risk"] == "high" and top["score"] == 20
     bad = dict(WILDLIFE_MODEL, species=[dict(WILDLIFE_MODEL["species"][0], damaging={"2021": 99})])
     assert client.post("/api/calc/wildlife", json=bad, headers=viewer).status_code == 422
+
+
+def test_assessment_template_aim(client, viewer, assessor):
+    """TC-TPL-01: creating an assessment from the AIM template gives 14 pre-filled studies; ratings left to the team."""
+    cat = client.get("/api/assessment-templates", headers=viewer).json()
+    t = next(x for x in cat if x["key"] == "aim_acquisition")
+    assert len(t["studies"]) == 14 and "build" not in t
+    pid = client.get("/api/projects", headers=viewer).json()[0]["id"]
+    a = client.post("/api/assessments", headers=assessor, json={"project_id": pid, "title": t["title"], "scope": t["scope"], "template": "aim_acquisition"}).json()
+    methods = sorted(s["method"] for s in a["studies"])
+    assert methods == sorted(["fha", "hazop", "fmea", "fta", "cca", "stpa", "hta", "hra", "sec", "jha", "swift", "bowtie", "sim", "gsn"])
+    sid = {s["method"]: s["id"] for s in a["studies"]}
+    haz = client.get(f"/api/studies/{sid['hazop']}", headers=viewer).json()["model"]
+    assert len(haz["nodes"]) == 7 and all("likelihood" not in r for r in haz["rows"])
+    fha = client.get(f"/api/studies/{sid['fha']}", headers=viewer).json()["model"]["rows"]
+    assert len(fha) == 12 and {r["failure_type"] for r in fha} >= {"Erroneous (undetected)", "Total loss", "Delayed"}
+    gsn = client.get(f"/api/studies/{sid['gsn']}", headers=viewer).json()["model"]["nodes"]
+    linked = {n["evidence"]["ref"] for n in gsn if n["type"] == "solution"}
+    assert linked <= set(sid.values()) and None not in linked
+    fta = client.post("/api/calc/fta", headers=viewer, json={"tree": client.get(f"/api/studies/{sid['fta']}", headers=viewer).json()["model"]["tree"]}).json()
+    assert abs(fta["top_probability"] - 2.857e-5) < 1e-8
+    assert client.post("/api/assessments", headers=assessor, json={"project_id": pid, "title": "x", "template": "nope"}).status_code == 422
+
+
+def test_demo4_aim(client, viewer):
+    p = next(x for x in client.get("/api/projects", headers=viewer).json() if x["code"] == "DEMO-04")
+    a = client.get(f"/api/projects/{p['id']}", headers=viewer).json()["assessments"][0]
+    full = client.get(f"/api/assessments/{a['id']}", headers=viewer).json()
+    assert len(full["studies"]) == 14 and len(full["hazards"]) == 7 and len(full["actions"]) == 6
+    sim = next(s for s in full["studies"] if s["method"] == "sim")
+    res = client.get(f"/api/studies/{sim['id']}", headers=viewer).json()["results"]["measures"]
+    assert [m["criterion_met"] for m in res] == [False, True, True]

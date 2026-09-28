@@ -1,6 +1,6 @@
 # ARAP User Guide
 
-**AirNav Risk Analysis Platform — version 0.3**
+**AirNav Risk Analysis Platform — version 0.4**
 
 ARAP is the web application that implements the *AirNav Risk Analysis Manual*. It lets AirNav staff plan, run, review and approve safety risk assessments with twenty-six methods, keeps every hazard in one hazard log, and produces the Safety Assessment Report.
 
@@ -12,7 +12,7 @@ This guide explains how to use the application. For *why* and *when* to use each
 
 1. [Getting started](#1-getting-started)
 2. [The dashboard](#2-the-dashboard)
-3. [Projects and assessments](#3-projects-and-assessments)
+3. [Projects and assessments (incl. assessment templates)](#3-projects-and-assessments)
 4. [Working in a method study](#4-working-in-a-method-study)
 5. [Worksheet methods: HAZID, HAZOP, JHA, FMEA/FMECA, FHA](#5-worksheet-methods)
 6. [Bowtie analysis](#6-bowtie-analysis)
@@ -29,7 +29,7 @@ This guide explains how to use the application. For *why* and *when* to use each
 17. [Reports and exports](#17-reports-and-exports)
 18. [Administration](#18-administration)
 19. [Troubleshooting and FAQ](#19-troubleshooting-and-faq)
-20. [What version 0.3 does not do yet](#20-what-version-03-does-not-do-yet)
+20. [What version 0.4 does not do yet](#20-what-version-04-does-not-do-yet)
 
 ---
 
@@ -115,6 +115,32 @@ The assessment page brings everything together:
 On the assessment page choose **Add study**, pick the method (suggested methods are marked ★) and give the study a title, e.g. *HAZOP of cut-over plan*. The study opens straight away.
 
 ---
+
+### 3.4 Starting from an assessment template
+
+![New assessment from a template](screenshots/v2-aim-template-dialog.png)
+
+In **New assessment**, the field **Start from** offers ready-made assessment templates. When you choose one:
+
+- ARAP fills in the title, scope, environment and assumptions. Edit them for your change.
+- On **Create**, ARAP also creates all of the template's method studies, pre-filled with proposed content.
+- Nothing is rated for you. Likelihoods, calculations and hazard-log entries are left for your workshops, and severities are proposals to confirm.
+
+**New AIM system acquisition** (Manual Appendix C) creates 14 studies covering the whole life of the change, from specification through installation and data migration to transition:
+
+| Study | Pre-filled content |
+|---|---|
+| FHA | 8 AIM functions and 12 failure conditions (loss, delay, detected and undetected error) with proposed severities and requirements |
+| Data-flow HAZOP | 7 nodes from originator to user, including legacy → new migration; 15 deviations filled in (use **Deviations** to add the rest) |
+| FMEA | 8 architecture items: servers, fail-over, database, CRC module, validation rules, AMHS gateway, time source, eAIP web |
+| FTA | "Erroneous critical data published undetected", with an entry-error branch and a storage/transfer corruption branch; data entry and verification come from the HRA |
+| CCA, STPA, HTA, HRA, security | Independence claims, the officer–automation control loop, the NOTAM publication task, data-entry and verification error probabilities, and integrity/access threats |
+| JHA, SWIFT | Installation works beside the live legacy AIS, and what-ifs for installation and cut-over |
+| Bowtie | "Loss of, or erroneous, AIS during transition", with migration, testing, training, interface, timing and installation threats, plus rollback and manual-NOTAM recovery |
+| Simulation | The shadow-operation plan and acceptance criteria (zero critical-data differences; processing time; rejections) |
+| GSN | The argument G0–G7, with every solution already linked to the new studies |
+
+Demo project **DEMO-04** is this template filled in with illustrative values. It has likelihoods, a calculated fault tree (2.86 × 10⁻⁵ per critical item, which is above the objective, so a further independent check is needed), shadow-operation results with one criterion not met, 7 hazards and 6 actions.
 
 ## 4. Working in a method study
 
@@ -544,9 +570,9 @@ Administrators can reassign cells: choose a region under **Paint region**, click
 
 ---
 
-## 20. What version 0.3 does not do yet
+## 20. What version 0.4 does not do yet
 
-Version 0.3 covers the core workflow and all twenty-six methods. The following SRS items are planned for later releases:
+Version 0.4 covers the core workflow and all twenty-six methods. The following SRS items are planned for later releases:
 
 - Single sign-on through Keycloak / SAML / OIDC with MFA. Version 0.2 uses local accounts with JWT tokens.
 - Real-time co-editing of a diagram by several users, and the offline workshop pack.
@@ -555,5 +581,6 @@ Version 0.3 covers the core workflow and all twenty-six methods. The following S
 - Integrations with the occurrence reporting, rostering and maintenance systems.
 - CAST (STPA for accident analysis), noisy-OR helpers for Bayesian networks, Monte Carlo uncertainty, and the full “braked” sleep-recovery form of the fatigue model.
 - An Apache Superset / Metabase reporting database.
+- Saving an existing assessment as a new template, and administrator editing of templates (SRS TPL-05).
 - For the wildlife module: import of strike records from the occurrence system and in ICAO IBIS format.
 - For the extended methods: import of occurrences from the reporting system into the ERC/RAT module, CRM sensitivity cases, administrator editing of the CARA/HEART libraries, and restricted (need-to-know) access to security studies (SRS SRA-04).

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { Button, Card, Descriptions, Form, Input, Modal, Table, App, Spin } from 'antd'
+import { Alert, Button, Card, Descriptions, Form, Input, Modal, Select, Table, Tag, App, Spin } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { api } from '../api'
@@ -14,12 +14,20 @@ export default function ProjectDetail() {
   const qc = useQueryClient()
   const { message } = App.useApp()
   const [open, setOpen] = useState(false)
+  const [form] = Form.useForm()
+  const [tpl, setTpl] = useState<any>(null)
   const { data: p } = useQuery({ queryKey: ['project', id], queryFn: () => api.get(`/projects/${id}`) })
+  const { data: templates = [] } = useQuery({ queryKey: ['assessment-templates'], queryFn: () => api.get('/assessment-templates'), enabled: open })
+  const pickTemplate = (key: string | undefined) => {
+    const t = templates.find((x: any) => x.key === key) ?? null
+    setTpl(t)
+    if (t) form.setFieldsValue({ title: t.title, scope: t.scope, environment: t.environment, assumptions: t.assumptions })
+  }
   if (!p) return <Spin />
 
   const create = async (v: any) => {
     try {
-      const a = await api.post('/assessments', { ...v, project_id: p.id })
+      const a = await api.post('/assessments', { ...v, project_id: p.id, template: tpl?.key })
       qc.invalidateQueries({ queryKey: ['project', id] })
       nav(`/assessments/${a.id}`)
     } catch (e: any) {
@@ -50,8 +58,15 @@ export default function ProjectDetail() {
             { title: 'Created by', dataIndex: 'created_by', width: 140 },
           ]} />
       </Card>
-      <Modal title="New safety assessment" open={open} onCancel={() => setOpen(false)} footer={null} destroyOnHidden width={640}>
-        <Form layout="vertical" onFinish={create}>
+      <Modal title="New safety assessment" open={open} onCancel={() => setOpen(false)} footer={null} destroyOnHidden width={720} afterClose={() => { setTpl(null); form.resetFields() }}>
+        <Form layout="vertical" onFinish={create} form={form}>
+          <Form.Item label="Start from (optional)">
+            <Select allowClear placeholder="Blank assessment" value={tpl?.key} onChange={pickTemplate}
+              options={templates.map((t: any) => ({ value: t.key, label: t.name }))} />
+          </Form.Item>
+          {tpl && <Alert type="info" showIcon style={{ marginBottom: 12 }} title={`${tpl.studies.length} pre-filled studies will be created (Manual ${tpl.manual})`}
+            description={<div><div className="small">{tpl.summary}</div><div style={{ marginTop: 6 }}>{tpl.studies.map((s: any) => <Tag key={s.key} style={{ marginBottom: 3 }}>{s.method.toUpperCase()}</Tag>)}</div>
+              <div className="small muted" style={{ marginTop: 6 }}>Content is proposed: review it, rate likelihoods and confirm severities in the workshops.</div></div>} />}
           <Form.Item name="title" label="Title" rules={[{ required: true }]}><Input /></Form.Item>
           <Form.Item name="scope" label="Scope and system boundary (Manual §2.3)" rules={[{ required: true }]}><Input.TextArea rows={3} /></Form.Item>
           <Form.Item name="environment" label="Operational environment"><Input.TextArea rows={2} /></Form.Item>

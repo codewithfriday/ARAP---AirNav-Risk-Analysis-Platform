@@ -22,6 +22,7 @@ from ..models import (ASSESSMENT_STATES, METHODS, ROLES, Action, Approval, Asses
 from ..reports import assessment_docx
 from ..security import EDITORS, create_token, current_user, hash_password, require, verify_password
 from ..templates import METHODS as METHOD_CATALOG
+from ..assessment_templates import TEMPLATES as ASSESSMENT_TEMPLATES, catalogue as assessment_templates_catalogue
 from .common import (active_scheme, ensure_editable, get_or_404, hazard_dict, next_ref, overdue_actions, rate,
                      scheme_version, to_dict)
 
@@ -190,6 +191,7 @@ class AssessmentIn(BaseModel):
     scope: str = ""
     environment: str = ""
     assumptions: str = ""
+    template: str | None = None
 
 
 def assessment_full(a: Assessment, db: Session) -> dict:
@@ -221,10 +223,23 @@ def list_assessments(status: str | None = None, db: Session = Depends(get_db), _
 def create_assessment(body: AssessmentIn, db: Session = Depends(get_db), u: User = Depends(require(*EDITORS))):
     get_or_404(db, Project, body.project_id)
     rs = db.query(RiskScheme).order_by(RiskScheme.version.desc()).first()
-    a = Assessment(**body.model_dump(), created_by=u.username, risk_scheme_version=rs.version if rs else 1)
+    tpl = None
+    if body.template:
+        tpl = ASSESSMENT_TEMPLATES.get(body.template)
+        if not tpl:
+            raise HTTPException(422, f"unknown assessment template {body.template}")
+    a = Assessment(**body.model_dump(exclude={"template"}), created_by=u.username, risk_scheme_version=rs.version if rs else 1)
     db.add(a); db.flush()
-    audit.record(db, u.username, "assessment", a.id, "create", after=to_dict(a)); db.commit()
+    audit.record(db, u.username, "assessment", a.id, "create", after={**to_dict(a), "template": body.template}); db.commit()
+    if tpl:
+        tpl["build"](db, a, filled=False)
+        db.commit()
     return assessment_full(a, db)
+
+
+@router.get("/assessment-templates")
+def list_assessment_templates(_: User = Depends(current_user)):
+    return assessment_templates_catalogue()
 
 
 @router.get("/assessments/{aid}")

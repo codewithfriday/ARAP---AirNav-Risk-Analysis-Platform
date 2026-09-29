@@ -19,7 +19,7 @@ It provides one hazard log and one risk classification scheme across all methods
 | [Software Requirements Specification](docs/AirNav_Risk_Analysis_Software_Requirements.pdf) | Requirements, calculation specs, reference tests, recommended stack (App. C) |
 | [Architecture notes](docs/ARCHITECTURE.md) | Code structure, data model, engines |
 
-> **Status: version 0.5 (pilot).** Numbers in the demo data are the Manual's illustrative worked examples, not AirNav data. See [User guide §20](docs/USER_GUIDE.md#20-what-version-05-does-not-do-yet) for what is not yet implemented.
+> **Status: version 0.6 (pilot).** Numbers in the demo data are the Manual's illustrative worked examples, not AirNav data. See [User guide §20](docs/USER_GUIDE.md#20-what-version-06-does-not-do-yet) for what is not yet implemented.
 
 ---
 
@@ -54,7 +54,7 @@ docker compose up -d --build
 
 Open **http://localhost:8080** and sign in as `admin` with the password from `.env`.
 
-With `ARAP_SEED_DEMO=true` (the default) five demo projects (DEMO-01 for the core methods, DEMO-02 for the extended methods including the cattle-egret wildlife example, DEMO-03 the H24 alternate-aerodrome SRA case study, DEMO-04 a new AIM system acquisition and DEMO-05 a major organisational change, both built from assessment templates) with one study per method and demo users (password `demo1234`) is created: `assessor`, `reviewer`, `director`, `accexec`, `viewer`. **Set `ARAP_SEED_DEMO=false` and change all passwords for real use.**
+With `ARAP_SEED_DEMO=true` (the default) five demo projects (DEMO-01 for the core methods, DEMO-02 for the extended methods including the cattle-egret wildlife example, DEMO-03 the H24 alternate-aerodrome SRA case study, DEMO-04 a new AIM system acquisition and DEMO-05 a major organisational change, both built from assessment templates) with one study per method and demo users (password `demo1234`) is created: `assessor`, `reviewer`, `director`, `accexec`, `viewer`. An administrator can delete any demo project (**Delete** on the project page); a deleted demo is not re-created at the next start. **Set `ARAP_SEED_DEMO=false` and change all passwords for real use.**
 
 The API applies database migrations (`alembic upgrade head`) on start-up. Interactive API documentation (OpenAPI) is at `http://localhost:8080/api/docs`.
 
@@ -100,7 +100,7 @@ pytest -q                                   # SQLite
 ARAP_DATABASE_URL=postgresql+psycopg://... pytest -q -p no:cacheprovider   # PostgreSQL
 ```
 
-The suite has 54 tests. They include the **reference test cases of SRS §9**: every calculation engine must reproduce the Manual's worked examples. For example, fault-tree top event 1.22 × 10⁻⁶, LOPA 2.5 × 10⁻⁵/yr, Bayesian posterior P(fatigue | loss of separation) = 0.390, fatigue-model minimum alertness 5.18 at 05:55, RVSM vertical collision risk 1.873 × 10⁻⁹, minimum lateral route spacing 11.68 NM, CARA HEP 2.016 × 10⁻³, Markov unavailability 2.04 × 10⁻⁶ and Cooke expert weight 0.814. The Bayesian engine is also checked against brute-force enumeration. The API tests cover roles, the approval workflow, acceptance authority, locking, versioning, hazard promotion, exports and audit.
+The suite has 58 tests. They include the **reference test cases of SRS §9**: every calculation engine must reproduce the Manual's worked examples. For example, fault-tree top event 1.22 × 10⁻⁶, LOPA 2.5 × 10⁻⁵/yr, Bayesian posterior P(fatigue | loss of separation) = 0.390, fatigue-model minimum alertness 5.18 at 05:55, RVSM vertical collision risk 1.873 × 10⁻⁹, minimum lateral route spacing 11.68 NM, CARA HEP 2.016 × 10⁻³, Markov unavailability 2.04 × 10⁻⁶ and Cooke expert weight 0.814. The Bayesian engine is also checked against brute-force enumeration. The API tests cover roles, the approval workflow, acceptance authority, locking, versioning, hazard promotion, archiving and deleting projects, exports and audit.
 
 GitHub Actions (`.github/workflows/ci.yml`) runs the back-end tests on SQLite and PostgreSQL and builds the front end on every push and pull request.
 

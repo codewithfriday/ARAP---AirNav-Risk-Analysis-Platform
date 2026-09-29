@@ -1,6 +1,6 @@
 # ARAP User Guide
 
-**AirNav Risk Analysis Platform — version 0.5**
+**AirNav Risk Analysis Platform — version 0.6**
 
 ARAP is the web application that implements the *AirNav Risk Analysis Manual*. It lets AirNav staff plan, run, review and approve safety risk assessments with twenty-six methods, keeps every hazard in one hazard log, and produces the Safety Assessment Report.
 
@@ -12,7 +12,7 @@ This guide explains how to use the application. For *why* and *when* to use each
 
 1. [Getting started](#1-getting-started)
 2. [The dashboard](#2-the-dashboard)
-3. [Projects and assessments (incl. assessment templates)](#3-projects-and-assessments)
+3. [Projects and assessments (incl. assessment templates, archiving and deleting)](#3-projects-and-assessments)
 4. [Working in a method study](#4-working-in-a-method-study)
 5. [Worksheet methods: HAZID, HAZOP, JHA, FMEA/FMECA, FHA](#5-worksheet-methods)
 6. [Bowtie analysis](#6-bowtie-analysis)
@@ -29,7 +29,7 @@ This guide explains how to use the application. For *why* and *when* to use each
 17. [Reports and exports](#17-reports-and-exports)
 18. [Administration](#18-administration)
 19. [Troubleshooting and FAQ](#19-troubleshooting-and-faq)
-20. [What version 0.5 does not do yet](#20-what-version-05-does-not-do-yet)
+20. [What version 0.6 does not do yet](#20-what-version-06-does-not-do-yet)
 
 ---
 
@@ -163,6 +163,26 @@ Demo project **DEMO-04** is this template filled in with illustrative values. It
 Demo project **DEMO-05** is this template filled in for an illustrative branch reorganisation. It has 13 of 18 functions with gaps (2 orphans), the Safety & Quality function losing its direct line to the Accountable Executive, a Delphi estimate converging on 0.12, SPI values, 7 hazards and 6 actions.
 
 The same modules can be added to any assessment on their own: **Organisational function map** and **SPI register** appear in **Add study**.
+
+### 3.5 Archiving and deleting a project
+
+A project you no longer need can be **archived** or, by an administrator, **deleted**. The buttons are at the top right of the project page.
+
+| | Archive | Delete |
+|---|---|---|
+| Who | Assessors, reviewers and administrators | Administrators only |
+| What happens | The project and its assessments disappear from the project list and the assessment list. Its hazards and actions stay in the hazard log, the action list and the dashboard, because they may still be live. Every record is kept and can still be opened by its link. No new assessments can be added. | The project and all its assessments, studies, hazards, controls and actions are removed permanently. |
+| Undo | **Restore** on the project page | Not possible |
+| When refused | — | If any assessment has been endorsed, accepted, closed or superseded. Those are safety records; archive the project instead. |
+| Audit trail | "archive" / "restore" | "delete", with the project details and the number of records removed |
+
+**To archive:** open the project and click **Archive**. A yellow banner shows that the project is archived. To find it again, switch on **Show archived** above the project list; archived projects carry an *archived* tag. Open it and click **Restore** to make it active.
+
+**To delete:** sign in as an administrator, open the project and click **Delete**. Type the project code exactly (for example `TRIAL-01`) and click **Delete permanently**. The button stays disabled until the code matches. ARAP then returns to the project list and reports how many assessments, studies, hazards and actions were removed.
+
+![Deleting a project](screenshots/v2-project-delete.png)
+
+Use delete for projects created by mistake, test projects and the demo projects. A deleted demo project is not re-created when ARAP restarts. For a real change that has been cancelled or completed, archive it: the assessment is part of the safety record.
 
 ## 4. Working in a method study
 
@@ -592,9 +612,9 @@ Administrators can reassign cells: choose a region under **Paint region**, click
 
 ---
 
-## 20. What version 0.5 does not do yet
+## 20. What version 0.6 does not do yet
 
-Version 0.5 covers the core workflow and all twenty-six methods. The following SRS items are planned for later releases:
+Version 0.6 covers the core workflow and all twenty-six methods. The following SRS items are planned for later releases:
 
 - Single sign-on through Keycloak / SAML / OIDC with MFA. Version 0.2 uses local accounts with JWT tokens.
 - Real-time co-editing of a diagram by several users, and the offline workshop pack.
@@ -604,6 +624,7 @@ Version 0.5 covers the core workflow and all twenty-six methods. The following S
 - CAST (STPA for accident analysis), noisy-OR helpers for Bayesian networks, Monte Carlo uncertainty, and the full “braked” sleep-recovery form of the fatigue model.
 - An Apache Superset / Metabase reporting database.
 - Linking SPI-register rows to bowtie barriers so barrier health shows the SPI status (SRS SPI-03).
+- Deleting a single assessment (only whole projects can be deleted), and a retention period after which archived projects are purged.
 - Saving an existing assessment as a new template, and administrator editing of templates (SRS TPL-05).
 - For the wildlife module: import of strike records from the occurrence system and in ICAO IBIS format.
 - For the extended methods: import of occurrences from the reporting system into the ERC/RAT module, CRM sensitivity cases, administrator editing of the CARA/HEART libraries, and restricted (need-to-know) access to security studies (SRS SRA-04).

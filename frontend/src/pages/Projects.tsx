@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { Button, Card, Form, Input, Modal, Select, Table, App } from 'antd'
+import { Button, Card, Form, Input, Modal, Select, Space, Switch, Table, Tag, App } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -15,8 +15,10 @@ export default function Projects() {
   const nav = useNavigate()
   const { message } = App.useApp()
   const [open, setOpen] = useState(false)
-  const { data: projects = [], isLoading } = useQuery({ queryKey: ['projects'], queryFn: () => api.get('/projects') })
-  const { data: assessments = [] } = useQuery({ queryKey: ['assessments'], queryFn: () => api.get('/assessments') })
+  const [showArchived, setShowArchived] = useState(false)
+  const qs = showArchived ? '?include_archived=true' : ''
+  const { data: projects = [], isLoading } = useQuery({ queryKey: ['projects', showArchived], queryFn: () => api.get(`/projects${qs}`) })
+  const { data: assessments = [] } = useQuery({ queryKey: ['assessments', showArchived], queryFn: () => api.get(`/assessments${qs}`) })
 
   const create = async (v: any) => {
     try {
@@ -33,10 +35,11 @@ export default function Projects() {
     <div>
       <PageHeader title={t('nav.projects')} sub="A project is a change (system, procedure, airspace, organisational). Each has one or more safety assessments."
         extra={canEdit(user) && <Button type="primary" icon={<PlusOutlined />} onClick={() => setOpen(true)}>New project</Button>} />
-      <Card title="Projects" style={{ marginBottom: 16 }}>
+      <Card title="Projects" style={{ marginBottom: 16 }}
+        extra={<Space><span className="small muted">Show archived</span><Switch size="small" checked={showArchived} onChange={setShowArchived} /></Space>}>
         <Table rowKey="id" loading={isLoading} dataSource={projects} pagination={false} size="middle"
           columns={[
-            { title: 'Code', dataIndex: 'code', width: 130, render: (v, r: any) => <Link to={`/projects/${r.id}`}>{v}</Link> },
+            { title: 'Code', dataIndex: 'code', width: 130, render: (v, r: any) => <Space size={4}><Link to={`/projects/${r.id}`}>{v}</Link>{r.status === 'archived' && <Tag>archived</Tag>}</Space> },
             { title: 'Title', dataIndex: 'title' },
             { title: 'Type', dataIndex: 'change_type', width: 130 },
             { title: 'Units', dataIndex: 'units' },

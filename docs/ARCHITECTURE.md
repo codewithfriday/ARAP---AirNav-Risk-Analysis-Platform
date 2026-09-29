@@ -1,4 +1,4 @@
-# ARAP architecture notes (v0.5)
+# ARAP architecture notes (v0.6)
 
 ## Overview
 
@@ -46,6 +46,8 @@ Method-specific objects (bowtie paths and barriers, HAZOP nodes, fault-tree gate
 1. The assessment has at least one hazard.
 2. No residual risk is intolerable.
 3. The worst residual region is in the accepting user's `authority_scope`.
+
+Projects are `active` or `archived`. `POST /projects/{id}/archive` and `/restore` (editors) toggle the status; archived projects are left out of `GET /projects` and `GET /assessments` unless `include_archived=true`, and refuse new assessments. `DELETE /projects/{id}?confirm=<code>` (admin) removes the project with its assessments, studies, approvals, hazards, controls and actions. It is refused with 409 when any assessment is locked, and the audit entry keeps a snapshot of the project and the counts. At start-up the demo seeders skip any demo code that has an audit "delete" entry, so a deleted demo stays deleted.
 
 ### Engines
 

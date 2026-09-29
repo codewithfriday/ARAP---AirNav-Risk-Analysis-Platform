@@ -17,7 +17,7 @@ from .. import audit
 from ..db import get_db
 from ..engines import bbn, crm, eta, fatigue, fmea, fta, hra, lopa, orc, rbd, security, sej, sim, wildlife
 from ..engines import risk as risk_engine
-from ..models import (ASSESSMENT_STATES, METHODS, ROLES, Action, Approval, Assessment, AuditLog, Control, Hazard,
+from ..models import (ASSESSMENT_STATES, LOCKED_STATES, METHODS, ROLES, Action, Approval, Assessment, AuditLog, Control, Hazard,
                       Project, RiskScheme, Study, User)
 from ..reports import assessment_docx
 from ..security import EDITORS, create_token, current_user, hash_password, require, verify_password
@@ -149,9 +149,12 @@ class ProjectIn(BaseModel):
 
 
 @router.get("/projects")
-def list_projects(db: Session = Depends(get_db), _: User = Depends(current_user)):
+def list_projects(include_archived: bool = False, db: Session = Depends(get_db), _: User = Depends(current_user)):
     out = []
-    for p in db.query(Project).order_by(Project.created_at.desc()):
+    q = db.query(Project)
+    if not include_archived:
+        q = q.filter(Project.status != "archived")
+    for p in q.order_by(Project.created_at.desc()):
         d = to_dict(p)
         d["assessment_count"] = len(p.assessments)
         out.append(d)
@@ -173,6 +176,56 @@ def get_project(pid: int, db: Session = Depends(get_db), _: User = Depends(curre
     d = to_dict(p)
     d["assessments"] = [to_dict(a) | {"study_count": len(a.studies)} for a in p.assessments]
     return d
+
+
+@router.post("/projects/{pid}/archive")
+def archive_project(pid: int, db: Session = Depends(get_db), u: User = Depends(require(*EDITORS))):
+    """Hide a project from the project list; all records are kept and it can be restored (SRS COM-17)."""
+    p = get_or_404(db, Project, pid)
+    if p.status == "archived":
+        raise HTTPException(409, "project is already archived")
+    before = to_dict(p); p.status = "archived"
+    audit.record(db, u.username, "project", p.id, "archive", before, to_dict(p)); db.commit()
+    return to_dict(p)
+
+
+@router.post("/projects/{pid}/restore")
+def restore_project(pid: int, db: Session = Depends(get_db), u: User = Depends(require(*EDITORS))):
+    p = get_or_404(db, Project, pid)
+    if p.status != "archived":
+        raise HTTPException(409, "project is not archived")
+    before = to_dict(p); p.status = "active"
+    audit.record(db, u.username, "project", p.id, "restore", before, to_dict(p)); db.commit()
+    return to_dict(p)
+
+
+@router.delete("/projects/{pid}")
+def delete_project(pid: int, confirm: str = Query(..., description="The project code, typed to confirm"),
+                   db: Session = Depends(get_db), u: User = Depends(require("admin"))):
+    """Permanently delete a project and everything in it (SRS COM-18). Admin only; the project code must be typed to
+    confirm; refused if any assessment has been endorsed, accepted, closed or superseded — those are safety records."""
+    p = get_or_404(db, Project, pid)
+    if confirm.strip() != p.code:
+        raise HTTPException(422, "confirmation does not match the project code")
+    locked = [a for a in p.assessments if a.status in LOCKED_STATES]
+    if locked:
+        raise HTTPException(409, f"cannot delete: {len(locked)} assessment(s) are {', '.join(sorted({a.status for a in locked}))}. "
+                                 "Endorsed, accepted, closed and superseded assessments are safety records — archive the project instead.")
+    aids = [a.id for a in p.assessments]
+    hz = db.query(Hazard).filter(Hazard.assessment_id.in_(aids)).all() if aids else []
+    hids = [h.id for h in hz]
+    counts = {"assessments": len(aids), "studies": sum(len(a.studies) for a in p.assessments), "hazards": len(hids)}
+    if aids or hids:
+        acts = db.query(Action).filter((Action.assessment_id.in_(aids)) | (Action.hazard_id.in_(hids or [-1])))
+        counts["actions"] = acts.count(); acts.delete(synchronize_session=False)
+        if hids:
+            db.query(Control).filter(Control.hazard_id.in_(hids)).delete(synchronize_session=False)
+            db.query(Hazard).filter(Hazard.id.in_(hids)).delete(synchronize_session=False)
+    snap = to_dict(p)
+    db.delete(p)  # cascades to assessments → studies and approvals
+    audit.record(db, u.username, "project", pid, "delete", before={**snap, "deleted": counts})
+    db.commit()
+    return {"deleted": snap["code"], **counts}
 
 
 @router.put("/projects/{pid}")
@@ -212,16 +265,21 @@ def assessment_full(a: Assessment, db: Session) -> dict:
 
 
 @router.get("/assessments")
-def list_assessments(status: str | None = None, db: Session = Depends(get_db), _: User = Depends(current_user)):
-    q = db.query(Assessment)
+def list_assessments(status: str | None = None, include_archived: bool = False, db: Session = Depends(get_db),
+                     _: User = Depends(current_user)):
+    q = db.query(Assessment).join(Project)
     if status:
-        q = q.filter_by(status=status)
-    return [to_dict(a) | {"project_code": a.project.code, "locked": a.locked} for a in q.order_by(Assessment.updated_at.desc())]
+        q = q.filter(Assessment.status == status)
+    if not include_archived:
+        q = q.filter(Project.status != "archived")
+    return [to_dict(a) | {"project_code": a.project.code, "project_status": a.project.status, "locked": a.locked}
+            for a in q.order_by(Assessment.updated_at.desc())]
 
 
 @router.post("/assessments")
 def create_assessment(body: AssessmentIn, db: Session = Depends(get_db), u: User = Depends(require(*EDITORS))):
-    get_or_404(db, Project, body.project_id)
+    if get_or_404(db, Project, body.project_id).status == "archived":
+        raise HTTPException(409, "the project is archived — restore it before adding assessments")
     rs = db.query(RiskScheme).order_by(RiskScheme.version.desc()).first()
     tpl = None
     if body.template:

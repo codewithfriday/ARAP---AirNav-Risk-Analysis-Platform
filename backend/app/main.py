@@ -7,7 +7,7 @@ from .api.routes import router
 from .config import settings
 from .db import Base, SessionLocal, engine
 from .engines.risk import DEFAULT_SCHEME
-from .models import RiskScheme, User
+from .models import AuditLog, RiskScheme, User
 from .security import hash_password
 
 
@@ -25,15 +25,22 @@ def init_db():
             from .demo import seed_demo
             from .demo2 import seed_demo_v2
             from .demo3 import seed_demo_v3
-            seed_demo(db)
-            seed_demo_v2(db)
-            seed_demo_v3(db)
+            # A demo project an administrator has deleted stays deleted (SRS COM-18): skip its seeder.
+            gone = {(r.before or {}).get("code") for r in db.query(AuditLog).filter_by(entity="project", action="delete")}
+            if "DEMO-01" not in gone:
+                seed_demo(db)
+            if "DEMO-02" not in gone:
+                seed_demo_v2(db)
+            if "DEMO-03" not in gone:
+                seed_demo_v3(db)
             from .seed_wildlife import seed_wildlife
             seed_wildlife(db)
             from .assessment_templates import seed_demo_v4
-            seed_demo_v4(db)
+            if "DEMO-04" not in gone:
+                seed_demo_v4(db)
             from .template_org import seed_demo_v5
-            seed_demo_v5(db)
+            if "DEMO-05" not in gone:
+                seed_demo_v5(db)
 
 
 @asynccontextmanager
@@ -42,7 +49,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(title="ARAP — AirNav Risk Analysis Platform", version="0.5.0", lifespan=lifespan,
+app = FastAPI(title="ARAP — AirNav Risk Analysis Platform", version="0.6.0", lifespan=lifespan,
               docs_url="/api/docs", openapi_url="/api/openapi.json", redoc_url=None,
               description="Safety risk assessment with twenty-five methods (AirNav Risk Analysis Manual).")
 app.add_middleware(CORSMiddleware, allow_origins=[o.strip() for o in settings.cors_origins.split(",")],

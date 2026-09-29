@@ -2,7 +2,7 @@ import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
 
 const en = {
-  nav: { dashboard: 'Dashboard', projects: 'Projects & assessments', hazards: 'Hazard log', actions: 'Actions',
+  nav: { dashboard: 'Dashboard', projects: 'Projects & assessments', hazards: 'Hazard log', actions: 'Actions', cases: 'Case library',
     scheme: 'Risk scheme', users: 'Users', audit: 'Audit trail', guide: 'User guide' },
   common: { save: 'Save', saved: 'Saved', cancel: 'Cancel', add: 'Add', delete: 'Delete', edit: 'Edit', create: 'Create',
     calculate: 'Calculate', export: 'Export', search: 'Search', status: 'Status', owner: 'Owner', title: 'Title',
@@ -16,7 +16,7 @@ const en = {
 }
 
 const id: typeof en = {
-  nav: { dashboard: 'Dasbor', projects: 'Proyek & penilaian', hazards: 'Log bahaya', actions: 'Tindakan',
+  nav: { dashboard: 'Dasbor', projects: 'Proyek & penilaian', hazards: 'Log bahaya', actions: 'Tindakan', cases: 'Pustaka kasus',
     scheme: 'Skema risiko', users: 'Pengguna', audit: 'Jejak audit', guide: 'Panduan pengguna' },
   common: { save: 'Simpan', saved: 'Tersimpan', cancel: 'Batal', add: 'Tambah', delete: 'Hapus', edit: 'Ubah', create: 'Buat',
     calculate: 'Hitung', export: 'Ekspor', search: 'Cari', status: 'Status', owner: 'Pemilik', title: 'Judul',

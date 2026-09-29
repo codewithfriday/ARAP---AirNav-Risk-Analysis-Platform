@@ -63,7 +63,7 @@ export default function Projects() {
           <Form.Item name="code" label="Code" rules={[{ required: true }]}><Input placeholder="e.g. ADSB-2027" /></Form.Item>
           <Form.Item name="title" label="Title" rules={[{ required: true }]}><Input /></Form.Item>
           <Form.Item name="change_type" label="Type of change">
-            <Select options={['system', 'procedure', 'airspace', 'organisational', 'temporary'].map((v) => ({ value: v, label: v }))} />
+            <Select options={['system', 'procedure', 'airspace', 'organisational', 'temporary', 'investigation'].map((v) => ({ value: v, label: v }))} />
           </Form.Item>
           <Form.Item name="units" label="Units affected"><Input /></Form.Item>
           <Form.Item name="sponsor" label="Change sponsor"><Input /></Form.Item>

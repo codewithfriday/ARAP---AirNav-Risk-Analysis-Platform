@@ -134,7 +134,7 @@ def test_v2_demo_and_calc_endpoints(client, viewer):
     a = client.get(f"/api/projects/{demo2['id']}", headers=viewer).json()["assessments"][0]
     full = client.get(f"/api/assessments/{a['id']}", headers=viewer).json()
     assert {s["method"] for s in full["studies"]} == {"crm", "eta", "hra", "orc", "gsn", "cca", "rbd", "swift", "hta", "sim", "sej", "sec", "inv", "wildlife"}
-    assert len(client.get("/api/meta/methods", headers=viewer).json()) == 28
+    assert len(client.get("/api/meta/methods", headers=viewer).json()) == 29
     v = client.post("/api/calc/crm", json={"dimension": "vertical", "params": S.CRM_VERTICAL}, headers=viewer).json()
     assert abs(v["total"] - 1.873e-9) < 1e-11
     L, m = S.CRM_LATERAL, S.CRM_LAT_MODEL

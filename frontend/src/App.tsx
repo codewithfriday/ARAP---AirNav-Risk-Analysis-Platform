@@ -3,7 +3,7 @@ import { Routes, Route, Navigate, useNavigate, useLocation, Link } from 'react-r
 import { Layout, Menu, Dropdown, Avatar, Space, Segmented, Spin, Typography } from 'antd'
 import {
   DashboardOutlined, FolderOpenOutlined, WarningOutlined, CheckSquareOutlined, TableOutlined, TeamOutlined,
-  AuditOutlined, LogoutOutlined, UserOutlined, BookOutlined,
+  AuditOutlined, LogoutOutlined, UserOutlined, BookOutlined, FileSearchOutlined,
 } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
 import { useAuth, isAdmin } from './store'
@@ -20,6 +20,8 @@ import RiskSchemePage from './pages/RiskScheme'
 import Users from './pages/Users'
 import Audit from './pages/Audit'
 import Guide from './pages/Guide'
+import CaseLibrary from './pages/CaseLibrary'
+import CaseEditor from './pages/CaseEditor'
 
 const { Sider, Header, Content } = Layout
 
@@ -45,6 +47,7 @@ export default function App() {
     { key: '/projects', icon: <FolderOpenOutlined />, label: t('nav.projects') },
     { key: '/hazards', icon: <WarningOutlined />, label: t('nav.hazards') },
     { key: '/actions', icon: <CheckSquareOutlined />, label: t('nav.actions') },
+    { key: '/cases', icon: <FileSearchOutlined />, label: t('nav.cases') },
     { key: '/scheme', icon: <TableOutlined />, label: t('nav.scheme') },
     ...(isAdmin(user) ? [{ key: '/users', icon: <TeamOutlined />, label: t('nav.users') }] : []),
     ...(['admin', 'reviewer'].includes(user.role) ? [{ key: '/audit', icon: <AuditOutlined />, label: t('nav.audit') }] : []),
@@ -90,6 +93,8 @@ export default function App() {
             <Route path="/users" element={<Users />} />
             <Route path="/audit" element={<Audit />} />
             <Route path="/guide" element={<Guide />} />
+            <Route path="/cases" element={<CaseLibrary />} />
+            <Route path="/cases/:id" element={<CaseEditor />} />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </Content>

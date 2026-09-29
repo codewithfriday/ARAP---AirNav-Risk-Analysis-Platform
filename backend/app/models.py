@@ -15,7 +15,7 @@ def now():
 ROLES = ("admin", "assessor", "reviewer", "authority", "viewer")
 METHODS = ("bowtie", "hazid", "hazop", "jha", "fmea", "lopa", "fha", "stpa", "fta", "fatigue", "fram", "bbn",
            "crm", "eta", "hra", "orc", "gsn", "cca", "rbd", "swift", "hta", "sim", "sej", "sec", "inv",
-           "wildlife", "orgmap", "spi")
+           "wildlife", "orgmap", "spi", "ies")
 ASSESSMENT_STATES = ("draft", "in_review", "endorsed", "accepted", "rejected", "closed", "superseded")
 LOCKED_STATES = ("endorsed", "accepted", "closed", "superseded")
 
@@ -179,3 +179,23 @@ class AuditLog(Base):
     action: Mapped[str] = mapped_column(String(20))
     before: Mapped[dict | None] = mapped_column(JSONType, nullable=True)
     after: Mapped[dict | None] = mapped_column(JSONType, nullable=True)
+
+
+class InvCase(Base):
+    """A past occurrence represented as an ORLIO AcciMap — the knowledge base of the investigation expert system."""
+    __tablename__ = "inv_cases"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    ref: Mapped[str] = mapped_column(String(30), unique=True, index=True)
+    title: Mapped[str] = mapped_column(String(300))
+    category: Mapped[str] = mapped_column(String(40), index=True)
+    source: Mapped[str] = mapped_column(Text, default="")
+    occurred: Mapped[str] = mapped_column(String(20), default="")
+    summary: Mapped[str] = mapped_column(Text, default="")
+    report_text: Mapped[str] = mapped_column(Text, default="")
+    model: Mapped[dict] = mapped_column(JSONType, default=dict)
+    status: Mapped[str] = mapped_column(String(20), default="draft")  # draft | approved
+    provenance: Mapped[dict] = mapped_column(JSONType, default=dict)
+    created_by: Mapped[str] = mapped_column(String(64), default="")
+    approved_by: Mapped[str] = mapped_column(String(64), default="")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, onupdate=now)

@@ -1,6 +1,6 @@
 # ARAP User Guide
 
-**AirNav Risk Analysis Platform — version 0.6**
+**AirNav Risk Analysis Platform — version 0.7**
 
 ARAP is the web application that implements the *AirNav Risk Analysis Manual*. It lets AirNav staff plan, run, review and approve safety risk assessments with twenty-six methods, keeps every hazard in one hazard log, and produces the Safety Assessment Report.
 
@@ -22,14 +22,14 @@ This guide explains how to use the application. For *why* and *when* to use each
 10. [Bayesian belief networks](#10-bayesian-belief-networks)
 11. [STPA](#11-stpa)
 12. [FRAM](#12-fram)
-13. [Extended methods: CRM, ETA, HRA, ERC/RAT, GSN, CCA, RBD/Markov, SWIFT, HTA, simulation, expert judgement, security, investigation, wildlife](#13-extended-methods-manual-chapters-1831)
+13. [Extended methods: CRM, ETA, HRA, ERC/RAT, GSN, CCA, RBD/Markov, SWIFT, HTA, simulation, expert judgement, security, investigation, wildlife, investigation expert system](#13-extended-methods-manual-chapters-1831)
 14. [The hazard log](#14-the-hazard-log)
 15. [Actions](#15-actions)
 16. [Review, approval and locking](#16-review-approval-and-locking)
 17. [Reports and exports](#17-reports-and-exports)
 18. [Administration](#18-administration)
 19. [Troubleshooting and FAQ](#19-troubleshooting-and-faq)
-20. [What version 0.6 does not do yet](#20-what-version-06-does-not-do-yet)
+20. [What version 0.7 does not do yet](#20-what-version-07-does-not-do-yet)
 
 ---
 
@@ -514,6 +514,64 @@ The feasibility gate and the capacity (queue/occupancy) model have no dedicated 
 
 ---
 
+### 13.16 Investigation expert system and case library (Manual Appendix E)
+
+The expert system helps in the **initial phase of an ATS occurrence investigation**. It finds similar past occurrences, compares the evidence you have with the evidence they needed, suggests the likely mechanism and — most usefully — lists the evidence worth collecting next. It is advisory: it suggests, investigators conclude, and its outputs do not apportion blame.
+
+It has two parts:
+
+- **Case library** (left menu). Past occurrences stored as AcciMaps in the five ORLIO lanes: Organisational influences, Risk controls, Local conditions, Individual actions, Occurrence events.
+- **Investigation expert system (ORLIO)**, a study you add to the assessment of an investigation.
+
+#### The case library
+
+![Case library](screenshots/v3-ies-library.png)
+
+Each case has **evidence** blocks (facts, rated in the past occurrence), **hypothesis** blocks (intermediate conclusions) and one **finding** (the occurrence and a verbal probability for each mechanism of the category). Give each block an **ORLIO factor** from the category's catalogue where one fits: the factor links the block across cases and is what the Bayesian network learns from.
+
+In the AcciMap editor:
+
+- **+ Evidence / + Hypothesis / + Finding** add blocks. Click a block to edit it in the panel on the right.
+- Drag from a block's lower handle to another block to link them. Click a link to make it an **input** (solid, used by the rules) or **context** (dashed, shown only). Drag a block into another lane to change its layer.
+- **Default rules** creates, for each hypothesis and finding, the *confirming* rule (the past states → the past conclusion), a *weakening* rule per input (that input "No effect") and a *contradicting* rule per input (that input opposed). Edit them in the **Rules** tab. A yellow banner warns when the rules no longer match the links.
+- The **Test** tab runs the inference with the past states; it should reproduce the past finding.
+
+![AcciMap editor](screenshots/v3-ies-case-editor.png)
+
+A case is used only after a **reviewer approves** it. Saving a change to an approved case returns it to draft.
+
+**Draft from report** creates a draft AcciMap from pasted text or a text-based PDF of a final report:
+
+- *Offline* (always available): sentences are matched to the factor catalogue and the mechanism keywords.
+- *AI (Claude)*: available when the administrator has set `ARAP_ANTHROPIC_API_KEY`. Claude proposes the blocks, links and mechanism. **Only send published final reports**; protected investigation records must not leave AirNav.
+
+Every drafted block carries a quote from the report, which ARAP checks against the text. A quote that is not found is marked in red and blocks approval until you correct or clear it; the **Report text** tab lists all quotes. Treat every draft as a starting point: check the layers, the past states and the links, and delete blocks that are not findings of the report.
+
+![Draft from a report](screenshots/v3-ies-draft.png)
+
+#### Using the expert system in an investigation
+
+Add the study **Investigation expert system (ORLIO)** to the investigation's assessment, choose the occurrence category, and work through the four tabs:
+
+1. **Occurrence & search.** Describe what is known so far and click **Search the case library**. Results show the matched terms and shared factors; tick up to five cases. Factors recognised in your text are shown as suggestions. Click one to rate it *Support*, but check it first.
+2. **Evidence ratings.** Rate each factor you have evidence for: *Strongly support* or *Strongly oppose* for recorded or physical evidence (radar replay, RT recording, logs); *Support* or *Oppose* for interviews and judgement; *No effect* when the factor was present but did not matter. Leave everything else **Not provided**. A factor rated once applies to every case.
+3. **AcciMaps.** Click **Run analysis**. Each selected case shows the inferred hypotheses and finding, or *not determined* when evidence is missing. **Clues from the past cases** lists that missing evidence. You can also rate evidence directly in the diagrams.
+4. **Bayesian network & ranked clues.** This tab uses the whole approved library of the category. The bar chart shows the prior and posterior probability of each mechanism. The table ranks the unrated factors by **value of information**: how much establishing each would reduce the uncertainty about the mechanism. Rate a clue and run again. **Open as BBN study** creates an ordinary Bayesian-network study with the learned network and your ratings.
+
+![Expert system — AcciMaps and clues](screenshots/v3-ies-accimaps.png)
+
+![Expert system — Bayesian network and ranked clues](screenshots/v3-ies-bn.png)
+
+Demo project **DEMO-06** is an illustrative loss of separation between two aircraft with similar callsigns on combined night sectors. The library has nine illustrative ATS cases and the reference example from Ng et al. (2022).
+
+After the day-1 ratings:
+
+- The network puts *readback/hearback error not detected* (M2) at 44% (prior 20%).
+- CASE-01 gives M2 *Very probable*.
+- The top clue is whether there was a **monitoring lapse**, which best separates M2 from *conflict not detected* (M5).
+
+Continue the investigation with SOAM/HFACS (§13.13). After the final report, add the occurrence to the case library.
+
 ## 14. The hazard log
 
 ![Hazard log](screenshots/05-hazard-log.png)
@@ -612,9 +670,9 @@ Administrators can reassign cells: choose a region under **Paint region**, click
 
 ---
 
-## 20. What version 0.6 does not do yet
+## 20. What version 0.7 does not do yet
 
-Version 0.6 covers the core workflow and all twenty-six methods. The following SRS items are planned for later releases:
+Version 0.7 covers the core workflow and all twenty-six methods. The following SRS items are planned for later releases:
 
 - Single sign-on through Keycloak / SAML / OIDC with MFA. Version 0.2 uses local accounts with JWT tokens.
 - Real-time co-editing of a diagram by several users, and the offline workshop pack.
@@ -625,6 +683,7 @@ Version 0.6 covers the core workflow and all twenty-six methods. The following S
 - An Apache Superset / Metabase reporting database.
 - Linking SPI-register rows to bowtie barriers so barrier health shows the SPI status (SRS SPI-03).
 - Deleting a single assessment (only whole projects can be deleted), and a retention period after which archived projects are purged.
+- For the investigation expert system: meaning-based search with text embeddings (pgvector), network structures other than mechanism → factors (e.g. noisy-OR between factors), statistical validation reports against held-back cases, and AI drafting tested only against a simulated service in the automated tests.
 - Saving an existing assessment as a new template, and administrator editing of templates (SRS TPL-05).
 - For the wildlife module: import of strike records from the occurrence system and in ICAO IBIS format.
 - For the extended methods: import of occurrences from the reporting system into the ERC/RAT module, CRM sensitivity cases, administrator editing of the CARA/HEART libraries, and restricted (need-to-know) access to security studies (SRS SRA-04).

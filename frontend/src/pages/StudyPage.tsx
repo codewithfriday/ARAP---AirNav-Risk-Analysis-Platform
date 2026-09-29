@@ -29,6 +29,7 @@ const EDITORS: Record<string, any> = {
   sej: lazy(() => import('../methods/SejEditor')),
   inv: lazy(() => import('../methods/InvEditor')),
   wildlife: lazy(() => import('../methods/WildlifeEditor')),
+  ies: lazy(() => import('../methods/IesEditor')),
 }
 const Worksheet = lazy(() => import('../methods/WorksheetEditor'))
 
@@ -87,7 +88,7 @@ export default function StudyPage() {
     }
   }
   const Editor = EDITORS[study.method]
-  const props = { model, setModel, results, setResults: setRes, readOnly, scheme: scheme?.data, template: m, promote }
+  const props = { model, setModel, results, setResults: setRes, readOnly, scheme: scheme?.data, template: m, promote, assessmentId: study.assessment.id }
 
   return (
     <div>

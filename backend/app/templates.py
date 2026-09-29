@@ -145,6 +145,8 @@ METHODS = {
                                "Roost / nesting colony", "Landfill", "Orchard (fruit)", "Food waste / market", "Standing water / drains", "Other"],
                  "mitigation_types": ["Habitat", "Dispersal", "Land use", "Detection", "ATS", "Reporting", "Exclusion"],
                  "circle_km": 13},
+    "ies": {"name": "Investigation expert system (ORLIO)", "chapter": "App. E", "kind": "composite", "template_version": "1.0",
+            "summary": "Search past ORLIO AcciMaps, rate the evidence, fuzzy inference per case, Bayesian network across the library and ranked clues for evidence collection."},
     "orgmap": {"name": "Organisational function map", "chapter": "App. D", "kind": "worksheet", "template_version": "1.0",
                "summary": "Every safety-related function mapped from its current to its new owner, with competence, capacity, authority and handover checked.",
                "options": {"fn_category": ["SMS", "Operations", "Technical", "Training and competence", "Barrier owner", "Support"],

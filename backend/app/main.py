@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from .api.ies import router as ies_router
 from .api.routes import router
 from .config import settings
 from .db import Base, SessionLocal, engine
@@ -41,6 +42,11 @@ def init_db():
             from .template_org import seed_demo_v5
             if "DEMO-05" not in gone:
                 seed_demo_v5(db)
+            from .investigation import seed_cases, seed_demo_v6
+            if not db.query(AuditLog).filter_by(entity="case", action="delete").first():
+                seed_cases(db)
+            if "DEMO-06" not in gone:
+                seed_demo_v6(db)
 
 
 @asynccontextmanager
@@ -49,12 +55,13 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(title="ARAP — AirNav Risk Analysis Platform", version="0.6.0", lifespan=lifespan,
+app = FastAPI(title="ARAP — AirNav Risk Analysis Platform", version="0.7.0", lifespan=lifespan,
               docs_url="/api/docs", openapi_url="/api/openapi.json", redoc_url=None,
               description="Safety risk assessment with twenty-five methods (AirNav Risk Analysis Manual).")
 app.add_middleware(CORSMiddleware, allow_origins=[o.strip() for o in settings.cors_origins.split(",")],
                    allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 app.include_router(router)
+app.include_router(ies_router)
 
 
 @app.get("/api/health")

@@ -15,7 +15,7 @@ const RECOMMEND: Record<string, string[]> = {
   system: ['hazid', 'fha', 'fmea', 'fta', 'cca', 'rbd', 'bowtie', 'sec', 'gsn'],
   procedure: ['hazid', 'hazop', 'hta', 'hra', 'stpa', 'bowtie', 'lopa', 'sim', 'gsn'],
   airspace: ['hazid', 'hazop', 'crm', 'eta', 'hra', 'bowtie', 'lopa', 'sim', 'gsn'],
-  organisational: ['hazid', 'fatigue', 'jha', 'bowtie'],
+  organisational: ['orgmap', 'stpa', 'hazid', 'hta', 'fatigue', 'swift', 'bowtie', 'spi', 'gsn'],
   temporary: ['swift', 'hazid', 'jha', 'bowtie', 'wildlife'],
 }
 

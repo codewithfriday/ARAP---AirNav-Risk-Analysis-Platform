@@ -32,6 +32,8 @@ def init_db():
             seed_wildlife(db)
             from .assessment_templates import seed_demo_v4
             seed_demo_v4(db)
+            from .template_org import seed_demo_v5
+            seed_demo_v5(db)
 
 
 @asynccontextmanager
@@ -40,7 +42,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(title="ARAP — AirNav Risk Analysis Platform", version="0.4.0", lifespan=lifespan,
+app = FastAPI(title="ARAP — AirNav Risk Analysis Platform", version="0.5.0", lifespan=lifespan,
               docs_url="/api/docs", openapi_url="/api/openapi.json", redoc_url=None,
               description="Safety risk assessment with twenty-five methods (AirNav Risk Analysis Manual).")
 app.add_middleware(CORSMiddleware, allow_origins=[o.strip() for o in settings.cors_origins.split(",")],

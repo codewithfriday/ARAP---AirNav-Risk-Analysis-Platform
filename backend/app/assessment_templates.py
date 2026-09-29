@@ -433,6 +433,11 @@ TEMPLATES = {
 }
 
 
+from .template_org import TEMPLATE as _ORG  # noqa: E402
+
+TEMPLATES["org_change"] = _ORG
+
+
 def catalogue():
     return [{k: v for k, v in t.items() if k != "build"} for t in TEMPLATES.values()]
 

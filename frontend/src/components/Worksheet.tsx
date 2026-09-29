@@ -16,6 +16,20 @@ export function secRisk(r: any) {
   return { score, level, color }
 }
 
+/** Organisational function map: list the open issues of a row (Manual Appendix D). */
+export function ofmGaps(r: any): string[] {
+  const g: string[] = []
+  const owner = String(r?.new_owner ?? '').trim()
+  if (!owner || owner === '—' || owner === '-') g.push('no owner')
+  if (r?.competence === 'gap') g.push('competence')
+  if (r?.capacity === 'stretched' || r?.capacity === 'overloaded') g.push(`capacity ${r.capacity}`)
+  if (r?.authority === 'pending' || r?.authority === 'none') g.push(`authority ${r.authority}`)
+  if (r?.handover === 'not planned') g.push('no handover')
+  if ([r?.competence, r?.capacity, r?.authority, r?.handover].some((v) => !v || v === 'unknown')) g.push('to assess')
+  return g
+}
+const RAG: Record<string, string> = { green: '#D5ECDD', amber: '#FBE7C2', red: '#F4CACA' }
+
 export type ColSpec = [string, string, number, string?]
 
 /** Generic spreadsheet-style worksheet driven by the method template columns (SRS HZD/HZP/JHA/FME/FHA). */
@@ -33,6 +47,9 @@ export function Worksheet({ columns, rows, onChange, scheme, readOnly, options, 
     if (kind === 'int5') return { ...base, cellEditor: 'agNumberCellEditor', cellEditorParams: { min: 1, max: 5, precision: 0 } }
     if (kind === 'computed' && field === 'sec_risk') return { ...base, filter: false, valueGetter: (p) => secRisk(p.data)?.score ?? null,
       cellRenderer: (p: any) => { const r = secRisk(p.data); return r ? <span className="risk-cell" style={{ background: r.color }}>{r.score} {r.level}</span> : '' } }
+    if (kind === 'computed' && field === 'gap') return { ...base, filter: false, valueGetter: (p) => ofmGaps(p.data).join(', ') || 'OK',
+      cellRenderer: (p: any) => { const g = ofmGaps(p.data); return g.length ? g.map((x) => <span key={x} className="risk-cell" style={{ background: x === 'to assess' ? '#9CA3AF' : x.includes('stretched') ? '#D98E04' : '#B23A3A', marginRight: 3, fontSize: 10.5 }}>{x}</span>) : <span className="risk-cell" style={{ background: '#3C8D5A' }}>OK</span> } }
+    if (kind === 'rag') return { ...base, cellEditor: 'agSelectCellEditor', cellEditorParams: { values: ['', 'green', 'amber', 'red'] }, cellStyle: (p: any) => ({ ...(base.cellStyle as any), background: RAG[p.value] ?? undefined, fontWeight: 600 }) as any }
     if (kind === 'int10') return { ...base, cellEditor: 'agNumberCellEditor', cellEditorParams: { min: 1, max: 10, precision: 0 } }
     if (kind === 'number') return { ...base, cellEditor: 'agNumberCellEditor', valueFormatter: (p) => (p.value === null || p.value === undefined || p.value === '' ? '' : fmtSci(Number(p.value))) }
     if (kind === 'bool') return { ...base, cellDataType: 'boolean', cellEditor: 'agCheckboxCellEditor', cellRenderer: 'agCheckboxCellRenderer' }

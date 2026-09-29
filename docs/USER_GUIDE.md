@@ -1,6 +1,6 @@
 # ARAP User Guide
 
-**AirNav Risk Analysis Platform — version 0.4**
+**AirNav Risk Analysis Platform — version 0.5**
 
 ARAP is the web application that implements the *AirNav Risk Analysis Manual*. It lets AirNav staff plan, run, review and approve safety risk assessments with twenty-six methods, keeps every hazard in one hazard log, and produces the Safety Assessment Report.
 
@@ -29,7 +29,7 @@ This guide explains how to use the application. For *why* and *when* to use each
 17. [Reports and exports](#17-reports-and-exports)
 18. [Administration](#18-administration)
 19. [Troubleshooting and FAQ](#19-troubleshooting-and-faq)
-20. [What version 0.4 does not do yet](#20-what-version-04-does-not-do-yet)
+20. [What version 0.5 does not do yet](#20-what-version-05-does-not-do-yet)
 
 ---
 
@@ -141,6 +141,28 @@ In **New assessment**, the field **Start from** offers ready-made assessment tem
 | GSN | The argument G0–G7, with every solution already linked to the new studies |
 
 Demo project **DEMO-04** is this template filled in with illustrative values. It has likelihoods, a calculated fault tree (2.86 × 10⁻⁵ per critical item, which is above the objective, so a further independent check is needed), shadow-operation results with one criterion not met, 7 hazards and 6 actions.
+
+**Major organisational change** (Manual Appendix D) creates 11 studies covering planning, execution and post-implementation:
+
+![Organisational function map](screenshots/v2-org-functionmap.png)
+
+| Study | Pre-filled content |
+|---|---|
+| Organisational function map | 18 safety-related functions: SMS roles, supervision, training and competence, technical functions and bowtie barrier owners, each with current owner → new owner. Competence, capacity, authority and handover start as *unknown*. The **Gaps** column flags orphans (no new owner), competence gaps, stretched or overloaded capacity, pending authority, missing handover and anything still to assess. Rows with gaps can be sent to the hazard log. |
+| FHA | Failure conditions of the organisational functions: triage delayed, investigations degraded, safety function not independent, merged supervisor overloaded, LoAs without an owner, and so on |
+| STPA × 2 | The **current** and the **new** control structure, so you can compare the feedback loops. The new one includes unsafe control actions (UCAs) and loss scenarios. |
+| HAZID | Uses its own **organisational guidewords**: roles, authority, competence, workload, interfaces, communication, corporate memory, contractors, culture, transition. Coverage is counted against this list. |
+| HTA | The merged Operations Supervisor post, with a plan that sets priorities between watch, OJT and events |
+| Delphi | The question and panel for the likelihood of triage failure after transfer |
+| SWIFT, bowtie | What-ifs for the transition plan; the top event "safety-related function not performed, or performed without competence, capacity or authority", with phased go/no-go and reversion |
+| SPI register | 10 indicators with target, alert level, owner and escalation. Rows at red are listed at the top. |
+| GSN | G0–G7, linked to all the studies above |
+
+![SPI register](screenshots/v2-org-spi.png)
+
+Demo project **DEMO-05** is this template filled in for an illustrative branch reorganisation. It has 13 of 18 functions with gaps (2 orphans), the Safety & Quality function losing its direct line to the Accountable Executive, a Delphi estimate converging on 0.12, SPI values, 7 hazards and 6 actions.
+
+The same modules can be added to any assessment on their own: **Organisational function map** and **SPI register** appear in **Add study**.
 
 ## 4. Working in a method study
 
@@ -570,9 +592,9 @@ Administrators can reassign cells: choose a region under **Paint region**, click
 
 ---
 
-## 20. What version 0.4 does not do yet
+## 20. What version 0.5 does not do yet
 
-Version 0.4 covers the core workflow and all twenty-six methods. The following SRS items are planned for later releases:
+Version 0.5 covers the core workflow and all twenty-six methods. The following SRS items are planned for later releases:
 
 - Single sign-on through Keycloak / SAML / OIDC with MFA. Version 0.2 uses local accounts with JWT tokens.
 - Real-time co-editing of a diagram by several users, and the offline workshop pack.
@@ -581,6 +603,7 @@ Version 0.4 covers the core workflow and all twenty-six methods. The following S
 - Integrations with the occurrence reporting, rostering and maintenance systems.
 - CAST (STPA for accident analysis), noisy-OR helpers for Bayesian networks, Monte Carlo uncertainty, and the full “braked” sleep-recovery form of the fatigue model.
 - An Apache Superset / Metabase reporting database.
+- Linking SPI-register rows to bowtie barriers so barrier health shows the SPI status (SRS SPI-03).
 - Saving an existing assessment as a new template, and administrator editing of templates (SRS TPL-05).
 - For the wildlife module: import of strike records from the occurrence system and in ICAO IBIS format.
 - For the extended methods: import of occurrences from the reporting system into the ERC/RAT module, CRM sensitivity cases, administrator editing of the CARA/HEART libraries, and restricted (need-to-know) access to security studies (SRS SRA-04).

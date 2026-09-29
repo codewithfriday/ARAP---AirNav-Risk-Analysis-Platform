@@ -1,4 +1,4 @@
-# ARAP architecture notes (v0.4)
+# ARAP architecture notes (v0.5)
 
 ## Overview
 
@@ -26,6 +26,7 @@ The back end is a single modular application (a "modular monolith", as recommend
 | `demo2.py`, `seed2.py`, `seed_wildlife.py` | Worked examples of chapters 18–31 (project DEMO-02) and their reference inputs; the wildlife study is also added to existing databases on start-up |
 | `demo3.py` | DEMO-03: the H24 alternate-aerodrome SRA case study |
 | `assessment_templates.py` | Assessment templates (catalogue, builders). `build_aim(db, assessment, filled)` creates the 14 AIM studies; `filled=True` adds illustrative ratings, results, hazards and actions (DEMO-04). Exposed by `GET /assessment-templates` and `POST /assessments {template}` |
+| `template_org.py` | Template *Major organisational change* (`build_org`) and DEMO-05 (`seed_demo_v5`) |
 | `engines/` | `risk`, `fta`, `lopa`, `fmea`, `bbn`, `fatigue`; v0.2: `crm`, `eta`, `hra`, `orc`, `rbd`, `sej`, `sim`, `security`; v0.3: `wildlife` |
 
 ### Data model
@@ -76,7 +77,7 @@ Method-specific objects (bowtie paths and barriers, HAZOP nodes, fault-tree gate
 | `risk.ts` | Client-side mirror of matrix classification for display (the server stays authoritative) |
 | `pages/` | Dashboard, projects, assessment, study host, hazard log, actions, risk scheme, users, audit, guide |
 | `components/` | Risk matrix picker, risk tags, generic AG Grid worksheet (incl. SWIFT and security kinds), `EditableTable` for small inline lists |
-| `methods/` | One editor per method: `BowtieEditor` + `bowtieLayout`, `WorksheetEditor` (HAZID, HAZOP, JHA, FMEA, FHA), `LopaEditor`, `FtaEditor` (ELK layout), `FatigueEditor`, `BbnEditor`, `StpaEditor`, `FramEditor`; v0.2: `CrmEditor`, `EtaEditor`, `HraEditor`, `OrcEditor`, `GsnEditor` (ELK), `CcaEditor`, `RbdEditor`, `HtaEditor` (ELK), `SimEditor`, `SejEditor`, `InvEditor`, `WildlifeEditor`; SWIFT and security use `WorksheetEditor` |
+| `methods/` | One editor per method: `BowtieEditor` + `bowtieLayout`, `WorksheetEditor` (HAZID, HAZOP, JHA, FMEA, FHA), `LopaEditor`, `FtaEditor` (ELK layout), `FatigueEditor`, `BbnEditor`, `StpaEditor`, `FramEditor`; v0.2: `CrmEditor`, `EtaEditor`, `HraEditor`, `OrcEditor`, `GsnEditor` (ELK), `CcaEditor`, `RbdEditor`, `HtaEditor` (ELK), `SimEditor`, `SejEditor`, `InvEditor`, `WildlifeEditor`; SWIFT, security, the organisational function map (`orgmap`, gap flags via `ofmGaps`) and the SPI register (`spi`, RAG status) use `WorksheetEditor`; a HAZID/SWIFT model may carry its own `guidewords` list |
 
 Method editors are lazy-loaded. Each receives `{model, setModel, results, setResults, readOnly, scheme, template, promote}` from `StudyPage`, which owns saving and hazard-log promotion.
 

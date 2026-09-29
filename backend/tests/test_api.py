@@ -134,7 +134,7 @@ def test_v2_demo_and_calc_endpoints(client, viewer):
     a = client.get(f"/api/projects/{demo2['id']}", headers=viewer).json()["assessments"][0]
     full = client.get(f"/api/assessments/{a['id']}", headers=viewer).json()
     assert {s["method"] for s in full["studies"]} == {"crm", "eta", "hra", "orc", "gsn", "cca", "rbd", "swift", "hta", "sim", "sej", "sec", "inv", "wildlife"}
-    assert len(client.get("/api/meta/methods", headers=viewer).json()) == 26
+    assert len(client.get("/api/meta/methods", headers=viewer).json()) == 28
     v = client.post("/api/calc/crm", json={"dimension": "vertical", "params": S.CRM_VERTICAL}, headers=viewer).json()
     assert abs(v["total"] - 1.873e-9) < 1e-11
     L, m = S.CRM_LATERAL, S.CRM_LAT_MODEL
@@ -234,3 +234,30 @@ def test_demo4_aim(client, viewer):
     sim = next(s for s in full["studies"] if s["method"] == "sim")
     res = client.get(f"/api/studies/{sim['id']}", headers=viewer).json()["results"]["measures"]
     assert [m["criterion_met"] for m in res] == [False, True, True]
+
+
+def test_assessment_template_org_change(client, viewer, assessor):
+    """TC-TPL-02: organisational change template — 11 studies, function map unassessed, HAZID with organisational guidewords."""
+    t = next(x for x in client.get("/api/assessment-templates", headers=viewer).json() if x["key"] == "org_change")
+    assert len(t["studies"]) == 11
+    pid = client.get("/api/projects", headers=viewer).json()[0]["id"]
+    a = client.post("/api/assessments", headers=assessor, json={"project_id": pid, "title": t["title"], "template": "org_change"}).json()
+    by = {}
+    for s in a["studies"]:
+        by.setdefault(s["method"], []).append(s["id"])
+    assert sorted(by) == sorted(["orgmap", "fha", "stpa", "hazid", "hta", "sej", "swift", "bowtie", "spi", "gsn"]) and len(by["stpa"]) == 2
+    fmap = client.get(f"/api/studies/{by['orgmap'][0]}", headers=viewer).json()["model"]["rows"]
+    assert len(fmap) == 18 and all(r["competence"] == "unknown" for r in fmap)
+    assert sum(1 for r in fmap if not r["new_owner"]) == 2          # orphan functions proposed by the design
+    hz = client.get(f"/api/studies/{by['hazid'][0]}", headers=viewer).json()["model"]
+    assert hz["guidewords"][0] == "Roles and responsibilities" and all("likelihood" not in r for r in hz["rows"])
+
+
+def test_demo5_org_change(client, viewer):
+    p = next(x for x in client.get("/api/projects", headers=viewer).json() if x["code"] == "DEMO-05")
+    a = client.get(f"/api/projects/{p['id']}", headers=viewer).json()["assessments"][0]
+    full = client.get(f"/api/assessments/{a['id']}", headers=viewer).json()
+    assert len(full["studies"]) == 11 and len(full["hazards"]) == 7 and len(full["actions"]) == 6
+    sej = next(s for s in full["studies"] if s["method"] == "sej")
+    d = client.get(f"/api/studies/{sej['id']}", headers=viewer).json()["results"]["delphi"]
+    assert [round(r["median"], 3) for r in d] == [0.125, 0.12, 0.12] and d[-1]["converging"]

@@ -15,7 +15,7 @@ def now():
 ROLES = ("admin", "assessor", "reviewer", "authority", "viewer")
 METHODS = ("bowtie", "hazid", "hazop", "jha", "fmea", "lopa", "fha", "stpa", "fta", "fatigue", "fram", "bbn",
            "crm", "eta", "hra", "orc", "gsn", "cca", "rbd", "swift", "hta", "sim", "sej", "sec", "inv",
-           "wildlife")
+           "wildlife", "orgmap", "spi")
 ASSESSMENT_STATES = ("draft", "in_review", "endorsed", "accepted", "rejected", "closed", "superseded")
 LOCKED_STATES = ("endorsed", "accepted", "closed", "superseded")
 

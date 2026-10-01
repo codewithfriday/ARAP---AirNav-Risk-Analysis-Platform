@@ -763,6 +763,23 @@ def calc_fatigue(body: FatigueIn, _: User = Depends(current_user)):
     return fatigue.run(body.sleeps, body.duties, body.start, body.end, body.step_minutes, body.params, body.kss_threshold)
 
 
+class SamnPerelliIn(BaseModel):
+    ratings: list[dict] = []
+
+
+@router.get("/meta/samn-perelli")
+def samn_perelli_meta(_: User = Depends(current_user)):
+    return fatigue.sp_meta()
+
+
+@router.post("/calc/samn-perelli")
+def calc_samn_perelli(body: SamnPerelliIn, _: User = Depends(current_user)):
+    try:
+        return fatigue.samn_perelli(body.ratings)
+    except (ValueError, TypeError) as e:
+        raise HTTPException(422, str(e))
+
+
 class ObjectiveIn(BaseModel):
     severity: str
     target_region: str = "tolerable_lower"

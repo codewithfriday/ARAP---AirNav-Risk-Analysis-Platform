@@ -1,10 +1,11 @@
 import { useState } from 'react'
-import { Alert, App, Button, Card, Col, Collapse, Input, InputNumber, Row, Space, Table, Tabs, TimePicker } from 'antd'
+import { Alert, App, Button, Card, Col, Collapse, Input, InputNumber, Row, Space, Table, Tabs, Tag, TimePicker } from 'antd'
 import { CalculatorOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons'
 import dayjs from 'dayjs'
 import ReactECharts from 'echarts-for-react'
 import { api } from '../api'
 import type { EditorProps } from './types'
+import SamnPerelli from './SamnPerelli'
 
 const COLORS = ['#B23A3A', '#2A7F8E', '#7C3AED', '#D98E04']
 const toDayTime = (h: number) => ({ day: Math.floor(h / 24) + 1, time: dayjs().startOf('day').add(((h % 24) + 24) % 24 * 60, 'minute') })
@@ -30,6 +31,7 @@ export default function FatigueEditor({ model, setModel, results, setResults, re
   const { message } = App.useApp()
   const m = { start: 0, end: 72, step_minutes: 5, kss_threshold: 7, params: {}, variants: [{ name: 'Roster A', sleeps: [[-1, 7]], duties: [[7, 14]] }], ...model }
   const [active, setActive] = useState('0')
+  const [view, setView] = useState('model')
   const set = (k: string, v: any) => setModel({ ...m, [k]: v })
   const updVar = (i: number, k: string, v: any) => set('variants', m.variants.map((x: any, j: number) => (j === i ? { ...x, [k]: v } : x)))
 
@@ -41,7 +43,7 @@ export default function FatigueEditor({ model, setModel, results, setResults, re
         out.push({ name: v.name, duties: r.duties, series: r.series.filter((_: any, i: number) => i % 2 === 0).map((p: any) => [p.t, p.alertness === null ? null : +p.alertness.toFixed(3)]),
           notice: r.notice, engine_version: r.engine_version })
       }
-      setResults({ variants: out })
+      setResults({ ...(results ?? {}), variants: out })
     } catch (e: any) {
       message.error(e.message)
     }
@@ -60,7 +62,12 @@ export default function FatigueEditor({ model, setModel, results, setResults, re
   }
   const rows = res ? res.flatMap((v: any) => v.duties.filter((d: any) => d.min_alertness !== undefined).map((d: any) => ({ key: `${v.name}${d.duty}`, variant: v.name, ...d }))) : []
 
-  return (
+  const sp = <SamnPerelli ratings={m.sp_ratings ?? []} onChange={(r) => set('sp_ratings', r)} readOnly={readOnly}
+    result={results?.samn_perelli} setResult={(r) => setResults({ ...(results ?? {}), samn_perelli: r })} />
+  const spRes = results?.samn_perelli
+  const spBad = (spRes?.checks ?? []).filter((c: any) => c.severity !== 'info').length
+
+  const modelView = (
     <div>
       <Alert type="info" showIcon style={{ marginBottom: 12 }} title="Three-process model of alertness (Åkerstedt–Folkard; parameters from Ingre et al. 2014). Predictions are group averages for healthy adults, not a measure of an individual’s fatigue." />
       <Row gutter={16}>
@@ -98,4 +105,8 @@ export default function FatigueEditor({ model, setModel, results, setResults, re
       </Row>
     </div>
   )
+  return <Tabs activeKey={view} onChange={setView} items={[
+    { key: 'model', label: 'Three-process model (roster)', children: modelView },
+    { key: 'sp', label: <span>Samn-Perelli fatigue check {(m.sp_ratings ?? []).length > 0 && <Tag>{(m.sp_ratings ?? []).length}</Tag>}{spBad > 0 && <Tag color="orange">{spBad} to act on</Tag>}</span>, children: sp },
+  ]} />
 }

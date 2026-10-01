@@ -64,6 +64,12 @@ def assessment_docx(a: dict, studies: list[dict], engines: dict) -> bytes:
             doc.add_paragraph(f"Mitigated frequency {res.get('mitigated_frequency', 0):.2e} {res.get('unit', '')}; "
                               f"target {res.get('target_frequency', 0):.1e}; target met: {res.get('target_met')}.")
         elif s["method"] == "fatigue" and res:
+            sp = res.get("samn_perelli") or {}
+            if sp.get("n"):
+                c = sp["counts"]
+                doc.add_paragraph(f"Samn-Perelli pre-shift ratings: {sp['n']} (green {c.get('green', 0)}, caution {c.get('caution', 0)}, "
+                                  f"amber {c.get('amber', 0)}, red {c.get('red', 0)}); mean score {sp['mean_score']:.1f}; "
+                                  f"{len([x for x in sp.get('checks', []) if x['severity'] != 'info'])} response(s) not meeting the action thresholds.")
             for d in res.get("duties", []):
                 if "min_alertness" in d:
                     doc.add_paragraph(f"Duty {d['duty']}: min alertness {d['min_alertness']:.2f} at {d['min_clock']}, "

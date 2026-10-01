@@ -183,3 +183,27 @@ def test_tc_fat_02():
     assert abs(d["min_alertness"] - 6.30) <= 0.05
     assert abs(d["max_kss"] - 6.82) <= 0.05
     assert d["share_at_or_above_threshold"] == 0
+
+
+def test_tc_fat_03_samn_perelli():
+    from app.engines import fatigue
+    assert [fatigue.sp_light(s)["key"] for s in range(1, 8)] == ["green"] * 3 + ["caution", "amber", "red", "red"]
+    r = fatigue.samn_perelli([
+        {"id": "a", "score": 2, "outcome": "normal"},
+        {"id": "b", "score": 4, "outcome": "normal"},           # caution needs standard position + earlier break
+        {"id": "c", "score": 4, "outcome": "standard"},
+        {"id": "d", "score": 5, "outcome": "mitigated"},        # ok, but mitigation not named
+        {"id": "e", "score": 5, "outcome": "standard"},         # amber needs mitigation first
+        {"id": "f", "score": 6, "outcome": "admin"},
+        {"id": "g", "score": 7, "outcome": "mitigated"},        # red must be removed from control
+        {"id": "h", "score": 6},                                # open
+        {"id": "i", "score": None},
+    ])
+    assert r["counts"] == {"green": 1, "caution": 2, "amber": 2, "red": 3} and r["n"] == 8
+    codes = {(c["ref"], c["code"], c["severity"]) for c in r["checks"]}
+    assert ("g", "sp_response", "error") in codes and ("b", "sp_response", "warning") in codes and ("e", "sp_response", "warning") in codes
+    assert ("h", "sp_open", "warning") in codes and ("d", "sp_mitigation", "info") in codes
+    assert not any(c["ref"] in ("a", "c", "f") for c in r["checks"])
+    assert abs(r["mean_score"] - 39 / 8) < 1e-9
+    with __import__("pytest").raises(ValueError):
+        fatigue.samn_perelli([{"score": 8}])

@@ -19,3 +19,7 @@ export function useAtsbScheme() {
 export function useAtsbMeta() {
   return useQuery({ queryKey: ['atsb-meta'], queryFn: () => api.get<any>('/meta/atsb'), staleTime: Infinity })
 }
+
+export function useSamnPerelliMeta() {
+  return useQuery({ queryKey: ['sp-meta'], queryFn: () => api.get<any>('/meta/samn-perelli'), staleTime: Infinity })
+}

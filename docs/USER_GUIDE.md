@@ -320,7 +320,23 @@ Press **Calculate**. The top-event probability appears above the tree, and basic
 3. **Simulation settings and parameters** sets the number of days, time step, KSS threshold and, if needed, the model parameters (leave blank for the defaults of the Manual, §15.2).
 4. Press **Run model**. The chart shows predicted alertness for each variant (gaps are sleep; shaded bands are duties of the first variant; the dashed line is the KSS threshold). The table gives, per duty, the minimum alertness and when it occurs, the maximum KSS, and the time spent at or above the threshold.
 
-> Predictions are group averages for healthy adults. They are not a measure of an individual's fatigue and must be checked against operational data (Manual §15.5).
+> Predictions are group averages for healthy adults. They are not a measure of an individual's fatigue and must be checked against operational data (Manual §15.6).
+
+**Samn-Perelli fatigue check.** The second tab of the fatigue study records how each controller feels before taking over a position (Manual §15.5). Click **+ Rating** and enter the date, time, shift, controller ID (not the name), planned position and the self-rated score:
+
+| Score | Description | Light and required action |
+|---|---|---|
+| 1 | Fully alert, wide awake | **Green** (1–3): proceed to the shift normally |
+| 2 | Very lively, responsive, but not at peak | |
+| 3 | Okay, somewhat fresh | |
+| 4 | A little tired, less than fresh | **Caution**: standard position (no highly complex, high-traffic sectors) and a slightly earlier break |
+| 5 | Moderately tired, let down | **Amber**: immediate mitigation before taking a position — e.g. a mandatory 15-minute walk, caffeine, or a rotation change |
+| 6 | Extremely tired, very difficult to concentrate | **Red** (6–7): operational risk — remove from active control (administrative desk tasks) or send home to rest |
+| 7 | Completely exhausted, unable to function | |
+
+NAVRAP shows the light for each score. Record the supervisor's response and, for amber, the mitigation applied. A response weaker than the threshold requires is flagged (red for a red-light controller left on a position; orange otherwise), and so is a non-green score with no response. The summary shows the count per light, the score distribution and the share of non-green ratings; the Safety Assessment Report includes it.
+
+![Samn-Perelli fatigue check](screenshots/v5-samn-perelli.png)
 
 ---
 

@@ -147,7 +147,18 @@ def seed_demo(db: Session):
                  "variants": [{"name": "No pre-shift nap", "sleeps": sleeps, "duties": [[7, 14], [46, 54]]},
                               {"name": "90-min nap 15:00–16:30", "sleeps": sleeps + [[39, 40.5]], "duties": [[7, 14], [46, 54]]}]}
     fr = fat_engine.run(sleeps, [[7, 14], [46, 54]], 0, 72)
-    study("fatigue", "Fatigue — night shift with/without nap (Manual §15.4)", fat_model, {"duties": fr["duties"], "engine_version": fr["engine_version"]})
+    # illustrative pre-shift Samn-Perelli ratings for the night shift (controller IDs, not names)
+    fat_model["sp_ratings"] = [
+        {"id": "SP1", "date": "2026-09-14", "time": "21:45", "shift": "Night", "controller": "ATC-07", "position": "APP West", "score": 2, "outcome": "normal", "mitigations": [], "notes": ""},
+        {"id": "SP2", "date": "2026-09-14", "time": "21:45", "shift": "Night", "controller": "ATC-12", "position": "APP East", "score": 3, "outcome": "normal", "mitigations": [], "notes": ""},
+        {"id": "SP3", "date": "2026-09-14", "time": "21:50", "shift": "Night", "controller": "ATC-03", "position": "TWR", "score": 4, "outcome": "standard", "mitigations": ["Break taken earlier"], "notes": "Moved from combined APP to TWR; break at 01:30 instead of 02:00"},
+        {"id": "SP4", "date": "2026-09-14", "time": "21:50", "shift": "Night", "controller": "ATC-21", "position": "ACC Sector 2", "score": 5, "outcome": "mitigated", "mitigations": ["Mandatory 15-minute walk", "Caffeine"], "notes": "Re-rated 4 after mitigation; took position 22:15"},
+        {"id": "SP5", "date": "2026-09-14", "time": "21:55", "shift": "Night", "controller": "ATC-15", "position": "ACC Sector 1", "score": 6, "outcome": "home", "mitigations": [], "notes": "Replaced by standby controller"},
+        {"id": "SP6", "date": "2026-09-15", "time": "05:40", "shift": "Morning", "controller": "ATC-09", "position": "APP West", "score": 4, "outcome": "normal", "mitigations": [], "notes": "Left on the busy morning position — to be reviewed"},
+    ]
+    sp = fat_engine.samn_perelli(fat_model["sp_ratings"])
+    study("fatigue", "Fatigue — night shift with/without nap (Manual §15.4)", fat_model,
+          {"duties": fr["duties"], "engine_version": fr["engine_version"], "samn_perelli": sp})
     study("fram", "FRAM — descent clearances in a busy arrival sector (Manual §16)", {"functions": [
         {"id": "F1", "name": "Manage sector workload", "type": "Organisational", "x": 180, "y": 0, "aspects": {"Output": ["Sector configuration"]}, "variability": {"timing": "Too late", "precision": "Acceptable"}},
         {"id": "F2", "name": "Plan arrival sequence", "type": "Human", "x": 0, "y": 220, "aspects": {"Output": ["Arrival sequence"], "Resource": ["Sector configuration"]}, "variability": {"timing": "On time", "precision": "Imprecise"}},

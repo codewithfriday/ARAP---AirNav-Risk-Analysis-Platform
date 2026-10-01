@@ -282,6 +282,34 @@ def ies_infer_model(body: InferModelIn, _: User = Depends(current_user)):
         raise HTTPException(422, str(e))
 
 
+# ------------------------------------------------------------------ ATSB analysis (Manual Appendix F)
+from .. import atsb as atsb_ref  # noqa: E402
+from ..engines import atsb as atsb_engine, risk as risk_engine  # noqa: E402
+from .common import active_scheme  # noqa: E402
+
+
+@router.get("/meta/atsb")
+def atsb_meta(_: User = Depends(current_user)):
+    return atsb_ref.meta()
+
+
+@router.get("/risk/atsb-scheme")
+def atsb_scheme(_: User = Depends(current_user)):
+    return {"data": risk_engine.ATSB_SCHEME, "airnav_to_atsb": risk_engine.AIRNAV_TO_ATSB_LEVEL}
+
+
+class AtsbIn(BaseModel):
+    model: dict
+
+
+@router.post("/calc/atsb")
+def calc_atsb(body: AtsbIn, db: Session = Depends(get_db), _: User = Depends(current_user)):
+    try:
+        return atsb_engine.analyse(body.model, active_scheme(db))
+    except (ValueError, KeyError, TypeError) as e:
+        raise HTTPException(422, f"analysis failed: {e}")
+
+
 class RulesIn(BaseModel):
     model: dict
 

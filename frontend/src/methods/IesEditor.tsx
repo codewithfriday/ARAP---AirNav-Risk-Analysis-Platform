@@ -11,7 +11,7 @@ import { ResultBadge, inputsOf } from '../pages/CaseEditor'
 import { useIesMeta } from '../pages/CaseLibrary'
 import type { EditorProps } from './types'
 
-const RATE_OPTS = [...SUPPORT_TERMS.map((t) => ({ value: t, label: SUPPORT_LABEL[t] })), { value: 'NP', label: 'Not provided' }]
+const RATE_OPTS = [...SUPPORT_TERMS.map((t) => ({ value: t, label: SUPPORT_LABEL[t] })), { value: 'U', label: 'Unsure (relevance unclear)' }, { value: 'NP', label: 'Not provided' }]
 const rkey = (caseId: number, b: Block) => (b.factor ? `f:${b.factor}` : `b:${caseId}:${b.id}`)
 
 export default function IesEditor({ model, setModel, results, setResults, readOnly, assessmentId }: EditorProps & { assessmentId?: number }) {
@@ -60,7 +60,7 @@ export default function IesEditor({ model, setModel, results, setResults, readOn
   const inCases: Record<string, string[]> = {}
   cases.forEach((c) => c.model.blocks.forEach((b: Block) => { const k = rkey(c.id, b); (inCases[k] ??= []).push(c.ref) }))
   const rows = [
-    ...factors.map((f) => ({ key: `f:${f.code}`, layer: f.layer, label: f.label, code: f.code })),
+    ...factors.map((f) => ({ key: `f:${f.code}`, layer: f.layer, label: f.label, code: f.code, atsb: f.atsb })),
     ...cases.flatMap((c) => c.model.blocks.filter((b: Block) => b.kind === 'evidence' && !b.factor).map((b: Block) => ({ key: rkey(c.id, b), layer: b.layer, label: b.label, code: `${c.ref}/${b.id}` }))),
   ]
   const rated = Object.keys(ratings).length
@@ -123,7 +123,7 @@ export default function IesEditor({ model, setModel, results, setResults, readOn
             columns={[
               { title: 'Layer', dataIndex: 'layer', width: 70, render: (l) => <Tooltip title={LAYER_NAME[l]}><Tag color={LAYER_COLOR[l]} style={{ color: '#111' }}>{l}</Tag></Tooltip>,
                 filters: ['O', 'R', 'L', 'I', 'E'].map((l) => ({ text: LAYER_NAME[l], value: l })), onFilter: (v, r: any) => r.layer === v },
-              { title: 'Factor', dataIndex: 'label', render: (v, r: any) => <span>{v} <span className="mono muted" style={{ fontSize: 10 }}>{r.code}</span></span> },
+              { title: 'Factor', dataIndex: 'label', render: (v, r: any) => <span>{v} <span className="mono muted" style={{ fontSize: 10 }}>{r.code}{r.atsb ? ` · ATSB ${r.atsb}` : ''}</span></span> },
               { title: 'In selected cases', width: 180, render: (_, r: any) => (inCases[r.key] ?? []).join(', ') },
               { title: 'BN clue', width: 80, render: (_, r: any) => r.key.startsWith('f:') && bnClue[r.code] ? <Tag color={bnClue[r.code] <= 3 ? 'volcano' : undefined}>#{bnClue[r.code]}</Tag> : null },
               { title: 'Rating', width: 180, render: (_, r: any) => <Select size="small" style={{ width: 170 }} disabled={readOnly} value={ratings[r.key] ?? 'NP'} options={RATE_OPTS} onChange={(v) => rate(r.key, v)} /> },
@@ -146,7 +146,7 @@ export default function IesEditor({ model, setModel, results, setResults, readOn
           <Col xs={24} xl={7}>
             <Card size="small" title="Clues from the past cases">
               {fz?.clues?.length ? fz.clues.map((k: any) => <div key={k.key} style={{ marginBottom: 8 }}>
-                <Tag color={LAYER_COLOR[k.layer]} style={{ color: '#111' }}>{k.layer}</Tag><b>{k.label}</b>
+                <Tag color={LAYER_COLOR[k.layer]} style={{ color: '#111' }}>{k.layer}</Tag><b>{k.label}</b>{k.unsure && <Tag style={{ marginLeft: 4 }}>rated unsure — clarify</Tag>}
                 <div className="small muted">needed by {k.cases.map((x: any) => `${x.ref} (${x.for.join(', ')})`).join('; ')} · priority {k.priority.toFixed(2)}</div>
               </div>) : <Empty description={fz ? 'No open clues' : 'Run the analysis'} />}
             </Card>

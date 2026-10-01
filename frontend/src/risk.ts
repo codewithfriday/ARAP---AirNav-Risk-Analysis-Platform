@@ -34,5 +34,5 @@ export const METHOD_COLORS: Record<string, string> = {
   bowtie: '#B23A3A', hazid: '#2A7F8E', hazop: '#2A7F8E', jha: '#6B7280', fmea: '#1F3A5F', lopa: '#D98E04',
   fha: '#1F3A5F', stpa: '#7C3AED', fta: '#1F3A5F', fatigue: '#D98E04', fram: '#3C8D5A', bbn: '#7C3AED',
   crm: '#0E7490', eta: '#B23A3A', hra: '#2A7F8E', orc: '#D98E04', gsn: '#1F3A5F', cca: '#A16207', rbd: '#0E7490',
-  swift: '#2A7F8E', hta: '#3C8D5A', sim: '#7C3AED', sej: '#A16207', sec: '#4B5563', inv: '#B23A3A', wildlife: '#3C8D5A', orgmap: '#A16207', spi: '#0E7490', ies: '#7C3AED',
+  swift: '#2A7F8E', hta: '#3C8D5A', sim: '#7C3AED', sej: '#A16207', sec: '#4B5563', inv: '#B23A3A', wildlife: '#3C8D5A', orgmap: '#A16207', spi: '#0E7490', ies: '#7C3AED', atsb: '#1F3A5F',
 }

@@ -29,8 +29,8 @@ import numpy as np
 
 ENGINE_VERSION = "fuzzy-1.0.0"
 
-LAYERS = ["O", "R", "L", "I", "E"]
-LAYER_NAMES = {"O": "Organisational influences", "R": "Risk controls", "L": "Local conditions",
+LAYERS = ["O", "R", "L", "I", "T", "E"]
+LAYER_NAMES = {"O": "Organisational influences", "R": "Risk controls", "L": "Local conditions", "T": "Technical failure mechanisms",
                "I": "Individual actions", "E": "Occurrence events"}
 
 SUPPORT = ["SO", "O", "NE", "S", "SS"]
@@ -42,8 +42,8 @@ IN_MF = {"SO": (-1, 0, 4, 5), "O": (5, 6, 33, 34), "NE": (34, 35, 65, 66), "S": 
 OUT_SUPPORT = {"SO": (0, 2.5, 5), "O": (5, 19.5, 34), "NE": (34, 50, 66), "S": (66, 80.5, 95), "SS": (95, 97.5, 100)}
 
 PROB = ["HU", "IM", "ML", "PR", "VP", "AC"]
-PROB_LABEL = {"HU": "Highly unlikely", "IM": "Improbable", "ML": "More or less likely", "PR": "Probable",
-              "VP": "Very probable", "AC": "Almost certain"}
+PROB_LABEL = {"HU": "Very unlikely", "IM": "Unlikely", "ML": "About as likely as not", "PR": "Likely",
+              "VP": "Very likely", "AC": "Virtually certain"}  # ATSB terms (Guidelines p.73); equivalents improbable … almost certain
 # finding output triangles on the IPCC verbal-probability bands (paper Fig. 8, Table 2). The paper does not publish
 # the peaks; ARAP places them so that a fully fired set defuzzifies to the values in the paper's Fig. 13
 # (Very probable 94.54, Highly unlikely 4.959).

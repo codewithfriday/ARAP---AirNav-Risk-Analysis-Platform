@@ -110,13 +110,14 @@ def entropy(d: dict[str, float]) -> float:
 
 
 def analyse(net: dict, ratings: dict[str, str], factor_meta: dict[str, dict] | None = None) -> dict[str, Any]:
+    rated = set(ratings or {})          # incl. "U" (unsure): rated, so not a clue, but adds no evidence
     ratings = {f: t for f, t in (ratings or {}).items() if t in CRISP}
     post = posterior(net, ratings)
     h = entropy(post)
     used = [f for f, t in ratings.items() if f in net["cpt"] and t != "NE"]
     clues = []
     for f in net["factors"]:
-        if f in ratings:  # rated (even "No effect"): no longer a clue
+        if f in rated:  # rated (even "No effect" or "Unsure"): no longer a clue
             continue
         cp = net["cpt"][f]
         p_true = sum(post[m] * cp[m] for m in post)

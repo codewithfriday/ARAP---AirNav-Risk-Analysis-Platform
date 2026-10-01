@@ -3,7 +3,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { App, Button, Card, Col, Row, Select, Space, Table, Tag, Alert } from 'antd'
 import { useTranslation } from 'react-i18next'
 import { api } from '../api'
-import { useScheme } from '../hooks'
+import { useAtsbScheme, useScheme } from '../hooks'
 import { isAdmin, useAuth } from '../store'
 import { RiskMatrix } from '../components/Risk'
 import { PageHeader } from '../components/common'
@@ -15,6 +15,7 @@ export default function RiskSchemePage() {
   const qc = useQueryClient()
   const { message } = App.useApp()
   const { data } = useScheme()
+  const { data: atsb } = useAtsbScheme()
   const [draft, setDraft] = useState<Scheme | null>(null)
   const [paint, setPaint] = useState<string>('acceptable')
   useEffect(() => { if (data) setDraft(structuredClone(data.data)) }, [data])
@@ -64,6 +65,27 @@ export default function RiskSchemePage() {
           </Card>
         </Col>
       </Row>
+      {atsb && <Card style={{ marginTop: 16 }} title="Option: ATSB 6×6 matrix for safety issues (Manual Appendix F)"
+        extra={<span className="small muted">Used when a safety issue in an ATSB analysis is rated on the ATSB scale</span>}>
+        <Row gutter={[16, 16]}>
+          <Col xs={24} xl={11}>
+            <RiskMatrix scheme={{ ...atsb.data, severity: atsb.data.severity.map((s: any) => ({ ...s, name: s.short ?? s.name })) } as any} size={50} />
+          </Col>
+          <Col xs={24} xl={13}>
+            <Alert type="info" showIcon style={{ marginBottom: 12 }} title="Colours follow the AirNav 5×5"
+              description="ATSB rates a potential safety issue Critical, Significant or Broadly acceptable (not a safety issue). The published cell colours are not available as text, so ARAP fills the 6×6 by the same pattern as the AirNav matrix: critical = intolerable red, significant = the two tolerable bands (near-critical amber, lower yellow), broadly acceptable = green. Every Catastrophic cell is at least significant. A safety issue rated on the AirNav 5×5 maps to the same three levels." />
+            <Table rowKey="key" size="small" pagination={false} dataSource={atsb.data.regions} columns={[
+              { title: 'Level', dataIndex: 'name', render: (v, r: any) => <Tag color={r.color}>{v}</Tag> },
+              { title: 'Cells', dataIndex: 'cells', render: (c: string[]) => [...c].sort().join(', ') },
+              { title: 'Safety action', dataIndex: 'action' },
+            ]} />
+            <Table style={{ marginTop: 12 }} rowKey="level" size="small" pagination={false} dataSource={atsb.data.likelihood} columns={[
+              { title: 'Level', dataIndex: 'level', width: 60 }, { title: 'Likelihood', dataIndex: 'name', width: 150 }, { title: 'Indicative', dataIndex: 'indicative' }]} />
+            <Table style={{ marginTop: 12 }} rowKey="code" size="small" pagination={false} dataSource={atsb.data.severity} columns={[
+              { title: 'Code', dataIndex: 'code', width: 60 }, { title: 'Consequence', dataIndex: 'name', width: 190 }, { title: 'Guide (passenger operations)', dataIndex: 'description' }]} />
+          </Col>
+        </Row>
+      </Card>}
     </div>
   )
 }

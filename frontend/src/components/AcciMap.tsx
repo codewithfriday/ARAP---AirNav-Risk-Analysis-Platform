@@ -3,18 +3,18 @@ import { ReactFlow, Background, Controls, Handle, Position, ReactFlowProvider, M
 import type { Connection, Edge, Node, NodeChange, NodeProps } from '@xyflow/react'
 import { Tag } from 'antd'
 
-export const LAYERS = ['O', 'R', 'L', 'I', 'E'] as const
-export const LAYER_NAME: Record<string, string> = { O: 'Organisational influences', R: 'Risk controls', L: 'Local conditions', I: 'Individual actions', E: 'Occurrence events' }
-export const LAYER_COLOR: Record<string, string> = { O: '#F4B6D2', R: '#CDBAF0', L: '#FBE67A', I: '#FBC477', E: '#B7DBA3' }
-const LANE_BG: Record<string, string> = { O: '#FDF0F6', R: '#F5F0FC', L: '#FFFBE3', I: '#FFF4E3', E: '#F1F8ED' }
+export const LAYERS = ['O', 'R', 'L', 'I', 'T', 'E'] as const
+export const LAYER_NAME: Record<string, string> = { O: 'Organisational influences', R: 'Risk controls', L: 'Local conditions', I: 'Individual actions', T: 'Technical failure mechanisms', E: 'Occurrence events' }
+export const LAYER_COLOR: Record<string, string> = { O: '#F4B6D2', R: '#CDBAF0', L: '#FBE67A', I: '#FBC477', T: '#F6D7A7', E: '#B7DBA3' }
+const LANE_BG: Record<string, string> = { O: '#FDF0F6', R: '#F5F0FC', L: '#FFFBE3', I: '#FFF4E3', T: '#FDF6EA', E: '#F1F8ED' }
 export const SUPPORT_TERMS = ['SS', 'S', 'NE', 'O', 'SO']
 export const SUPPORT_LABEL: Record<string, string> = { SO: 'Strongly oppose', O: 'Oppose', NE: 'No effect', S: 'Support', SS: 'Strongly support' }
 export const PROB_TERMS = ['AC', 'VP', 'PR', 'ML', 'IM', 'HU']
-export const PROB_LABEL: Record<string, string> = { HU: 'Highly unlikely', IM: 'Improbable', ML: 'More or less likely', PR: 'Probable', VP: 'Very probable', AC: 'Almost certain' }
+export const PROB_LABEL: Record<string, string> = { HU: 'Very unlikely', IM: 'Unlikely', ML: 'About as likely as not', PR: 'Likely', VP: 'Very likely', AC: 'Virtually certain' }
 export const PROB_COLOR: Record<string, string> = { HU: '#9CA3AF', IM: '#6B9BD1', ML: '#D9A441', PR: '#E0782F', VP: '#C2452D', AC: '#8B1E1E' }
 export const SUPPORT_COLOR: Record<string, string> = { SO: '#1F6E43', O: '#4E9E6E', NE: '#9CA3AF', S: '#D0782F', SS: '#B23A3A' }
 
-export type Block = { id: string; layer: string; kind: 'evidence' | 'hypothesis' | 'finding'; label: string; text?: string; factor?: string | null; quote?: string; quote_verified?: boolean; past?: any; x?: number; y?: number }
+export type Block = { id: string; layer: string; kind: 'evidence' | 'hypothesis' | 'finding'; kindLabel?: string; label: string; text?: string; factor?: string | null; quote?: string; quote_verified?: boolean; past?: any; x?: number; y?: number }
 export type AEdge = { source: string; target: string; role?: 'input' | 'context' }
 export type AModel = { blocks: Block[]; edges: AEdge[]; rules?: Record<string, any[]> }
 
@@ -69,7 +69,7 @@ function BlockView({ data }: NodeProps) {
     <div style={{ width: 210, background: '#fff', border, borderRadius: 6, boxShadow: '0 1px 3px rgba(0,0,0,.08)', fontSize: 11.5 }}>
       <Handle type="target" position={Position.Top} />
       <div style={{ background: LAYER_COLOR[b.layer], padding: '3px 7px', borderRadius: '5px 5px 0 0', display: 'flex', justifyContent: 'space-between', gap: 4 }}>
-        <span style={{ fontWeight: 700 }}>{b.kind === 'evidence' ? 'Evidence' : b.kind === 'hypothesis' ? 'Hypothesis' : 'Finding'}</span>
+        <span style={{ fontWeight: 700 }}>{b.kindLabel ?? (b.kind === 'evidence' ? 'Evidence' : b.kind === 'hypothesis' ? 'Hypothesis' : 'Finding')}</span>
         <span className="mono" style={{ fontSize: 10, opacity: 0.7 }}>{b.id}</span>
       </div>
       <div style={{ padding: '5px 7px' }}>
@@ -126,7 +126,7 @@ export default function AcciMap({ model, height = 620, editable = false, selecte
   }
   const onDragStop = (_: any, n: Node) => {
     if (!editable || !onChange) return
-    const li = Math.min(4, Math.max(0, Math.floor((n.position.y + 40) / LANE_H)))
+    const li = Math.min(LAYERS.length - 1, Math.max(0, Math.floor((n.position.y + 40) / LANE_H)))
     const layer = LAYERS[li]
     onChange({ ...model, blocks: model.blocks.map((b) => (b.id === n.id ? { ...b, layer, x: Math.round(n.position.x), y: Math.round(n.position.y) } : b)) })
   }

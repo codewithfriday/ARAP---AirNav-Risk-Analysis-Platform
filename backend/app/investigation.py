@@ -11,12 +11,12 @@ CATEGORIES = {
         "name": "ATS — loss of separation",
         "taxonomy": "ADREP/ECCAIRS: ATM — separation minima infringement (MAC/ATM)",
         "mechanisms": [
-            {"code": "M1", "label": "Controller clearance or instruction error", "keywords": ["wrong level", "incorrect clearance", "occupied level", "cleared to"]},
+            {"code": "M1", "label": "Clearance or instruction conflicted with other traffic", "keywords": ["wrong level", "incorrect clearance", "occupied level", "cleared to"]},
             {"code": "M2", "label": "Readback/hearback error not detected", "keywords": ["readback", "hearback", "wrong aircraft", "similar callsign"]},
-            {"code": "M3", "label": "Pilot deviation from clearance", "keywords": ["level bust", "deviated", "climbed through", "descended through"]},
-            {"code": "M4", "label": "Coordination failure between units or sectors", "keywords": ["coordination", "estimate", "transfer", "letter of agreement"]},
-            {"code": "M5", "label": "Conflict not detected (monitoring / workload)", "keywords": ["not detected", "monitoring", "workload", "scan"]},
-            {"code": "M6", "label": "Safety-net or system deficiency", "keywords": ["stca", "inhibition", "safety net", "system update"]},
+            {"code": "M3", "label": "Aircraft deviated from the clearance", "keywords": ["level bust", "deviated", "climbed through", "descended through"]},
+            {"code": "M4", "label": "Coordination between units or sectors not completed", "keywords": ["coordination", "estimate", "transfer", "letter of agreement"]},
+            {"code": "M5", "label": "Conflict not detected in time (monitoring / workload)", "keywords": ["not detected", "monitoring", "workload", "scan"]},
+            {"code": "M6", "label": "Safety net or system did not alert", "keywords": ["stca", "inhibition", "safety net", "system update"]},
         ],
     },
     "fuel": {
@@ -35,7 +35,22 @@ CATEGORIES = {
 
 
 def _f(code, layer, label, keywords):
-    return {"code": code, "layer": layer, "label": label, "keywords": keywords}
+    return {"code": code, "layer": layer, "label": label, "keywords": keywords, "atsb": ATSB_CODE.get(code, "")}
+
+
+# ATSB safety factor type code for each catalogue factor (Tools Manual — Analysis Supplement, Appendix D, aviation)
+ATSB_CODE = {
+    "O-CALLSIGN-MGMT": "O1", "O-STAFFING": "O2", "O-TRAINING": "O1", "O-CHANGE-MGMT": "O1", "O-LOA-REVIEW": "O1",
+    "R-CALLSIGN-ALERT": "R1.1", "R-SECTOR-COMBINING": "R3", "R-OJT-SUPERVISION": "R5", "R-LOA-COORD": "R3", "R-STCA-CONFIG": "R1.4",
+    "R-READBACK-PROC": "R3", "R-FLOW-MEASURES": "R3", "R-STCA-LATE": "R1.4",
+    "L-SIMILAR-CALLSIGN": "L3.6", "L-FREQ-CONGESTION": "L3.6", "L-COMBINED-SECTORS": "L3.1", "L-NIGHT-FATIGUE": "L1.3",
+    "L-HIGH-WORKLOAD": "L3.1", "L-TRAINEE": "L2.2", "L-WX-DEVIATIONS": "L7.6", "L-LANGUAGE": "L2.1",
+    "I-HEARBACK-MISSED": "I3.3", "I-CLEARANCE-TO-WRONG-AC": "I1.6", "I-WRONG-LEVEL": "I3.1", "I-PILOT-LEVEL-BUST": "I1.3",
+    "I-NO-COORD": "I3.3", "I-MONITORING-LAPSE": "I3.5", "I-LATE-RESOLUTION": "I3.2", "E-LOS": "OE",
+    "L-FUEL-BELIEVED-FULL": "L3.5", "L-FUEL-QTY-ASSESS": "L3.5", "L-FUEL-PLAN-ERROR": "L3.5", "L-FUEL-SUFFICIENT-BELIEF": "L3.5",
+    "L-FUEL-EXHAUSTED": "OE", "L-ENGINES-SERVICEABLE": "OE", "L-ENGINE-SURGE": "OE", "L-ENGINE-POWER-LOSS": "OE", "L-WATER-IN-FUEL": "L6.3",
+    "I-EMERG-PROC": "I1.3",
+}
 
 
 FACTORS = {
@@ -47,9 +62,9 @@ FACTORS = {
         _f("O-LOA-REVIEW", "O", "Letters of agreement not reviewed after change", ["loa not reviewed", "not reviewed", "agreement not updated"]),
         _f("R-CALLSIGN-ALERT", "R", "No similar-callsign alerting or strip marking", ["strip marking", "callsign alert", "similar callsign marking", "similar callsign warning"]),
         _f("R-SECTOR-COMBINING", "R", "Sector-combining criteria missing or not applied", ["combining criteria", "sector configuration", "criteria for combining"]),
-        _f("R-OJT-SUPERVISION", "R", "OJT supervision / intervention criteria inadequate", ["ojti", "instructor intervention", "intervention criteria", "ojt supervision"]),
+        _f("R-OJT-SUPERVISION", "R", "OJT supervision / intervention criteria not defined", ["ojti", "instructor intervention", "intervention criteria", "ojt supervision"]),
         _f("R-LOA-COORD", "R", "Coordination procedure or LoA unclear", ["letter of agreement", "loa", "transfer conditions", "coordination procedure"]),
-        _f("R-STCA-CONFIG", "R", "STCA parameters or inhibition areas inappropriate", ["inhibition", "stca parameter", "safety net configuration", "inhibition volume"]),
+        _f("R-STCA-CONFIG", "R", "STCA parameters or inhibition areas not suited to the traffic", ["inhibition", "stca parameter", "safety net configuration", "inhibition volume"]),
         _f("R-READBACK-PROC", "R", "Readback/hearback procedure not specific", ["readback procedure", "hearback procedure", "readback confirmation"]),
         _f("R-FLOW-MEASURES", "R", "No flow measures for the peak or weather", ["flow regulation", "atfm", "flow control", "capacity measure"]),
         _f("L-SIMILAR-CALLSIGN", "L", "Similar callsigns on frequency", ["similar callsign", "callsign confusion", "callsigns differing"]),
@@ -59,15 +74,15 @@ FACTORS = {
         _f("L-HIGH-WORKLOAD", "L", "High workload / traffic peak", ["high workload", "traffic peak", "workload", "busy"]),
         _f("L-TRAINEE", "L", "Trainee controller on position", ["trainee", "ojt", "on-the-job training", "student controller"]),
         _f("L-WX-DEVIATIONS", "L", "Weather deviations", ["weather deviation", "thunderstorm", "cumulonimbus", "cb line", "deviating"]),
-        _f("L-STCA-LATE", "L", "Safety-net alert late or absent", ["no stca", "stca alert late", "no alert", "alert late", "without an alert"]),
+        _f("R-STCA-LATE", "R", "Safety-net alert late or absent", ["no stca", "stca alert late", "no alert", "alert late", "without an alert"]),
         _f("L-LANGUAGE", "L", "Language or phraseology issue", ["phraseology", "english proficiency", "non-standard"]),
         _f("I-HEARBACK-MISSED", "I", "Incorrect readback not detected (hearback)", ["readback not detected", "hearback", "incorrect readback", "readback error", "readback was not"]),
         _f("I-CLEARANCE-TO-WRONG-AC", "I", "Clearance acted on by the wrong aircraft", ["wrong aircraft", "took the clearance", "intended for", "acted on"]),
         _f("I-WRONG-LEVEL", "I", "Controller issued a conflicting level or clearance", ["wrong level", "occupied level", "conflicting level", "incorrect clearance"]),
         _f("I-PILOT-LEVEL-BUST", "I", "Pilot deviated from the cleared level", ["level bust", "climbed through", "descended through", "above the cleared", "below the cleared", "altitude deviation"]),
         _f("I-NO-COORD", "I", "Coordination not carried out", ["no coordination", "not coordinated", "without coordination", "estimate not passed"]),
-        _f("I-MONITORING-LAPSE", "I", "Conflict not detected — monitoring lapse", ["conflict not detected", "conflict was not detected", "did not detect the conflict", "traffic not detected", "not detected until", "monitoring lapse", "relied on the safety net"]),
-        _f("I-LATE-RESOLUTION", "I", "Late or ineffective avoiding action", ["avoiding action", "late resolution", "traffic information late"]),
+        _f("I-MONITORING-LAPSE", "I", "Conflict not detected while monitoring", ["conflict not detected", "conflict was not detected", "did not detect the conflict", "traffic not detected", "not detected until", "monitoring lapse", "relied on the safety net"]),
+        _f("I-LATE-RESOLUTION", "I", "Avoiding action given late", ["avoiding action", "late resolution", "traffic information late"]),
         _f("E-LOS", "E", "Loss of separation", ["loss of separation", "separation infringement", "minimum separation", "less than the required"]),
     ],
     "fuel": [
@@ -210,7 +225,7 @@ DEMO_CASES = [
          summary="No STCA alert was generated because the conflict was inside an inhibition volume enlarged by a system update that had not been "
                  "safety assessed. The controller, relying on the safety net in a busy period, gave late avoiding action.",
          model=lambda: build_case("ats-los", [
-             ("e1", "L-STCA-LATE", "No STCA alert", "Conflict inside an inhibition volume — no alert.", "S"),
+             ("e1", "R-STCA-LATE", "No STCA alert", "Conflict inside an inhibition volume — no alert.", "S"),
              ("e2", "R-STCA-CONFIG", "Inhibition volume too large", "Inhibition volume enlarged by a system update.", "S"),
              ("e3", "O-CHANGE-MGMT", "Update not safety assessed", "The system update was not safety assessed.", "S"),
              ("e4", "I-LATE-RESOLUTION", "Late avoiding action", "Avoiding action after visual detection on the display.", "S"),
@@ -274,8 +289,8 @@ DEMO_CASES = [
 ]
 
 DEMO_OCCURRENCE = (
-    "At 02:10 local two sectors were combined under night staffing. Two aircraft with similar callsigns, GIA612 and GIA621, were on frequency. "
-    "The controller cleared GIA612 to climb to FL340; GIA621 read back the clearance and began to climb. The readback was not detected. "
+    "At 02:10 local two sectors were combined under night staffing. Two aircraft with similar callsigns, ABC612 and ABC621, were on frequency. "
+    "The controller cleared ABC612 to climb to FL340; ABC621 read back the clearance and began to climb. The readback was not detected. "
     "There were blocked transmissions on the frequency just before. STCA alerted and avoiding action was given. "
     "Minimum separation was 3.2 NM and 400 ft against 5 NM / 1000 ft. The controller was in the last two hours of a night shift.")
 

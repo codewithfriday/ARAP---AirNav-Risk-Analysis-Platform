@@ -1,4 +1,4 @@
-# ARAP architecture notes (v0.7)
+# ARAP architecture notes (v0.8)
 
 ## Overview
 
@@ -49,9 +49,13 @@ Method-specific objects (bowtie paths and barriers, HAZOP nodes, fault-tree gate
 
 Projects are `active` or `archived`. `POST /projects/{id}/archive` and `/restore` (editors) toggle the status; archived projects are left out of `GET /projects` and `GET /assessments` unless `include_archived=true`, and refuse new assessments. `DELETE /projects/{id}?confirm=<code>` (admin) removes the project with its assessments, studies, approvals, hazards, controls and actions. It is refused with 409 when any assessment is locked, and the audit entry keeps a snapshot of the project and the counts. At start-up the demo seeders skip any demo code that has an audit "delete" entry, so a deleted demo stays deleted.
 
-### Investigation expert system (v0.7)
+### Investigation expert system (v0.8)
 
 `InvCase` (table `inv_cases`) holds the case library: an AcciMap JSON model (`blocks`, `edges` with role input/context, `rules`), status draft/approved, provenance and report text. Categories, mechanisms, the ORLIO factor catalogue, the thesaurus and the demo cases are in `app/investigation.py`; routes in `app/api/ies.py`, study analysis in `app/api/ies_logic.py`. Engines: `fuzzy` (Mamdani inference per AcciMap, default rules, clues), `casebn` (naive-Bayes network learned from approved cases, virtual evidence, value of information, export to the BBN format), `casesearch` (thesaurus + TF-IDF + factor share), `draft` (offline drafter and optional Claude drafter via the Messages API with tool use; quotes verified against the report). The study method `ies` stores `category`, `narrative`, `selected` case ids and `ratings` (`f:<factor>` or `b:<case>:<block>`); results are recomputed by `POST /ies/analyse`.
+
+### ATSB safety investigation analysis (v0.8)
+
+Study method `atsb`. Reference data (taxonomy, checklists, scales, safety action classification) in `app/atsb.py`, served by `GET /meta/atsb`; engine `app/engines/atsb.py` (`POST /calc/atsb`) derives finding types, safety-issue levels, residual evaluation and follow-up dates, and returns the checks. The ATSB 6×6 is `ATSB_SCHEME` in `app/engines/risk.py` (same structure as the AirNav scheme, so the matrix component renders both; `GET /risk/atsb-scheme`); `classify_issue()` maps either scheme to critical / significant / broadly acceptable. Everything is stored in the study model; safety issues go to the hazard log through the existing promote endpoint. Demo content: `app/atsb_demo.py`.
 
 ### Engines
 

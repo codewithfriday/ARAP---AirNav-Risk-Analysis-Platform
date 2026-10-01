@@ -30,6 +30,7 @@ const EDITORS: Record<string, any> = {
   inv: lazy(() => import('../methods/InvEditor')),
   wildlife: lazy(() => import('../methods/WildlifeEditor')),
   ies: lazy(() => import('../methods/IesEditor')),
+  atsb: lazy(() => import('../methods/AtsbEditor')),
 }
 const Worksheet = lazy(() => import('../methods/WorksheetEditor'))
 

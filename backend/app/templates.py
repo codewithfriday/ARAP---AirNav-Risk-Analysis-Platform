@@ -147,6 +147,8 @@ METHODS = {
                  "circle_km": 13},
     "ies": {"name": "Investigation expert system (ORLIO)", "chapter": "App. E", "kind": "composite", "template_version": "1.0",
             "summary": "Search past ORLIO AcciMaps, rate the evidence, fuzzy inference per case, Bayesian network across the library and ranked clues for evidence collection."},
+    "atsb": {"name": "Safety investigation analysis (ATSB)", "chapter": "App. F", "kind": "composite", "template_version": "1.0",
+             "summary": "ATSB method: sequence of events, safety factors list, tests for existence, influence and importance, safety issues with risk analysis (AirNav 5×5 or ATSB 6×6), safety action and analysis review."},
     "orgmap": {"name": "Organisational function map", "chapter": "App. D", "kind": "worksheet", "template_version": "1.0",
                "summary": "Every safety-related function mapped from its current to its new owner, with competence, capacity, authority and handover checked.",
                "options": {"fn_category": ["SMS", "Operations", "Technical", "Training and competence", "Barrier owner", "Support"],

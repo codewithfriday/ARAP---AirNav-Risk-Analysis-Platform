@@ -1,6 +1,6 @@
 # ARAP User Guide
 
-**AirNav Risk Analysis Platform — version 0.7**
+**AirNav Risk Analysis Platform — version 0.8**
 
 ARAP is the web application that implements the *AirNav Risk Analysis Manual*. It lets AirNav staff plan, run, review and approve safety risk assessments with twenty-six methods, keeps every hazard in one hazard log, and produces the Safety Assessment Report.
 
@@ -22,14 +22,14 @@ This guide explains how to use the application. For *why* and *when* to use each
 10. [Bayesian belief networks](#10-bayesian-belief-networks)
 11. [STPA](#11-stpa)
 12. [FRAM](#12-fram)
-13. [Extended methods: CRM, ETA, HRA, ERC/RAT, GSN, CCA, RBD/Markov, SWIFT, HTA, simulation, expert judgement, security, investigation, wildlife, investigation expert system](#13-extended-methods-manual-chapters-1831)
+13. [Extended methods: CRM, ETA, HRA, ERC/RAT, GSN, CCA, RBD/Markov, SWIFT, HTA, simulation, expert judgement, security, investigation, wildlife, investigation expert system, ATSB analysis](#13-extended-methods-manual-chapters-1831)
 14. [The hazard log](#14-the-hazard-log)
 15. [Actions](#15-actions)
 16. [Review, approval and locking](#16-review-approval-and-locking)
 17. [Reports and exports](#17-reports-and-exports)
 18. [Administration](#18-administration)
 19. [Troubleshooting and FAQ](#19-troubleshooting-and-faq)
-20. [What version 0.7 does not do yet](#20-what-version-07-does-not-do-yet)
+20. [What version 0.8 does not do yet](#20-what-version-08-does-not-do-yet)
 
 ---
 
@@ -527,6 +527,8 @@ It has two parts:
 
 ![Case library](screenshots/v3-ies-library.png)
 
+AcciMaps have a lane for *technical failure mechanisms* beside individual actions, and every catalogue factor shows its ATSB code (§13.17). Verbal probabilities use the ATSB terms: very unlikely, unlikely, about as likely as not, likely, very likely, virtually certain.
+
 Each case has **evidence** blocks (facts, rated in the past occurrence), **hypothesis** blocks (intermediate conclusions) and one **finding** (the occurrence and a verbal probability for each mechanism of the category). Give each block an **ORLIO factor** from the category's catalogue where one fits: the factor links the block across cases and is what the Bayesian network learns from.
 
 In the AcciMap editor:
@@ -554,7 +556,7 @@ Every drafted block carries a quote from the report, which ARAP checks against t
 Add the study **Investigation expert system (ORLIO)** to the investigation's assessment, choose the occurrence category, and work through the four tabs:
 
 1. **Occurrence & search.** Describe what is known so far and click **Search the case library**. Results show the matched terms and shared factors; tick up to five cases. Factors recognised in your text are shown as suggestions. Click one to rate it *Support*, but check it first.
-2. **Evidence ratings.** Rate each factor you have evidence for: *Strongly support* or *Strongly oppose* for recorded or physical evidence (radar replay, RT recording, logs); *Support* or *Oppose* for interviews and judgement; *No effect* when the factor was present but did not matter. Leave everything else **Not provided**. A factor rated once applies to every case.
+2. **Evidence ratings.** Rate each factor you have evidence for: *Strongly support* or *Strongly oppose* for recorded or physical evidence (radar replay, RT recording, logs); *Support* or *Oppose* for interviews and judgement; *No effect* when the factor was present but did not matter. Use *Unsure* when evidence exists but its relevance cannot be judged yet. Leave everything else **Not provided**. A factor rated once applies to every case.
 3. **AcciMaps.** Click **Run analysis**. Each selected case shows the inferred hypotheses and finding, or *not determined* when evidence is missing. **Clues from the past cases** lists that missing evidence. You can also rate evidence directly in the diagrams.
 4. **Bayesian network & ranked clues.** This tab uses the whole approved library of the category. The bar chart shows the prior and posterior probability of each mechanism. The table ranks the unrated factors by **value of information**: how much establishing each would reduce the uncertainty about the mechanism. Rate a clue and run again. **Open as BBN study** creates an ordinary Bayesian-network study with the learned network and your ratings.
 
@@ -567,10 +569,51 @@ Demo project **DEMO-06** is an illustrative loss of separation between two aircr
 After the day-1 ratings:
 
 - The network puts *readback/hearback error not detected* (M2) at 44% (prior 20%).
-- CASE-01 gives M2 *Very probable*.
-- The top clue is whether there was a **monitoring lapse**, which best separates M2 from *conflict not detected* (M5).
+- CASE-01 gives M2 *Very likely*.
+- The top clue is whether the conflict went **undetected while monitoring**, which best separates M2 from *conflict not detected in time* (M5).
 
 Continue the investigation with SOAM/HFACS (§13.13). After the final report, add the occurrence to the case library.
+
+### 13.17 Safety investigation analysis — the ATSB method (Manual Appendix F)
+
+This study carries an occurrence investigation from the sequence of events to the findings, safety issues and safety action, following the ATSB *Safety Investigation Guidelines Manual — Analysis* and its tools manual. Add **Safety investigation analysis (ATSB)** to the investigation's assessment. ARAP re-checks the analysis automatically about half a second after each change.
+
+![Sequence of events](screenshots/v4-atsb-events.png)
+
+**1 · Occurrence & sequence of events.** Record the occurrence, then list the events. Each event needs a start time (estimate if necessary and say so in the comments) and a title written as a subject and an action verb. Theme groups events on the timeline (ATC, aircraft, crew). To put an event on the safety factors list, choose its type in the *Safety factor* column and click **Add**. The *Events to look for* list on the right is ATSB's prompt list.
+
+**2 · Safety factors.** The master register: one row per potential safety factor with its type, codes, whether it is analysed further, existence, the **finding type** that ARAP derives, safety issue and risk level, and an *analysis complete* switch. Click an ID to open the factor.
+
+![Safety factors list](screenshots/v4-atsb-factors.png)
+
+**3 · Safety factor form.** For the selected factor:
+
+- **Define**: a complete, neutral sentence (no "failed", "inadequate"; one factor per statement); the type; one or more ATSB codes from the taxonomy (coding guidance appears for codes that have it); the role and error type for individual actions, the functional area for conditions, preventive or recovery for risk controls, internal or external for organisational influences. Tick *Potential safety issue* (local conditions, risk controls and organisational influences only) and name the owner. Untick *Analyse further* only with a reason.
+- **Existence** and **Influence**: evidence tables. Rate each item *supports*, *opposes*, *no effect* or *unsure*, and record its source, type, relevance, credibility concerns and whether it was expected but not seen. Then conclude *supported* or *not supported* with a probability expression (a finding needs *likely*, 66 % or more). For influence, first choose what the factor influenced: the occurrence or another safety factor. The questions on the right are ATSB's checklist for the test.
+- **Importance** (only when existence passed and influence did not): is the factor still worth analysing? Justify the decision.
+- **Explain**: the factors whose influence is on this one; **Add an explaining factor** starts a new one already linked.
+- **Risk analysis** (safety issues): worst possible scenario, existing controls, worst credible scenario, then click the matrix. Choose **AirNav 5×5** (default) or **ATSB 6×6**. Both give *critical*, *significant* or *broadly acceptable* (not a safety issue). The small matrix records an alternative rating for sensitivity.
+- **Safety action**: the issue status; each action with its kind (organisation's action, recommendation, advisory notice), organisation, date notified, status, classification and a communication log; **Track in Actions** creates an entry in the action list. Rate the residual risk, tick ALARP if justified and note the practicability considerations. ARAP shows whether further action is required and the six-monthly follow-up date.
+
+![Risk analysis on the ATSB 6×6](screenshots/v4-atsb-risk6x6.png)
+
+**4 · Other key findings.** Basic evidence tables for findings that are not safety factors.
+
+**5 · Safety factor map.** Generated from the verified influences, in the ORLIO lanes.
+
+![Safety factor map](screenshots/v4-atsb-map.png)
+
+**6 · Review & findings.** The findings organised for the report; the safety issues with **Send to hazard log** (AirNav-rated issues keep their 5×5 rating; ATSB-rated issues carry the 6×6 rating in the text, to be rated on the AirNav scheme in the log); all checks (errors, warnings, notes) with links to the factor; the analysis review checklist and the stop rule.
+
+![Review and findings](screenshots/v4-atsb-review.png)
+
+How ARAP derives the finding type: existence + influence on the occurrence or a contributing factor → **contributing safety factor**; influence only on a non-contributing factor, or existence + importance → **other safety factor**; positive actions and conditions → **positive safety factor**; existence not shown → *not established*. The checks include arguments from ignorance (supported with no supporting item), conclusions below the standard of proof, two "just likely" tests that together fall below 50 %, evidence from one source, judgemental wording, the **test for sufficiency** (a contributing factor with no explaining factor) and **fairness** (an individual action with no identified reasons).
+
+**The ATSB 6×6 option.** The Risk scheme page shows it beside the AirNav matrix. ATSB does not publish its cell colours as text, so ARAP uses the AirNav colours by the same pattern: critical = intolerable red; significant = amber (near critical) and yellow, like AirNav's two tolerable bands; broadly acceptable = green. Every catastrophic cell is at least significant.
+
+![AirNav 5×5 and ATSB 6×6](screenshots/v4-risk-schemes.png)
+
+Demo project **DEMO-06** contains the ATSB analysis of the illustrative occurrence OCC-ILL-01: 11 events, 7 contributing and 2 other safety factors, 2 positive safety factors and 2 significant safety issues — one rated on the AirNav 5×5 (3B) and one on the ATSB 6×6 (2B).
 
 ## 14. The hazard log
 
@@ -670,9 +713,9 @@ Administrators can reassign cells: choose a region under **Paint region**, click
 
 ---
 
-## 20. What version 0.7 does not do yet
+## 20. What version 0.8 does not do yet
 
-Version 0.7 covers the core workflow and all twenty-six methods. The following SRS items are planned for later releases:
+Version 0.8 covers the core workflow and all twenty-six methods. The following SRS items are planned for later releases:
 
 - Single sign-on through Keycloak / SAML / OIDC with MFA. Version 0.2 uses local accounts with JWT tokens.
 - Real-time co-editing of a diagram by several users, and the offline workshop pack.
@@ -684,6 +727,7 @@ Version 0.7 covers the core workflow and all twenty-six methods. The following S
 - Linking SPI-register rows to bowtie barriers so barrier health shows the SPI status (SRS SPI-03).
 - Deleting a single assessment (only whole projects can be deleted), and a retention period after which archived projects are purged.
 - For the investigation expert system: meaning-based search with text embeddings (pgvector), network structures other than mechanism → factors (e.g. noisy-OR between factors), statistical validation reports against held-back cases, and AI drafting tested only against a simulated service in the automated tests.
+- For the ATSB analysis: rail and marine taxonomies, a report generator that writes the findings section, and administrator editing of the ATSB 6×6 cell assignment (the matrix is fixed in this version).
 - Saving an existing assessment as a new template, and administrator editing of templates (SRS TPL-05).
 - For the wildlife module: import of strike records from the occurrence system and in ICAO IBIS format.
 - For the extended methods: import of occurrences from the reporting system into the ERC/RAT module, CRM sensitivity cases, administrator editing of the CARA/HEART libraries, and restricted (need-to-know) access to security studies (SRS SRA-04).

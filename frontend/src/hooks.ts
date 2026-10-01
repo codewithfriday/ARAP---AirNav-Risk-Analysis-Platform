@@ -11,3 +11,11 @@ export function useMethods() {
 }
 
 export const uid = (p = 'id') => `${p}${Math.random().toString(36).slice(2, 8)}`
+
+export function useAtsbScheme() {
+  return useQuery({ queryKey: ['atsb-scheme'], queryFn: () => api.get<{ data: Scheme & { severity: any[]; likelihood: any[] } }>('/risk/atsb-scheme'), staleTime: Infinity })
+}
+
+export function useAtsbMeta() {
+  return useQuery({ queryKey: ['atsb-meta'], queryFn: () => api.get<any>('/meta/atsb'), staleTime: Infinity })
+}

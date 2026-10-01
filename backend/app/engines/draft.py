@@ -123,7 +123,7 @@ TOOL = {
             "summary": {"type": "string", "description": "Two or three sentences summarising the occurrence."},
             "mechanism": {"type": "string", "description": "Code of the primary contributing mechanism."},
             "blocks": {"type": "array", "items": {"type": "object", "properties": {
-                "id": {"type": "string"}, "layer": {"type": "string", "enum": ["O", "R", "L", "I", "E"]},
+                "id": {"type": "string"}, "layer": {"type": "string", "enum": ["O", "R", "L", "I", "T", "E"]},
                 "kind": {"type": "string", "enum": ["evidence", "hypothesis", "finding"]},
                 "label": {"type": "string", "description": "Short label, at most 12 words."},
                 "factor": {"type": ["string", "null"], "description": "Factor code from the catalogue, or null."},
@@ -140,11 +140,12 @@ TOOL = {
 
 
 def llm_prompt(text: str, category: dict, factor_list: list[dict]) -> str:
-    cat = "\n".join(f"- {f['code']} ({f['layer']}): {f['label']}" for f in factor_list)
+    cat = "\n".join(f"- {f['code']} ({f['layer']}, ATSB {f.get('atsb', '-')}): {f['label']}" for f in factor_list)
     mech = "\n".join(f"- {m['code']}: {m['label']}" for m in category["mechanisms"])
     return f"""You are helping an air navigation service provider build a case library for its occurrence-investigation
 expert system. Represent the final report below as an AcciMap in the ATSB ORLIO layers:
-O = organisational influences, R = risk controls, L = local conditions, I = individual actions, E = occurrence events.
+O = organisational influences, R = risk controls, L = local conditions, I = individual actions, T = technical failure mechanisms,
+E = occurrence events (ATSB Safety Investigation Guidelines — Analysis).
 
 Rules:
 - Evidence blocks are facts established in the report. Hypothesis blocks are intermediate conclusions the investigators
@@ -157,6 +158,8 @@ Rules:
 - "past": SS if the report states it as established by physical or recorded evidence, S if from interviews or
   judgement, O or SO if the report rules it out.
 - Choose the mechanism code from the list.
+- Write labels in neutral ATSB style: a subject and an action verb for events and actions; no judgemental words such as
+  "failed", "deficient", "inadequate", "poor"; one factor per block.
 
 Occurrence category: {category['name']}
 Mechanisms:

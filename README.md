@@ -19,7 +19,7 @@ It provides one hazard log and one risk classification scheme across all methods
 | [Software Requirements Specification](docs/AirNav_Risk_Analysis_Software_Requirements.pdf) | Requirements, calculation specs, reference tests, recommended stack (App. C) |
 | [Architecture notes](docs/ARCHITECTURE.md) | Code structure, data model, engines |
 
-> **Status: version 0.7 (pilot).** Numbers in the demo data are the Manual's illustrative worked examples, not AirNav data. See [User guide §20](docs/USER_GUIDE.md#20-what-version-07-does-not-do-yet) for what is not yet implemented.
+> **Status: version 0.8 (pilot).** Numbers in the demo data are the Manual's illustrative worked examples, not AirNav data. See [User guide §20](docs/USER_GUIDE.md#20-what-version-08-does-not-do-yet) for what is not yet implemented.
 
 ---
 
@@ -102,7 +102,7 @@ pytest -q                                   # SQLite
 ARAP_DATABASE_URL=postgresql+psycopg://... pytest -q -p no:cacheprovider   # PostgreSQL
 ```
 
-The suite has 68 tests. They include the **reference test cases of SRS §9**: every calculation engine must reproduce the Manual's worked examples. For example, fault-tree top event 1.22 × 10⁻⁶, LOPA 2.5 × 10⁻⁵/yr, Bayesian posterior P(fatigue | loss of separation) = 0.390, fatigue-model minimum alertness 5.18 at 05:55, RVSM vertical collision risk 1.873 × 10⁻⁹, minimum lateral route spacing 11.68 NM, CARA HEP 2.016 × 10⁻³, Markov unavailability 2.04 × 10⁻⁶ and Cooke expert weight 0.814. The Bayesian engine is also checked against brute-force enumeration. The API tests cover roles, the approval workflow, acceptance authority, locking, versioning, hazard promotion, archiving and deleting projects, exports and audit. The investigation expert system tests reproduce the fuzzy result of Ng et al. (2022) (fuel exhaustion 94.54 Very probable), check the case-library Bayesian network against the BBN engine, and check that drafted AcciMaps with invented quotes are flagged.
+The suite has 73 tests. They include the **reference test cases of SRS §9**: every calculation engine must reproduce the Manual's worked examples. For example, fault-tree top event 1.22 × 10⁻⁶, LOPA 2.5 × 10⁻⁵/yr, Bayesian posterior P(fatigue | loss of separation) = 0.390, fatigue-model minimum alertness 5.18 at 05:55, RVSM vertical collision risk 1.873 × 10⁻⁹, minimum lateral route spacing 11.68 NM, CARA HEP 2.016 × 10⁻³, Markov unavailability 2.04 × 10⁻⁶ and Cooke expert weight 0.814. The Bayesian engine is also checked against brute-force enumeration. The API tests cover roles, the approval workflow, acceptance authority, locking, versioning, hazard promotion, archiving and deleting projects, exports and audit. The investigation expert system tests reproduce the fuzzy result of Ng et al. (2022) (fuel exhaustion 94.54 Very probable), check the case-library Bayesian network against the BBN engine, and check that drafted AcciMaps with invented quotes are flagged. The ATSB analysis tests check the 6×6 matrix, the derivation of finding types and the analysis checks.
 
 GitHub Actions (`.github/workflows/ci.yml`) runs the back-end tests on SQLite and PostgreSQL and builds the front end on every push and pull request.
 

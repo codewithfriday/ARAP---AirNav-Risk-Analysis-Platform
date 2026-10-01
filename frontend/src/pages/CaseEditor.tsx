@@ -120,7 +120,7 @@ export default function CaseEditor() {
         </Space.Compact>
         {b.kind !== 'finding' && <Form.Item label="ORLIO factor (links the block across cases and to the Bayesian network)">
           <Select allowClear showSearch optionFilterProp="label" value={b.factor ?? undefined} onChange={(v) => updBlock({ factor: v ?? null })}
-            options={factors.map((f) => ({ value: f.code, label: `${f.code} — ${f.label}` }))} /></Form.Item>}
+            options={factors.map((f) => ({ value: f.code, label: `${f.code}${f.atsb ? ` [ATSB ${f.atsb}]` : ''} — ${f.label}` }))} /></Form.Item>}
         {b.kind !== 'finding'
           ? <Form.Item label={b.kind === 'evidence' ? 'State in the past occurrence' : 'Conclusion in the past occurrence'}><Select value={b.past} onChange={(v) => updBlock({ past: v })} options={supportOpts} /></Form.Item>
           : <Form.Item label="Past finding — verbal probability per mechanism">
@@ -204,7 +204,7 @@ export default function CaseEditor() {
                 <Tag color={LAYER_COLOR[x.layer]} style={{ color: '#111' }}>{x.id}</Tag>
                 <span style={{ flex: 1 }} className="small">{x.label}</span>
                 <Select size="small" style={{ width: 150 }} value={x.id in test ? (test[x.id] ?? 'NP') : (typeof x.past === 'string' ? x.past : 'S')}
-                  onChange={(v) => setTest({ ...test, [x.id]: v === 'NP' ? null : v })} options={[...supportOpts, { value: 'NP', label: 'Not provided' }]} />
+                  onChange={(v) => setTest({ ...test, [x.id]: v === 'NP' ? null : v })} options={[...supportOpts, { value: 'U', label: 'Unsure' }, { value: 'NP', label: 'Not provided' }]} />
               </div>)}
             </Card>
           </Col>

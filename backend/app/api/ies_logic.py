@@ -40,7 +40,7 @@ def infer_cases(cases: list[InvCase], ratings: dict[str, str]) -> dict:
             b = blocks[cl["block"]]
             k = rating_key(c.id, b)
             e = clues.setdefault(k, {"key": k, "label": cl["label"], "layer": cl["layer"], "factor": cl.get("factor"),
-                                     "cases": [], "priority": 0.0})
+                                     "cases": [], "priority": 0.0, "unsure": ratings.get(k) == "U"})
             e["cases"].append({"id": c.id, "ref": c.ref, "for": [blocks[x]["label"] for x in cl["for"] if x in blocks]})
             e["priority"] = max(e["priority"], cl["priority"])
         per_case.append({"id": c.id, "ref": c.ref, "title": c.title, "blocks": _round(r["blocks"]), "findings": findings,
@@ -77,7 +77,7 @@ def network(db: Session, category: str) -> dict:
 
 
 def factor_ratings(ratings: dict[str, str]) -> dict[str, str]:
-    return {k[2:]: v for k, v in (ratings or {}).items() if k.startswith("f:") and v in fuzzy.CRISP}
+    return {k[2:]: v for k, v in (ratings or {}).items() if k.startswith("f:") and (v in fuzzy.CRISP or v == "U")}
 
 
 def bn_analysis(db: Session, category: str, ratings: dict[str, str]) -> dict:

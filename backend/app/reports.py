@@ -31,7 +31,7 @@ def assessment_docx(a: dict, studies: list[dict], engines: dict) -> bytes:
     p = doc.add_paragraph()
     p.add_run(f"{a['project']['code']} — {a['project']['title']}\n").bold = True
     p.add_run(f"Assessment: {a['title']} (version {a['version']}, status {a['status']})\n")
-    p.add_run(f"Generated {date.today().isoformat()} by ARAP. Risk scheme version {a['risk_scheme_version']}. "
+    p.add_run(f"Generated {date.today().isoformat()} by NAVRAP. Risk scheme version {a['risk_scheme_version']}. "
               f"Engine versions: {', '.join(f'{k} {v}' for k, v in engines.items())}.")
 
     doc.add_heading("1. Summary and conclusion", 1)
@@ -110,16 +110,16 @@ def assessment_docx(a: dict, studies: list[dict], engines: dict) -> bytes:
                      "—" if x["damage_pct"] is None else f"{x['damage_pct']:.1f}", f"{x['likelihood']} × {x['severity']} = {x['score']}",
                      x["risk"]] for x in res["species"]])
         elif m.get("rows"):
-            doc.add_paragraph(f"{len(m['rows'])} worksheet rows recorded (see ARAP for the full worksheet).")
+            doc.add_paragraph(f"{len(m['rows'])} worksheet rows recorded (see NAVRAP for the full worksheet).")
         else:
-            doc.add_paragraph("See ARAP for the full model.")
+            doc.add_paragraph("See NAVRAP for the full model.")
     doc.add_heading("6. Residual risk, actions and conditions", 1)
     _table(doc, ["Ref", "Action", "Owner", "Due", "Status"],
            [[x["ref"], x["text"], x["owner"], x["due_date"] or "", x["status"]] for x in a["actions"]] or [["—"] * 5])
     doc.add_heading("7. Review and approval history", 1)
     _table(doc, ["When", "Action", "From → to", "By", "Comment"],
            [[x["at"][:16], x["action"], f"{x['from_status']} → {x['to_status']}", x["username"], x["comment"]] for x in a["approvals"]] or [["—"] * 5])
-    f = doc.add_paragraph("Numbers produced by ARAP calculation engines are order-of-magnitude estimates; "
+    f = doc.add_paragraph("Numbers produced by NAVRAP calculation engines are order-of-magnitude estimates; "
                           "their inputs and sources are recorded in the studies.")
     f.alignment = WD_ALIGN_PARAGRAPH.LEFT
     buf = io.BytesIO(); doc.save(buf)

@@ -3,7 +3,7 @@
 * ARMS Event Risk Classification (ERC) — ARMS Working Group (2010).
 * EUROCONTROL Risk Analysis Tool (RAT) scoring — severity = risk of collision + controllability.
   The official RAT look-up table that maps the scores to severity classes A–E is published by
-  EUROCONTROL and is not embedded here; ARAP computes the scores and the analyst records the class.
+  EUROCONTROL and is not embedded here; NAVRAP computes the scores and the analyst records the class.
 """
 from __future__ import annotations
 

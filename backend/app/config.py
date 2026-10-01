@@ -16,6 +16,15 @@ class Settings(BaseSettings):
     anthropic_api_key: str = ""
     llm_model: str = "claude-sonnet-5"
     llm_url: str = "https://api.anthropic.com/v1/messages"
+    # Single-container deployment: serve the built frontend from this directory (e.g. /app/static). Empty = API only.
+    static_dir: str = ""
+
+    def model_post_init(self, __context) -> None:
+        # Hosted Postgres (Neon, Render, Supabase…) gives postgres:// or postgresql:// URLs — use the psycopg 3 driver.
+        u = self.database_url
+        for pre in ("postgres://", "postgresql://"):
+            if u.startswith(pre):
+                self.database_url = "postgresql+psycopg://" + u[len(pre):]
 
 
 settings = Settings()

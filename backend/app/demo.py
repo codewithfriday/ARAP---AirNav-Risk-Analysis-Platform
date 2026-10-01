@@ -60,7 +60,7 @@ def seed_demo(db: Session):
                 sponsor="SQRM", description="One study per method, reproducing the examples in the AirNav Risk Analysis Manual.")
     db.add(p); db.flush()
     a = Assessment(project_id=p.id, title="Worked examples — all twelve methods", created_by="assessor",
-                   scope="Demonstration of every ARAP method module using the Manual's examples.",
+                   scope="Demonstration of every NAVRAP method module using the Manual's examples.",
                    environment="Illustrative values only.", assumptions="All numbers are illustrative (Manual, How to use).")
     db.add(a); db.flush()
 

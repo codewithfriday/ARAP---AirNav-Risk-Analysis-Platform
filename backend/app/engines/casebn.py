@@ -17,7 +17,7 @@ Clues: for each unrated factor F, the expected reduction in the entropy of C if 
     VOI(F) = H(C | e) − Σ_f P(F = f | e) · H(C | e, F = f)        (bits)
 ranked high to low. This is the rigorous version of the paper's "Not provided" clue.
 
-The network can be exported in ARAP's BBN format (Manual Ch. 17); virtual evidence becomes an observed child node,
+The network can be exported in NAVRAP's BBN format (Manual Ch. 17); virtual evidence becomes an observed child node,
 which gives identical posteriors in the BBN engine (reference test TC-IES-03).
 """
 from __future__ import annotations
@@ -138,7 +138,7 @@ def analyse(net: dict, ratings: dict[str, str], factor_meta: dict[str, dict] | N
 
 
 def to_bbn(net: dict, ratings: dict[str, str], labels: dict[str, str] | None = None) -> dict[str, Any]:
-    """Export to ARAP's BBN format. Rated factors get an observed child 'obs_<factor>' carrying the virtual evidence."""
+    """Export to NAVRAP's BBN format. Rated factors get an observed child 'obs_<factor>' carrying the virtual evidence."""
     labels = labels or {}
     ms = net["mechanisms"]
     nodes = [{"id": "C", "label": "Mechanism", "states": ms, "parents": [], "cpt": [round(net["prior"][m], 6) for m in ms]}]

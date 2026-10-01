@@ -145,7 +145,7 @@ def seed_demo_v2(db: Session):
                 description="One study per method added in Manual edition 0.2 (chapters 18–30).")
     db.add(p); db.flush()
     a = Assessment(project_id=p.id, title="Worked examples — thirteen extended methods", created_by="assessor",
-                   scope="Demonstration of the extended ARAP method modules using the Manual's examples.",
+                   scope="Demonstration of the extended NAVRAP method modules using the Manual's examples.",
                    environment="Illustrative values only.", assumptions="All numbers are illustrative.")
     db.add(a); db.flush()
     ids = {}

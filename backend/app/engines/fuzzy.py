@@ -45,7 +45,7 @@ PROB = ["HU", "IM", "ML", "PR", "VP", "AC"]
 PROB_LABEL = {"HU": "Very unlikely", "IM": "Unlikely", "ML": "About as likely as not", "PR": "Likely",
               "VP": "Very likely", "AC": "Virtually certain"}  # ATSB terms (Guidelines p.73); equivalents improbable … almost certain
 # finding output triangles on the IPCC verbal-probability bands (paper Fig. 8, Table 2). The paper does not publish
-# the peaks; ARAP places them so that a fully fired set defuzzifies to the values in the paper's Fig. 13
+# the peaks; NAVRAP places them so that a fully fired set defuzzifies to the values in the paper's Fig. 13
 # (Very probable 94.54, Highly unlikely 4.959).
 OUT_PROB = {"HU": (0, 4.877, 10), "IM": (10, 21.5, 33), "ML": (33, 49.5, 66), "PR": (66, 78, 90),
             "VP": (90, 94.62, 99), "AC": (99, 99.5, 100)}

@@ -1,0 +1,17 @@
+# Render Blueprint: New + → Blueprint → select this repository.
+services:
+  - type: web
+    name: navrap
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    envVars:
+      - key: ARAP_DATABASE_URL      # paste the Neon connection string (postgresql://…?sslmode=require)
+        sync: false
+      - key: ARAP_ADMIN_PASSWORD    # password of the 'admin' account created on first start
+        sync: false
+      - key: ARAP_SECRET_KEY
+        generateValue: true
+      - key: ARAP_SEED_DEMO
+        value: "true"

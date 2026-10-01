@@ -1,6 +1,8 @@
-# ARAP — AirNav Risk Analysis Platform
+<img src="frontend/public/navrap-logo.svg" width="80" alt="NAVRAP logo">
 
-ARAP is a web application for conducting air navigation safety risk assessments with the 26 methods of the **AirNav Risk Analysis Manual** (edition 0.3):
+# NAVRAP — AirNav Risk Analysis Platform
+
+NAVRAP is a web application for conducting air navigation safety risk assessments with the 26 methods of the **AirNav Risk Analysis Manual** (edition 0.3):
 
 **Core (Manual ch. 6–17):** Bowtie · HAZID · HAZOP · JHA · FMEA/FMECA · LOPA · FHA · STPA · FTA · bio-mathematical fatigue modelling (three-process model) · FRAM · Bayesian belief networks
 
@@ -14,7 +16,7 @@ It provides one hazard log and one risk classification scheme across all methods
 
 | Document | |
 |---|---|
-| [User guide](docs/USER_GUIDE.md) ([PDF](docs/ARAP_User_Guide.pdf)) | How to use the application |
+| [User guide](docs/USER_GUIDE.md) ([PDF](docs/NAVRAP_User_Guide.pdf)) | How to use the application |
 | [AirNav Risk Analysis Manual](docs/AirNav_Risk_Analysis_Manual.pdf) | The methods — why, when and how |
 | [Software Requirements Specification](docs/AirNav_Risk_Analysis_Software_Requirements.pdf) | Requirements, calculation specs, reference tests, recommended stack (App. C) |
 | [Architecture notes](docs/ARCHITECTURE.md) | Code structure, data model, engines |
@@ -46,7 +48,7 @@ Follows SRS Appendix C:
 Requires Docker with Compose v2.
 
 ```bash
-git clone https://github.com/codewithfriday/ARAP---AirNav-Risk-Analysis-Platform.git arap
+git clone https://github.com/codewithfriday/NAVRAP---AirNav-Risk-Analysis-Platform.git arap
 cd arap
 cp .env.example .env        # then edit .env: set POSTGRES_PASSWORD, ARAP_SECRET_KEY, ARAP_ADMIN_PASSWORD
 docker compose up -d --build
@@ -57,6 +59,16 @@ Open **http://localhost:8080** and sign in as `admin` with the password from `.e
 With `ARAP_SEED_DEMO=true` (the default) five demo projects (DEMO-01 for the core methods, DEMO-02 for the extended methods including the cattle-egret wildlife example, DEMO-03 the H24 alternate-aerodrome SRA case study, DEMO-04 a new AIM system acquisition and DEMO-05 a major organisational change, both built from assessment templates) with one study per method and demo users (password `demo1234`) is created: `assessor`, `reviewer`, `director`, `accexec`, `viewer`. An administrator can delete any demo project (**Delete** on the project page); a deleted demo is not re-created at the next start. **Set `ARAP_SEED_DEMO=false` and change all passwords for real use.**
 
 The API applies database migrations (`alembic upgrade head`) on start-up. Interactive API documentation (OpenAPI) is at `http://localhost:8080/api/docs`.
+
+## Free hosting: Render + Neon
+
+The root `Dockerfile` builds one container that serves both the API and the web app, so the platform runs as a single web service. A free setup:
+
+1. **Database — Neon** (free Postgres, 0.5 GB, does not expire): create a project and copy the connection string (`postgresql://…?sslmode=require`). NAVRAP converts `postgres://` / `postgresql://` URLs to its driver automatically.
+2. **App — Render** (free web service, 512 MB): *New + → Blueprint*, select this repository (it reads `render.yaml`), then fill in `ARAP_DATABASE_URL` (the Neon string) and `ARAP_ADMIN_PASSWORD`. `ARAP_SECRET_KEY` is generated.
+3. Open `https://<service>.onrender.com`. The first start runs the migrations and seeds the demo data (a few minutes). On the free plan the service sleeps after 15 minutes without traffic and takes about a minute to wake.
+
+Environment variables keep the `ARAP_` prefix for compatibility with existing installations.
 
 ## Development setup
 

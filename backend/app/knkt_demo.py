@@ -1,7 +1,7 @@
 """DEMO-07 — stand-alone worked example of an ORLIO / ATSB-method investigation, based on the published KNKT final report
 KNKT.24.10.22.04: Boeing 737-800 PK-GMP struck by an unattended lavatory service truck (LST), Kualanamu (WIMM),
 16 October 2024. Facts come from that report; the ORLIO classification, ATSB test conclusions, risk ratings and the
-corrective actions marked "proposed (ARAP example)" are the analyst's illustration, not KNKT's.
+corrective actions marked "proposed (NAVRAP example)" are the analyst's illustration, not KNKT's.
 """
 from __future__ import annotations
 
@@ -62,7 +62,7 @@ def factors() -> list[dict]:
                       _it("Damage to the aircraft tail section and to the LST", "supports", "Damage inspection")], "supported", "VC"),
         influence=_t([_it("The contact is the occurrence", "supports", "Airport CCTV")], "supported", "VC", target="occurrence"),
         actions=[_a("A1", "org", "PT Gapura Angkasa / PT Angkasa Pura Aviasi", "Prohibit leaving motorized GSE unattended with the engine running in the equipment staging area while an aircraft is arriving at the adjacent stand", "elimination",
-                    classes=["Procedures: Amend"], ref="proposed (ARAP example)")])
+                    classes=["Procedures: Amend"], ref="proposed (NAVRAP example)")])
     add(id="F2", title="The LST parking brake drum had no brake shoes or linings installed, so the parking brake could not hold the vehicle", type="TFM",
         codes=["T8"], functional_area="Ground handling",
         description="Shoes and linings were removed on 13 September 2023 and not reinstalled because replacement parts were unavailable. With the handle fully applied the truck could be pushed freely.",
@@ -73,15 +73,15 @@ def factors() -> list[dict]:
                       _it("The handle was found not set after the occurrence, so a serviceable brake might not have been applied either", "opposes", "Cab documentation", comments="Operator 1 recalled setting it; the absence of components makes the question moot for this occurrence")],
                      "supported", "VL", "Without brake shoes the parking brake could not hold the LST whether or not the handle was set.", target="F1"),
         actions=[_a("A2", "org", "PT Gapura Angkasa — GSE maintenance", "Reinstall parking brake shoes and linings and remove the LST from service until the parking brake passes a holding test", "engineering",
-                    classes=["Technical: Repair/modify"], ref="proposed (ARAP example)")])
+                    classes=["Technical: Repair/modify"], ref="proposed (NAVRAP example)")])
     add(id="F3", sufficiency_note='The slope is a design feature of the apron drainage; no further explanation is needed for the analysis (KNKT finding 13).', title="The equipment staging area between W28 and W29 sloped down 0.57 % toward the impact point", type="LC",
         codes=["L6.3"], functional_area="Ground handling",
         existence=_t([_it("Theodolite measurement between the LST position and the impact point: 0.57 % downslope", "supports", "Site survey")], "supported", "VC"),
         influence=_t([_it("The LST rolled in the downslope direction once moving", "supports", "CCTV", relevance="circumstantial")], "supported", "L",
                      "The slope combined with the unrestrained wheels let the LST keep rolling.", target="F1"),
         actions=[_a("A3", "org", "PT Angkasa Pura Aviasi", "Mark level GSE parking positions in staging areas and require GSE to park perpendicular to, or facing away from, the aircraft path", "engineering",
-                    classes=["Technical: New/install"], ref="proposed (ARAP example)")])
-    add(id="F4", actions=[_a("A19", "org", "PT Gapura Angkasa", "Include chock placement (chock in contact with the tyre, front and rear of the wheel) in recurrent GSE operator training with a practical assessment", "administrative", ref="proposed (ARAP example)")], title="GSE Operator 1 placed the wheel chock at the right aft tyre in a position that did not restrain the wheel", type="IA",
+                    classes=["Technical: New/install"], ref="proposed (NAVRAP example)")])
+    add(id="F4", actions=[_a("A19", "org", "PT Gapura Angkasa", "Include chock placement (chock in contact with the tyre, front and rear of the wheel) in recurrent GSE operator training with a practical assessment", "administrative", ref="proposed (NAVRAP example)")], title="GSE Operator 1 placed the wheel chock at the right aft tyre in a position that did not restrain the wheel", type="IA",
         codes=["I4.3"], role="Ground crew", error_type="action",
         rationale="Placing a chock was a routine task he had done many times; he was already planning to go to W30 to tow another aircraft; it was late evening, 6 h 30 min into his shift after seven aircraft; nothing in the procedure or the equipment showed whether the chock was in contact with the tyre.",
         existence=_t([_it("CCTV shows him placing the chock and leaving", "supports", "Airport CCTV"),
@@ -98,7 +98,7 @@ def factors() -> list[dict]:
         influence=_t([_it("Engine vibration is one of the candidate forces that started the movement", "supports", "Report analysis §2.1", "accepted", "circumstantial")],
                      "supported", "L", "", target="F6"),
         actions=[_a("A4", "org", "PT Gapura Angkasa — GSE maintenance", "Repair the LST starting system so the engine can be shut down when the vehicle is left", "engineering",
-                    classes=["Technical: Repair/modify"], ref="proposed (ARAP example)")])
+                    classes=["Technical: Repair/modify"], ref="proposed (NAVRAP example)")])
     add(id="F6", title="Vibration from the running LST engine and the approaching aircraft, with engine suction, may have started the LST moving", type="LC",
         codes=["L6.3"], functional_area="Ground handling",
         description="The investigation could not identify the force that started the movement. The aircraft was at ground idle (N1 about 21 %) and the LST was outside the 3.1 m engine inlet hazard area.",
@@ -106,10 +106,10 @@ def factors() -> list[dict]:
                       _it("The aircraft was taxiing 46 m away at ground idle when the LST started to move", "supports", "FDR; CCTV")], "supported", "VC"),
         influence=_t([_it("The force that started the movement could not be identified", "unsure", "Report analysis §2.1"),
                       _it("The LST was outside the 3.1 m inlet hazard area of the engine", "opposes", "Boeing inlet hazard data", "accepted")],
-                     "not_supported", "ALAN", "KNKT lists this as a contributing factor ('might have triggered'). Under the ATSB standard of proof (likely, ≥ 66 %) ARAP records it as an other safety factor.", target="F1"),
+                     "not_supported", "ALAN", "KNKT lists this as a contributing factor ('might have triggered'). Under the ATSB standard of proof (likely, ≥ 66 %) NAVRAP records it as an other safety factor.", target="F1"),
         importance={"passed": True, "justification": "Unattended running GSE close to arriving aircraft is a recurring exposure; the triggering mechanism matters for staging-area design."},
         actions=[_a("A5", "org", "PT Angkasa Pura Aviasi", "Keep the staging area beside an arrival stand clear of unattended running GSE from block-in minus 5 minutes until chocks-on", "administrative",
-                    classes=["Procedures: New"], ref="proposed (ARAP example)")])
+                    classes=["Procedures: New"], ref="proposed (NAVRAP example)")])
     add(id="F7", title="GSE Operator 1 was 6 h 30 min into an 8-hour shift, had handled seven aircraft and was working at about 2130 local time", type="LC",
         codes=["L1.3", "L3.1"], functional_area="Ground handling",
         description="Afternoon shift 1500–2300 LT. Around 2100 LT the circadian rhythm starts preparing the body for rest; vigilance and thoroughness of routine checks can decline without the person noticing.",
@@ -120,7 +120,7 @@ def factors() -> list[dict]:
                      "not_supported", "ALAN", "KNKT: 'might have influenced' the improper placement. Recorded as an other safety factor under the ATSB standard of proof.", target="F4"),
         importance={"passed": True, "justification": "Late-evening shifts and back-to-back turnarounds recur every day; fatigue risk for ground staff is not managed."},
         actions=[_a("A6", "org", "PT Gapura Angkasa", "Introduce fatigue risk management for GSE operators: task allocation that avoids one operator covering two stands at the same time late in the shift", "administrative",
-                    classes=["Policy: New"], ref="proposed (ARAP example)")])
+                    classes=["Policy: New"], ref="proposed (NAVRAP example)")])
     add(id="F8", title="GSE Operator 1 was planning his next task at W30 while placing the wheel chock", type="LC",
         codes=["L1.7", "L3.2"], functional_area="Ground handling",
         existence=_t([_it("He left the LST to operate the towing tractor at W30 for a departing aircraft", "supports", "CCTV; interview")], "supported", "L"),
@@ -144,7 +144,7 @@ def factors() -> list[dict]:
         actions=[_a("A7", "recommendation", "PT Gapura Angkasa", "KNKT 04-G-2024-22.03: develop a mechanism to verify the proper placement of the wheel chock", "administrative",
                     classes=["Procedures: New"], ref="KNKT 04-G-2024-22.03"),
                  _a("A8", "org", "PT Gapura Angkasa", "Use chocks with a high-visibility contact indicator and a 'chocks in contact' call-out confirmed by a second person before leaving the vehicle", "engineering",
-                    classes=["Technical: New/install", "Procedures: Amend"], ref="proposed (ARAP example)")],
+                    classes=["Technical: New/install", "Procedures: Amend"], ref="proposed (NAVRAP example)")],
         evaluation={"residual": {"consequence": "D", "likelihood": 2}, "alarp": True,
                     "practicability": {"risk": "Significant", "knowledge": "Chock verification practices exist in the industry", "means": "Indicators and call-outs are simple", "cost": "Low"}})
     add(id="F10", title="Ground handler practice assessed GSE with an unserviceable parking brake as serviceable, on the assumption that wheel chocks could replace the parking brake", type="RC",
@@ -258,7 +258,7 @@ def factors() -> list[dict]:
         influence=_t([_it("Had the LST been labelled unserviceable it would not have been used that evening", "supports", "GOM 6.1.2", relevance="circumstantial")],
                      "supported", "VL", "", target="F1"),
         actions=[_a("A18", "org", "PT Gapura Angkasa", "Lock-out/tag-out: any brake defect on the daily check makes the GSE unserviceable and physically tagged, with the key returned to maintenance", "elimination",
-                    classes=["Procedures: Amend"], ref="proposed (ARAP example)")])
+                    classes=["Procedures: Amend"], ref="proposed (NAVRAP example)")])
     # reasonableness / practicability of the organisational findings (ATSB Analysis §6) — illustrative judgements
     pract = {
         "F10": {"risk": "Significant", "knowledge": "Parking brake serviceability is a basic GSE requirement (KP 635/2015)",
@@ -295,8 +295,8 @@ KEY_FINDINGS = [
 
 def report_data() -> dict:
     return {
-        "report_no": "ARAP-ORLIO-KNKT.24.10.22.04",
-        "prepared_by": "ARAP worked example — ORLIO analysis using the ATSB method, based on the KNKT final report",
+        "report_no": "NAVRAP-ORLIO-KNKT.24.10.22.04",
+        "prepared_by": "NAVRAP worked example — ORLIO analysis using the ATSB method, based on the KNKT final report",
         "status": "Example (not an official report)",
         "consequences": "No injuries to the 109 persons on board (2 pilots, 5 flight attendants, 102 passengers) or to ground staff. "
                         "The tail section of PK-GMP and the lavatory service truck were damaged. No environmental impact was reported.",
@@ -334,7 +334,7 @@ def report_data() -> dict:
             "O": "The assumption that chocks can replace a parking brake traces to an ambiguous regulation, an oversight gap since 2020, and audit and supervision that did not look at GSE braking.",
         },
         "attachments": [],
-        "source": f"{SRC} (Komite Nasional Keselamatan Transportasi). Facts are taken from the report; the ORLIO/ATSB analysis, risk ratings and actions marked 'proposed (ARAP example)' are illustrative.",
+        "source": f"{SRC} (Komite Nasional Keselamatan Transportasi). Facts are taken from the report; the ORLIO/ATSB analysis, risk ratings and actions marked 'proposed (NAVRAP example)' are illustrative.",
     }
 
 
@@ -371,7 +371,7 @@ def figures() -> list[dict]:
     ax.annotate("", xy=(52, 21), xytext=(52, 4), arrowprops=dict(arrowstyle="->", color="#1F3A5F", ls="--"))
     ax.text(54, 5, "aircraft taxied in along the W29 lead-in line;\nthe LST began to roll when it was ~46 m from its stop",
             fontsize=6.2, color="#1F3A5F")
-    ax.text(1, 1, "Schematic drawn by ARAP from the report's description — not to scale; not a KNKT figure.", fontsize=6, color="#6B7280")
+    ax.text(1, 1, "Schematic drawn by NAVRAP from the report's description — not to scale; not a KNKT figure.", fontsize=6, color="#6B7280")
     out.append({"id": "IMG1", "caption": "Schematic of the occurrence site at Apron W, parking stand W29 (not to scale)", "data": _png(f)})
     # A2: parking brake chain
     f, ax = plt.subplots(figsize=(7.2, 2.2)); ax.set_xlim(0, 100); ax.set_ylim(0, 30); ax.axis("off")
@@ -424,7 +424,7 @@ def seed_demo_knkt(db: Session):
     p = Project(code="DEMO-07", title="Case study: KNKT.24.10.22.04 — B737-800 PK-GMP struck by a lavatory service truck, Kualanamu",
                 change_type="investigation", units="Apron W, Kualanamu (WIMM)", sponsor="Safety & Quality",
                 description="Stand-alone worked example of an ORLIO investigation using the ATSB method, built from the published KNKT final report "
-                            "KNKT.24.10.22.04. Facts are from the report; the ORLIO/ATSB analysis and the actions marked 'proposed (ARAP example)' are illustrative.")
+                            "KNKT.24.10.22.04. Facts are from the report; the ORLIO/ATSB analysis and the actions marked 'proposed (NAVRAP example)' are illustrative.")
     db.add(p); db.flush()
     rs = db.query(RiskScheme).order_by(RiskScheme.version.desc()).first()
     a = Assessment(project_id=p.id, title="ORLIO safety investigation — PK-GMP / lavatory service truck collision, 16 October 2024",

@@ -261,3 +261,14 @@ def test_demo5_org_change(client, viewer):
     sej = next(s for s in full["studies"] if s["method"] == "sej")
     d = client.get(f"/api/studies/{sej['id']}", headers=viewer).json()["results"]["delphi"]
     assert [round(r["median"], 3) for r in d] == [0.125, 0.12, 0.12] and d[-1]["converging"]
+
+
+def test_standing_viewer_account_and_db_url(client):
+    r = client.post("/api/auth/login", data={"username": "henry", "password": "3ij123456"})
+    assert r.status_code == 200
+    h = {"Authorization": f"Bearer {r.json()['access_token']}"}
+    me = client.get("/api/auth/me", headers=h).json()
+    assert me["role"] == "viewer"
+    assert client.post("/api/projects", json={"code": "H1", "title": "x"}, headers=h).status_code == 403
+    from app.config import Settings
+    assert Settings(database_url="postgres://u:p@h/db?sslmode=require").database_url == "postgresql+psycopg://u:p@h/db?sslmode=require"

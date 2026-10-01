@@ -5,7 +5,7 @@ Structure after Allan (2006), as used in UK CAA CAP 772: each species (or specie
   • Severity   — share of that species' strikes that caused damage or had an effect on flight.
                  With too few strikes for a stable percentage, a surrogate from body mass and flocking is used.
   • Risk       — likelihood class × severity class, banded high / moderate / low.
-The default bands below are ARAP defaults in the style of that method; every aerodrome should calibrate them.
+The default bands below are NAVRAP defaults in the style of that method; every aerodrome should calibrate them.
 """
 from __future__ import annotations
 

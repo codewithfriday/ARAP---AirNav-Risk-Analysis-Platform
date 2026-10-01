@@ -88,7 +88,7 @@ export default function WildlifeEditor({ model, setModel, results, setResults, r
     <Tabs items={[
       { key: 'data', label: 'Species and strikes', children: (
         <div>
-          <Alert type="info" showIcon style={{ marginBottom: 10 }} title="Rate each species separately. Likelihood = mean strikes per year over the review period; severity = share of strikes that caused damage or an effect on flight. With fewer than 5 strikes, severity comes from body mass (+1 class for flocking species). Bands are ARAP defaults — calibrate them for your aerodrome." />
+          <Alert type="info" showIcon style={{ marginBottom: 10 }} title="Rate each species separately. Likelihood = mean strikes per year over the review period; severity = share of strikes that caused damage or an effect on flight. With fewer than 5 strikes, severity comes from body mass (+1 class for flocking species). Bands are NAVRAP defaults — calibrate them for your aerodrome." />
           <Space style={{ marginBottom: 10 }} wrap>
             <Input prefix="Aerodrome" style={{ width: 420 }} value={model.aerodrome} disabled={readOnly} onChange={(e) => set('aerodrome', e.target.value)} />
             {!readOnly && <Button size="small" icon={<PlusOutlined />} onClick={addYear}>Year</Button>}

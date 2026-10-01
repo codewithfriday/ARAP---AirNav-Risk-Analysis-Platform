@@ -60,9 +60,9 @@ export default function App() {
     <Layout style={{ minHeight: '100vh' }}>
       <Sider width={236} breakpoint="lg" collapsedWidth={64}>
         <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '18px 18px 14px', color: '#fff' }}>
-          <img src="/favicon.svg" width={30} height={30} alt="" />
+          <img src="/navrap-logo.svg" width={38} height={38} alt="NAVRAP" />
           <div style={{ lineHeight: 1.15 }}>
-            <div style={{ fontWeight: 800, fontSize: 18, letterSpacing: 0.5 }}>ARAP</div>
+            <div style={{ fontWeight: 800, fontSize: 18, letterSpacing: 0.5 }}>NAVRAP</div>
             <div style={{ fontSize: 10.5, opacity: 0.75 }}>AirNav Risk Analysis Platform</div>
           </div>
         </Link>

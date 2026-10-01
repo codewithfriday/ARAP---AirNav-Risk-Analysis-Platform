@@ -1,8 +1,8 @@
-# ARAP User Guide
+# NAVRAP User Guide
 
 **AirNav Risk Analysis Platform — version 0.9**
 
-ARAP is the web application that implements the *AirNav Risk Analysis Manual*. It lets AirNav staff plan, run, review and approve safety risk assessments with twenty-six methods, keeps every hazard in one hazard log, and produces the Safety Assessment Report.
+NAVRAP is the web application that implements the *AirNav Risk Analysis Manual*. It lets AirNav staff plan, run, review and approve safety risk assessments with twenty-six methods, keeps every hazard in one hazard log, and produces the Safety Assessment Report.
 
 This guide explains how to use the application. For *why* and *when* to use each method, see the Manual (`docs/AirNav_Risk_Analysis_Manual.pdf`). For the formal requirements, see the SRS (`docs/AirNav_Risk_Analysis_Software_Requirements.pdf`).
 
@@ -37,7 +37,7 @@ This guide explains how to use the application. For *why* and *when* to use each
 
 ### 1.1 Signing in
 
-Open ARAP in a browser (Chrome, Edge, Firefox or Safari) at the address your administrator gives you — for a local installation this is `http://localhost:8080`. Enter your username and password.
+Open NAVRAP in a browser (Chrome, Edge, Firefox or Safari) at the address your administrator gives you — for a local installation this is `http://localhost:8080`. Enter your username and password.
 
 ![Sign-in page](screenshots/01-login.png)
 
@@ -55,7 +55,7 @@ What you can do depends on your role:
 
 ### 1.3 Demo accounts
 
-When ARAP is installed with demo data (`ARAP_SEED_DEMO=true`), these accounts exist, all with password `demo1234`:
+When NAVRAP is installed with demo data (`ARAP_SEED_DEMO=true`), these accounts exist, all with password `demo1234`:
 
 | Username | Role | May accept |
 |---|---|---|
@@ -104,7 +104,7 @@ The assessment page brings everything together:
 
 ![Assessment page](screenshots/04-assessment.png)
 
-- **Method studies** — the analyses carried out for this assessment. ARAP suggests methods for the type of change (Manual §4.1); the suggestion is only advice.
+- **Method studies** — the analyses carried out for this assessment. NAVRAP suggests methods for the type of change (Manual §4.1); the suggestion is only advice.
 - **Hazards** — hazard-log entries that belong to this assessment, with initial and residual risk.
 - **Risk acceptance** — the worst residual risk region and the authority that must accept it.
 - **Actions** and the **review and approval history**.
@@ -122,8 +122,8 @@ On the assessment page choose **Add study**, pick the method (suggested methods 
 
 In **New assessment**, the field **Start from** offers ready-made assessment templates. When you choose one:
 
-- ARAP fills in the title, scope, environment and assumptions. Edit them for your change.
-- On **Create**, ARAP also creates all of the template's method studies, pre-filled with proposed content.
+- NAVRAP fills in the title, scope, environment and assumptions. Edit them for your change.
+- On **Create**, NAVRAP also creates all of the template's method studies, pre-filled with proposed content.
 - Nothing is rated for you. Likelihoods, calculations and hazard-log entries are left for your workshops, and severities are proposals to confirm.
 
 **New AIM system acquisition** (Manual Appendix C) creates 14 studies covering the whole life of the change, from specification through installation and data migration to transition:
@@ -178,11 +178,11 @@ A project you no longer need can be **archived** or, by an administrator, **dele
 
 **To archive:** open the project and click **Archive**. A yellow banner shows that the project is archived. To find it again, switch on **Show archived** above the project list; archived projects carry an *archived* tag. Open it and click **Restore** to make it active.
 
-**To delete:** sign in as an administrator, open the project and click **Delete**. Type the project code exactly (for example `TRIAL-01`) and click **Delete permanently**. The button stays disabled until the code matches. ARAP then returns to the project list and reports how many assessments, studies, hazards and actions were removed.
+**To delete:** sign in as an administrator, open the project and click **Delete**. Type the project code exactly (for example `TRIAL-01`) and click **Delete permanently**. The button stays disabled until the code matches. NAVRAP then returns to the project list and reports how many assessments, studies, hazards and actions were removed.
 
 ![Deleting a project](screenshots/v2-project-delete.png)
 
-Use delete for projects created by mistake, test projects and the demo projects. A deleted demo project is not re-created when ARAP restarts. For a real change that has been cancelled or completed, archive it: the assessment is part of the safety record.
+Use delete for projects created by mistake, test projects and the demo projects. A deleted demo project is not re-created when NAVRAP restarts. For a real change that has been cancelled or completed, archive it: the assessment is part of the safety record.
 
 ## 4. Working in a method study
 
@@ -191,7 +191,7 @@ Every study page has the same header:
 - The **method** tag and the **study title** (editable).
 - A link back to the assessment, the Manual chapter for the method and the template version.
 - The number of **participants** recorded.
-- **Save**. Changes are not saved automatically: the button reads *Save* while there are unsaved changes and *Saved* afterwards. If you try to leave the page with unsaved changes ARAP asks you to confirm.
+- **Save**. Changes are not saved automatically: the button reads *Save* while there are unsaved changes and *Saved* afterwards. If you try to leave the page with unsaved changes NAVRAP asks you to confirm.
 
 When the assessment is endorsed, accepted or closed, or if your role cannot edit, the study opens **read-only** and a blue banner says so.
 
@@ -223,7 +223,7 @@ Work through the guidewords (People, Procedures, Equipment/systems, Airspace and
 ### 5.2 HAZOP (Manual §8)
 
 1. In **Nodes and design intent**, add a node per procedure step or message exchange (**+ Node**), choose its type (*procedural* or *data-flow*) and write the design intent.
-2. Press **Deviations** on a node. Choose the parameters and guidewords; ARAP adds one worksheet row per combination (e.g. *Message — No / Not*).
+2. Press **Deviations** on a node. Choose the parameters and guidewords; NAVRAP adds one worksheet row per combination (e.g. *Message — No / Not*).
 3. For each row either tick **N/A** (not meaningful) or record causes, consequences, safeguards, S, L and a recommendation.
 4. The **Progress** column counts rows analysed out of rows generated.
 
@@ -231,11 +231,11 @@ Work through the guidewords (People, Procedures, Equipment/systems, Airspace and
 
 ### 5.3 JHA (Manual §9)
 
-Fill in the job header (job, location, permits), then one row per job step with its hazards, controls, control type and the person responsible. ARAP warns when a step relies only on **Administrative** controls or **PPE**, the lowest levels of the hierarchy of controls.
+Fill in the job header (job, location, permits), then one row per job step with its hazards, controls, control type and the person responsible. NAVRAP warns when a step relies only on **Administrative** controls or **PPE**, the lowest levels of the hierarchy of controls.
 
 ### 5.4 FMEA / FMECA (Manual §10)
 
-One row per failure mode: item, failure mode, cause, end effect on the ATS, detection, compensation, and **S**, **O**, **D** ratings (1–10). ARAP computes the **RPN** (S × O × D), colours high values and sorts by RPN. It also lists high-severity modes (S ≥ 8) so they are not missed because of a low RPN. For FMECA, add the failure rate λp, mode ratio α, conditional probability β and operating time t.
+One row per failure mode: item, failure mode, cause, end effect on the ATS, detection, compensation, and **S**, **O**, **D** ratings (1–10). NAVRAP computes the **RPN** (S × O × D), colours high values and sorts by RPN. It also lists high-severity modes (S ≥ 8) so they are not missed because of a low RPN. For FMECA, add the failure rate λp, mode ratio α, conditional probability β and operating time t.
 
 ### 5.5 FHA (Manual §12)
 
@@ -279,7 +279,7 @@ The bowtie editor draws the diagram automatically: threats on the left, the top 
 1. Describe the **scenario**, the **initiating event**, its frequency, unit and data source, and the **tolerable target** frequency.
 2. Add **enabling conditions / conditional modifiers** with their probabilities.
 3. Add **safeguards** with a probability of failure on demand (PFD). Tick each of the four IPL criteria — *independent, effective, dependable, auditable* — only if it is justified, and write the justification. A safeguard is credited **only if all four are ticked**.
-4. Record shared dependencies (e.g. `surveillance`) — ARAP warns if two credited layers share one.
+4. Record shared dependencies (e.g. `surveillance`) — NAVRAP warns if two credited layers share one.
 5. Press **Calculate**. The result shows the mitigated frequency, the verdict (*Target met* or *Gap ×n*), the extra risk reduction needed, the safeguards not credited and why, and a log-scale chart of the frequency after each layer.
 
 In the demo study the proposed *SFL mismatch alert* is not yet ticked *dependable*, so the result shows a gap of ×2.5. Tick it and recalculate to see the target met (2.5 × 10⁻⁶ per year).
@@ -331,7 +331,7 @@ Press **Calculate**. The top-event probability appears above the tree, and basic
 **Building the network**
 
 - **+ Node** adds a node; drag nodes to arrange them.
-- To add a causal arc, drag from the **bottom handle** of the cause to the effect node. Double-click an arc to remove it. ARAP rejects cycles when calculating.
+- To add a causal arc, drag from the **bottom handle** of the cause to the effect node. Double-click an arc to remove it. NAVRAP rejects cycles when calculating.
 - Select a node to edit its label and **states** (comma-separated) and its **conditional probability table** — one row per combination of parent states. Each row must sum to 1; the Σ column turns red when it does not (for two-state nodes the second value fills in automatically).
 
 **Using the network**
@@ -351,7 +351,7 @@ The STPA study follows the four steps of the STPA Handbook, one tab each.
 
    ![STPA control structure](screenshots/16-stpa-structure.png)
 
-3. **Unsafe control actions** — for every control action, four columns (*not providing*, *providing*, *too early/too late/wrong order*, *stopped too soon/applied too long*). Add UCAs with **+ UCA**; each needs a context (“when …”) and at least one hazard, otherwise ARAP warns.
+3. **Unsafe control actions** — for every control action, four columns (*not providing*, *providing*, *too early/too late/wrong order*, *stopped too soon/applied too long*). Add UCAs with **+ UCA**; each needs a context (“when …”) and at least one hazard, otherwise NAVRAP warns.
 
    ![UCA table](screenshots/17-stpa-uca.png)
 
@@ -389,7 +389,7 @@ Two tabs. **Vertical (RVSM)** takes the Reich-model parameters: overlap probabil
 1. Enter the initiating event and its frequency.
 2. List the barriers **in the order they act**, with their probability of success.
 3. Under **Conditional probabilities**, enter any dependence as a path prefix. For example, `F` / `B2` / 0.8 means "STCA succeeds 80% of the time when the controller has already failed".
-4. Press **Calculate**. ARAP draws the tree and lists each sequence with its probability and frequency.
+4. Press **Calculate**. NAVRAP draws the tree and lists each sequence with its probability and frequency.
 5. Name each outcome and give it a severity, then recalculate. The totals by severity appear under the table.
 
 ### 13.3 Human reliability — HRA (Manual §20)
@@ -404,15 +404,15 @@ Add a task and choose **CARA** (controller tasks) or **HEART** (other tasks) and
 
 - **Add an occurrence.** Add a short description, date and occurrence ID.
 - **ARMS ERC.** Click the matrix cell that answers Q1 (most credible accident outcome) and Q2 (effectiveness of the remaining barriers). The band and recommended response are shown.
-- **RAT scoring.** Pick one answer per item. ARAP adds the points for risk of collision and controllability. Record the ESARR 2 severity class that you read from the EUROCONTROL RAT table.
+- **RAT scoring.** Pick one answer per item. NAVRAP adds the points for risk of collision and controllability. Record the ESARR 2 severity class that you read from the EUROCONTROL RAT table.
 - **Send red-band occurrences to hazard log.** Creates hazard entries for the red-band occurrences.
 
 ### 13.5 Safety argument — GSN (Manual §22)
 
 ![GSN](screenshots/v2-gsn.png)
 
-- **Build the argument.** Click an element to edit it. Use **+ goal / + strategy / + solution / + context / + assumption / + justification** to add elements below it. ARAP lays out the diagram automatically.
-- **Link evidence.** For a **solution**, link the evidence: an ARAP study, a hazard log entry or an external document. The solution shows the evidence status in green (complete or accepted) or red (still provisional).
+- **Build the argument.** Click an element to edit it. Use **+ goal / + strategy / + solution / + context / + assumption / + justification** to add elements below it. NAVRAP lays out the diagram automatically.
+- **Link evidence.** For a **solution**, link the evidence: an NAVRAP study, a hazard log entry or an external document. The solution shows the evidence status in green (complete or accepted) or red (still provisional).
 - **Argument checks.** This panel lists structural problems: more than one top goal, unsupported goals, strategies supported by something other than goals, solutions without evidence, and cycles. Mark a goal **undeveloped** when its support is still to come.
 
 ### 13.6 Common cause analysis — CCA (Manual §23)
@@ -485,7 +485,7 @@ A worksheet of threat scenarios: asset, threat, source, vulnerability, C/I/A imp
 ![Wildlife species risk matrix](screenshots/v2-wildlife-matrix.png)
 
 - **Species and strikes.** Enter the review years and the aircraft movements for each year. Then add one row per species, or per group of similar species: common and scientific name, body mass, whether it flocks, and the strikes and damaging strikes for each year. Press **Calculate risk**.
-- **Risk matrix.** Each species is placed on a 5 × 5 grid. Rows are likelihood (mean strikes per year) and columns are severity (share of strikes that caused damage or had an effect on flight). The ranking table adds the rate per 10,000 movements and its trend. A species with fewer than 5 strikes gets its severity from body mass, plus one class if it flocks; ARAP marks this with \*. Use **Send high and moderate species to hazard log** to create hazard entries, with the species' attractants and measures.
+- **Risk matrix.** Each species is placed on a 5 × 5 grid. Rows are likelihood (mean strikes per year) and columns are severity (share of strikes that caused damage or had an effect on flight). The ranking table adds the rate per 10,000 movements and its trend. A species with fewer than 5 strikes gets its severity from body mass, plus one class if it flocks; NAVRAP marks this with \*. Use **Send high and moderate species to hazard log** to create hazard entries, with the species' attractants and measures.
 - **Species profile.** For the selected species: ecology notes, time of day of strikes, a year-by-year chart of strikes and strike rate, a monthly chart of survey counts and strikes (use **Edit** to enter counts), and the species management measures with type, owner and status.
 - **Attractants within 13 km.** A register of wildlife attractants: landfills, tambak, rice fields, roosts, grazing land and so on. Each entry has a distance, the species it attracts, an action and an owner. Sites inside the 13 km circle are flagged.
 
@@ -497,7 +497,7 @@ The worked example in **DEMO-02** uses the cattle egret, *Bubulcus ibis*. It has
 
 The project **DEMO-03** reproduces a real-format Safety Risk Assessment, *SRA/MOC/OPS/001/IX/2026 Rev 00 — Assessment Operasi 24 Jam Aerodrome Alternate*. It covers activating H24 ATS at seven alternates (WAHI, WAHH, WAHQ, WAHS, WICA, WICC, WIPP) when an eruption of Gunung Anak Krakatau closes WIII. The content is kept in Bahasa Indonesia, as in the source report.
 
-| ARAP item | What it holds |
+| NAVRAP item | What it holds |
 |---|---|
 | Assessment scope, environment, assumptions | The change, system boundary, scenarios S1–S3, demand derivation (72-aircraft design wave), feasibility-gate and capacity-model results, and the assumption register A-01 to A-12 |
 | HAZID study *Register risiko* | The 40 hazards from FHA (F1–F7), HAZOP and STPA with their current rating, existing barriers and mitigations |
@@ -508,7 +508,7 @@ The project **DEMO-03** reproduces a real-format Safety Risk Assessment, *SRA/MO
 | Hazard log | `ALT-G-01` … `ALT-S-03`. The initial rating is the report's *Current* column, the residual is the *Residual* column, and the *Inherent* rating is in the context field. Mitigations M-01 to M-20 are planned controls |
 | Actions | `ALT-PK-1` … `ALT-PK-8`, the activation preconditions (PK-1, PK-3 and PK-4 are blocking) |
 
-The feasibility gate and the capacity (queue/occupancy) model have no dedicated ARAP module yet, so their results are recorded in the assessment's environment text.
+The feasibility gate and the capacity (queue/occupancy) model have no dedicated NAVRAP module yet, so their results are recorded in the assessment's environment text.
 
 ![DEMO-03 bowtie](screenshots/v2-alt-bowtie.png)
 
@@ -547,7 +547,7 @@ A case is used only after a **reviewer approves** it. Saving a change to an appr
 - *Offline* (always available): sentences are matched to the factor catalogue and the mechanism keywords.
 - *AI (Claude)*: available when the administrator has set `ARAP_ANTHROPIC_API_KEY`. Claude proposes the blocks, links and mechanism. **Only send published final reports**; protected investigation records must not leave AirNav.
 
-Every drafted block carries a quote from the report, which ARAP checks against the text. A quote that is not found is marked in red and blocks approval until you correct or clear it; the **Report text** tab lists all quotes. Treat every draft as a starting point: check the layers, the past states and the links, and delete blocks that are not findings of the report.
+Every drafted block carries a quote from the report, which NAVRAP checks against the text. A quote that is not found is marked in red and blocks approval until you correct or clear it; the **Report text** tab lists all quotes. Treat every draft as a starting point: check the layers, the past states and the links, and delete blocks that are not findings of the report.
 
 ![Draft from a report](screenshots/v3-ies-draft.png)
 
@@ -576,13 +576,13 @@ Continue the investigation with SOAM/HFACS (§13.13). After the final report, ad
 
 ### 13.17 Safety investigation analysis — the ATSB method (Manual Appendix F)
 
-This study carries an occurrence investigation from the sequence of events to the findings, safety issues and safety action, following the ATSB *Safety Investigation Guidelines Manual — Analysis* and its tools manual. Add **Safety investigation analysis (ATSB)** to the investigation's assessment. ARAP re-checks the analysis automatically about half a second after each change.
+This study carries an occurrence investigation from the sequence of events to the findings, safety issues and safety action, following the ATSB *Safety Investigation Guidelines Manual — Analysis* and its tools manual. Add **Safety investigation analysis (ATSB)** to the investigation's assessment. NAVRAP re-checks the analysis automatically about half a second after each change.
 
 ![Sequence of events](screenshots/v4-atsb-events.png)
 
 **1 · Occurrence & sequence of events.** Record the occurrence, then list the events. Each event needs a start time (estimate if necessary and say so in the comments) and a title written as a subject and an action verb. Theme groups events on the timeline (ATC, aircraft, crew). To put an event on the safety factors list, choose its type in the *Safety factor* column and click **Add**. The *Events to look for* list on the right is ATSB's prompt list.
 
-**2 · Safety factors.** The master register: one row per potential safety factor with its type, codes, whether it is analysed further, existence, the **finding type** that ARAP derives, safety issue and risk level, and an *analysis complete* switch. Click an ID to open the factor.
+**2 · Safety factors.** The master register: one row per potential safety factor with its type, codes, whether it is analysed further, existence, the **finding type** that NAVRAP derives, safety issue and risk level, and an *analysis complete* switch. Click an ID to open the factor.
 
 ![Safety factors list](screenshots/v4-atsb-factors.png)
 
@@ -593,7 +593,7 @@ This study carries an occurrence investigation from the sequence of events to th
 - **Importance** (only when existence passed and influence did not): is the factor still worth analysing? Justify the decision.
 - **Explain**: the factors whose influence is on this one; **Add an explaining factor** starts a new one already linked.
 - **Risk analysis** (safety issues): worst possible scenario, existing controls, worst credible scenario, then click the matrix. Choose **AirNav 5×5** (default) or **ATSB 6×6**. Both give *critical*, *significant* or *broadly acceptable* (not a safety issue). The small matrix records an alternative rating for sensitivity.
-- **Safety action**: the issue status; each action with its kind (organisation's action, recommendation, advisory notice), organisation, date notified, status, classification and a communication log; **Track in Actions** creates an entry in the action list. Rate the residual risk, tick ALARP if justified and note the practicability considerations. ARAP shows whether further action is required and the six-monthly follow-up date.
+- **Safety action**: the issue status; each action with its kind (organisation's action, recommendation, advisory notice), organisation, date notified, status, classification and a communication log; **Track in Actions** creates an entry in the action list. Rate the residual risk, tick ALARP if justified and note the practicability considerations. NAVRAP shows whether further action is required and the six-monthly follow-up date.
 
 ![Risk analysis on the ATSB 6×6](screenshots/v4-atsb-risk6x6.png)
 
@@ -607,9 +607,9 @@ This study carries an occurrence investigation from the sequence of events to th
 
 ![Review and findings](screenshots/v4-atsb-review.png)
 
-How ARAP derives the finding type: existence + influence on the occurrence or a contributing factor → **contributing safety factor**; influence only on a non-contributing factor, or existence + importance → **other safety factor**; positive actions and conditions → **positive safety factor**; existence not shown → *not established*. The checks include arguments from ignorance (supported with no supporting item), conclusions below the standard of proof, two "just likely" tests that together fall below 50 %, evidence from one source, judgemental wording, the **test for sufficiency** (a contributing factor with no explaining factor) and **fairness** (an individual action with no identified reasons).
+How NAVRAP derives the finding type: existence + influence on the occurrence or a contributing factor → **contributing safety factor**; influence only on a non-contributing factor, or existence + importance → **other safety factor**; positive actions and conditions → **positive safety factor**; existence not shown → *not established*. The checks include arguments from ignorance (supported with no supporting item), conclusions below the standard of proof, two "just likely" tests that together fall below 50 %, evidence from one source, judgemental wording, the **test for sufficiency** (a contributing factor with no explaining factor) and **fairness** (an individual action with no identified reasons).
 
-**The ATSB 6×6 option.** The Risk scheme page shows it beside the AirNav matrix. ATSB does not publish its cell colours as text, so ARAP uses the AirNav colours by the same pattern: critical = intolerable red; significant = amber (near critical) and yellow, like AirNav's two tolerable bands; broadly acceptable = green. Every catastrophic cell is at least significant.
+**The ATSB 6×6 option.** The Risk scheme page shows it beside the AirNav matrix. ATSB does not publish its cell colours as text, so NAVRAP uses the AirNav colours by the same pattern: critical = intolerable red; significant = amber (near critical) and yellow, like AirNav's two tolerable bands; broadly acceptable = green. Every catastrophic cell is at least significant.
 
 ![AirNav 5×5 and ATSB 6×6](screenshots/v4-risk-schemes.png)
 
@@ -623,7 +623,7 @@ Demo project **DEMO-06** contains the ATSB analysis of the illustrative occurren
 2. **Factual information** — the occurrence timeline (from the sequence of events list), personnel and assets (experience, equipment types, environmental configuration) and the immediate actions taken (emergency response, site preservation, stabilisation).
 3. **ORLIO analysis framework** — 3.1 occurrence events (occurrence events and technical failure mechanisms), 3.2 individual actions, 3.3 local conditions, 3.4 risk controls and 3.5 organisational influences. Each layer shows its definition, your narrative for the layer, then each factor with its codes, finding, existence and influence results, key evidence, the factor it influenced and, for safety issues, the risk. For individual actions the report shows **why the action made sense to the person at the time** — enter this in the *Define* tab (field shown for individual and positive actions). It is written without assigning blame.
 4. **Findings and contributing factors** — contributing factors in priority order (safety issues by risk level first, then from the organisational level down to the occurrence), each with its **chain** (e.g. F13 → F10 → F19 → F1 → the occurrence); then other factors that increased risk, other key findings, the safety issues and the factors considered but not included.
-5. **Safety recommendations and corrective actions** — a table with the columns *ORLIO layer · Identified deficiency · Corrective action required · Action owner · Target date*. Each action is prefixed with its level in the **hierarchy of controls** (elimination, substitution, engineering, administrative, PPE) and ordered by it. A blank target date prints as *[Date]*. A contributing factor with no action gets a flagged row (*[No corrective action recorded]*), and ARAP also lists it as a note in the checks.
+5. **Safety recommendations and corrective actions** — a table with the columns *ORLIO layer · Identified deficiency · Corrective action required · Action owner · Target date*. Each action is prefixed with its level in the **hierarchy of controls** (elimination, substitution, engineering, administrative, PPE) and ordered by it. A blank target date prints as *[Date]*. A contributing factor with no action gets a flagged row (*[No corrective action recorded]*), and NAVRAP also lists it as a note in the checks.
 6. **Appendices** — A: photographs and diagrams you upload (PNG/JPEG up to 3 MB, with captions); B: interview summaries and witness accounts; C: the **ORLIO factor map**, drawn automatically (solid borders = contributing, dashed = other; solid arrows = established influence; SI badges = safety issues with their risk index).
 
 Corrective actions are entered in the factor's **Safety / corrective action** tab, now available for every factor (the issue status and residual-risk evaluation appear only for safety issues). Each action has a hierarchy level, a target date and a reference (for example a recommendation number).
@@ -632,7 +632,7 @@ Click **Preview** to see the report beside the form, or **Word (.docx)** / **PDF
 
 ![Report tab with preview](screenshots/v5-knkt-report-preview.png)
 
-**DEMO-07 — worked example from KNKT.24.10.22.04.** The demo project contains a complete stand-alone ORLIO analysis, using the ATSB method, of the serious incident at Kualanamu on 16 October 2024, in which an unattended lavatory service truck (LST) rolled and struck the tail of Boeing 737-800 PK-GMP at parking stand W29. Facts, findings, safety actions taken and the seven safety recommendations (04-G-2024-22.01 to .03, 04-B-2024-22.04, 04-O-2024-22.05, 04-R-2024-22.06 and .07) are taken from the KNKT final report. The evidence ratings, probability expressions, risk ratings, hierarchy levels and the actions marked *proposed (ARAP example)* are ARAP's illustration. Two judgements differ from KNKT and are explained in the factors: the vibration/engine-suction trigger and the operator's fatigue are *other* factors, because the evidence did not reach *likely* under the ATSB standard of proof. A generated report is in `docs/examples/`.
+**DEMO-07 — worked example from KNKT.24.10.22.04.** The demo project contains a complete stand-alone ORLIO analysis, using the ATSB method, of the serious incident at Kualanamu on 16 October 2024, in which an unattended lavatory service truck (LST) rolled and struck the tail of Boeing 737-800 PK-GMP at parking stand W29. Facts, findings, safety actions taken and the seven safety recommendations (04-G-2024-22.01 to .03, 04-B-2024-22.04, 04-O-2024-22.05, 04-R-2024-22.06 and .07) are taken from the KNKT final report. The evidence ratings, probability expressions, risk ratings, hierarchy levels and the actions marked *proposed (NAVRAP example)* are NAVRAP's illustration. Two judgements differ from KNKT and are explained in the factors: the vibration/engine-suction trigger and the operator's fatigue are *other* factors, because the evidence did not reach *likely* under the ATSB standard of proof. A generated report is in `docs/examples/`.
 
 ![ORLIO factor map — DEMO-07](examples/DEMO-07-orlio-factor-map.png)
 
@@ -647,7 +647,7 @@ Click a hazard to open it:
 ![Hazard detail](screenshots/06-hazard-drawer.png)
 
 - **Details and risk** — description, causes, consequences, unit, system, owner, status and review date. Rate **initial/current** and **residual** risk by clicking a cell in each matrix. A residual rating requires a **rationale** (the basis of the judgement).
-- When you create a new hazard, ARAP checks for **possible duplicates** as you leave the title field.
+- When you create a new hazard, NAVRAP checks for **possible duplicates** as you leave the title field.
 - **Controls** — each with side (prevention/recovery), type, status, effectiveness, owner and a safety-critical flag. Only *existing-verified* controls may be credited in the current risk.
 - **Links** — the source study, the assessment and the related actions.
 - **History** — every change from the audit trail.
@@ -673,7 +673,7 @@ Actions have an owner, a due date, a status (open, in progress, closed) and an o
 | **Rejected** | Not accepted. | Revise and **Submit** again |
 | **Closed / Superseded** | Finished, or replaced by a newer version. | — |
 
-**Rules ARAP enforces**
+**Rules NAVRAP enforces**
 
 - An assessment with an **intolerable** residual risk cannot be accepted.
 - An assessment with **no hazards** cannot be accepted.
@@ -707,7 +707,7 @@ The report includes scope, methods used, hazards and their risk ratings, study r
 
 ![Risk scheme](screenshots/08-risk-scheme.png)
 
-Administrators can reassign cells: choose a region under **Paint region**, click the cells, then **Save as new version**. ARAP checks that every cell belongs to exactly one region. Existing assessments keep the version they were created with.
+Administrators can reassign cells: choose a region under **Paint region**, click the cells, then **Save as new version**. NAVRAP checks that every cell belongs to exactly one region. Existing assessments keep the version they were created with.
 
 ### 18.2 Users
 

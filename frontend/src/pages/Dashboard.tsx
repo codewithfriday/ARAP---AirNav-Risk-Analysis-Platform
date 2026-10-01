@@ -47,7 +47,7 @@ export default function Dashboard() {
 
   return (
     <div>
-      <PageHeader title={t('nav.dashboard')} sub="Organisation-wide safety risk picture from the ARAP hazard log." />
+      <PageHeader title={t('nav.dashboard')} sub="Organisation-wide safety risk picture from the NAVRAP hazard log." />
       <Row gutter={[16, 16]}>
         <Col xs={12} lg={6}><Card className="kpi"><Statistic title={t('dash.hazards')} value={data.hazards_total} /></Card></Col>
         <Col xs={12} lg={6}><Card className="kpi"><Statistic title={t('dash.overdue')} value={data.overdue_actions.length} styles={{ content: { color: data.overdue_actions.length ? '#B23A3A' : undefined } }} /></Card></Col>

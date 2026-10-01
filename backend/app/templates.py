@@ -76,7 +76,7 @@ METHODS = {
     "orc": {"name": "Occurrence risk classification", "chapter": 21, "kind": "worksheet", "template_version": "1.0",
             "summary": "ARMS Event Risk Classification and EUROCONTROL RAT scoring of occurrences."},
     "gsn": {"name": "Safety case (GSN)", "chapter": 22, "kind": "diagram", "template_version": "1.0",
-            "summary": "Goal Structuring Notation argument linking claims to ARAP evidence.",
+            "summary": "Goal Structuring Notation argument linking claims to NAVRAP evidence.",
             "node_types": ["goal", "strategy", "solution", "context", "assumption", "justification"]},
     "cca": {"name": "Common cause analysis", "chapter": 23, "kind": "composite", "template_version": "1.0",
             "summary": "Zonal safety analysis, particular risks analysis and common mode analysis.",

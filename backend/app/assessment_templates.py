@@ -450,7 +450,7 @@ def seed_demo_v4(db: Session):
     t = TEMPLATES["aim_acquisition"]
     p = Project(code="DEMO-04", title="New AIM system acquisition — installation to transition (template example)", change_type="system",
                 units="AIS / NOTAM office; AIM data management; CNS/IT engineering", sponsor="Directorate of Operations",
-                description="Created from the ARAP assessment template 'New AIM system acquisition' (Manual Appendix C) and completed "
+                description="Created from the NAVRAP assessment template 'New AIM system acquisition' (Manual Appendix C) and completed "
                             "with illustrative ratings, calculations, hazards and actions. All numbers are illustrative.")
     db.add(p); db.flush()
     a = Assessment(project_id=p.id, title=t["title"], created_by="assessor", scope=t["scope"], environment=t["environment"], assumptions=t["assumptions"])

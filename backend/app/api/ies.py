@@ -338,7 +338,7 @@ def investigation_report(sid: int, body: InvReportIn, db: Session = Depends(get_
     content = inv_report.to_docx(rep) if body.format == "docx" else inv_report.to_pdf(rep)
     audit.record(db, u.username, "study", s.id, "export", after={"format": body.format, "kind": "investigation_report"}); db.commit()
     mt = ("application/vnd.openxmlformats-officedocument.wordprocessingml.document" if body.format == "docx" else "application/pdf")
-    name = f"ARAP-{p.code}-S{s.id}-investigation-report.{body.format}"
+    name = f"NAVRAP-{p.code}-S{s.id}-investigation-report.{body.format}"
     return Response(content, media_type=mt, headers={"Content-Disposition": f'attachment; filename="{name}"'})
 
 

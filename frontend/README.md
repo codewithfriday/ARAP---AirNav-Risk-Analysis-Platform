@@ -1,4 +1,4 @@
-# ARAP front end
+# NAVRAP front end
 
 React 19 + TypeScript (Vite). See the repository [README](../README.md) and [architecture notes](../docs/ARCHITECTURE.md).
 

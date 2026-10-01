@@ -154,7 +154,7 @@ def build_case(category: str, evidence: list, hyps: list, finding: tuple, contex
     return model
 
 
-ILLUS = "Illustrative case written for ARAP training — not a real occurrence."
+ILLUS = "Illustrative case written for NAVRAP training — not a real occurrence."
 LOS = ("E-LOS",)
 
 DEMO_CASES = [

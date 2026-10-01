@@ -93,7 +93,7 @@ export default function AssessmentDetail() {
                 onClick={() => (v.comment || k === 'accept' ? setTransition(k) : doTransition(k))}>{v.label}</Button>
             ))}
             {a.locked && canEdit(user) && a.status !== 'superseded' && <Button icon={<BranchesOutlined />} onClick={newVersion}>New version</Button>}
-            <Button icon={<DownloadOutlined />} onClick={() => download(`/assessments/${a.id}/report.docx`, `ARAP-${a.project.code}-v${a.version}.docx`)}>Report (.docx)</Button>
+            <Button icon={<DownloadOutlined />} onClick={() => download(`/assessments/${a.id}/report.docx`, `NAVRAP-${a.project.code}-v${a.version}.docx`)}>Report (.docx)</Button>
           </Space>
         } />
       {a.locked && <Alert type="info" showIcon title={`This assessment is ${a.status} and locked. Create a new version to make changes.`} style={{ marginBottom: 16 }} />}

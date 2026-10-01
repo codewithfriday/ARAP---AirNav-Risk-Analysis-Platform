@@ -47,7 +47,7 @@ DEFAULT_SCHEME: dict[str, Any] = {
 
 
 def _atsb_cells():
-    """ATSB 6×6 (Guidelines — Analysis v1.07 p.173). The published colours are not available in text form; ARAP assigns the
+    """ATSB 6×6 (Guidelines — Analysis v1.07 p.173). The published colours are not available in text form; NAVRAP assigns the
     cells by the same pattern as the AirNav 5×5, scaled to 6×6: rank sum r = likelihood (1–6) + consequence (F=1 … A=6);
     critical r ≥ 10; significant 6 ≤ r ≤ 9, shaded upper (8–9) and lower (6–7) like AirNav's tolerable bands;
     broadly acceptable r ≤ 5. Every Catastrophic (B) and Very large vehicle catastrophic (A) cell is at least significant,

@@ -483,7 +483,7 @@ def to_docx(report: dict) -> bytes:
                        ("Source", "source"), ("Generated", "generated")):
         if m.get(key):
             p.add_run(f"{label}: ").bold = True; p.add_run(f"{m[key]}\n")
-    p.add_run(f"ARAP {m.get('report_version')} · analysis engine {m.get('engine')}").italic = True
+    p.add_run(f"NAVRAP {m.get('report_version')} · analysis engine {m.get('engine')}").italic = True
     usable = 17.0
     for sec in report["sections"]:
         doc.add_page_break() if sec["id"] == "s6" else None
@@ -578,7 +578,7 @@ def to_pdf(report: dict) -> bytes:
         t = Table(meta_rows, colWidths=[30 * mm, W - 30 * mm])
         t.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "TOP"), ("LINEBELOW", (0, 0), (-1, -1), 0.3, colors.HexColor("#e5e7eb"))]))
         story += [t, Spacer(1, 3 * mm)]
-    story.append(P(f"ARAP {m.get('report_version')} · analysis engine {m.get('engine')}", note))
+    story.append(P(f"NAVRAP {m.get('report_version')} · analysis engine {m.get('engine')}", note))
     for sec in report["sections"]:
         if sec["id"] == "s6":
             story.append(PageBreak())
@@ -633,5 +633,5 @@ def to_pdf(report: dict) -> bytes:
 
     buf = io.BytesIO()
     SimpleDocTemplate(buf, pagesize=A4, leftMargin=18 * mm, rightMargin=18 * mm, topMargin=16 * mm, bottomMargin=16 * mm,
-                      title=report["title"], author="ARAP").build(story, onFirstPage=foot, onLaterPages=foot)
+                      title=report["title"], author="NAVRAP").build(story, onFirstPage=foot, onLaterPages=foot)
     return buf.getvalue()

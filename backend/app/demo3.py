@@ -188,7 +188,7 @@ HAZARDS = [
      "Prosedur Avsec, imigrasi, dan bea cukai malam hari disepakati dalam SLA."),
 ]
 
-# id: (text, hierarchy, barrier side, ARAP control kind, owner, prakondisi, verification of closure, SPI)
+# id: (text, hierarchy, barrier side, NAVRAP control kind, owner, prakondisi, verification of closure, SPI)
 MITIGATIONS = {
     "M-01": ("Cabut WICC dan WAHH dari daftar alternate widebody; publikasikan batas Code C secara eksplisit di AIP/NOTAM", "Eliminasi", "prevention", "organisational", "Dir. Operasi", "PK-2", "NOTAM/AIP SUP terbit; konfirmasi diterima operator penerbangan", "SPI-01"),
     "M-02": ("Tetapkan alternate tambahan di luar kedua sektor sebaran abu (kandidat WARR, WADD, WAAA, WIBB) yang menyediakan sekurang-kurangnya 11 posisi Code-E dan 23 posisi Code-C, dengan konfirmasi kesiapan tertulis", "Substitusi", "prevention", "organisational", "Direksi", "PK-3", "Kesepakatan tertulis; readiness confirmation per aerodrome; pemodelan dispersi dua pola angin", "SPI-03"),

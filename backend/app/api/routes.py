@@ -390,7 +390,7 @@ def report(aid: int, db: Session = Depends(get_db), u: User = Depends(current_us
     content = assessment_docx(data, studies, engines(u))
     audit.record(db, u.username, "assessment", a.id, "export", after={"format": "docx"}); db.commit()
     return Response(content, media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                    headers={"Content-Disposition": f'attachment; filename="ARAP-{a.project.code}-A{a.id}-v{a.version}.docx"'})
+                    headers={"Content-Disposition": f'attachment; filename="NAVRAP-{a.project.code}-A{a.id}-v{a.version}.docx"'})
 
 
 # ================================================================ studies

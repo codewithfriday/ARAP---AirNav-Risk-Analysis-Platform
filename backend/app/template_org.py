@@ -344,7 +344,7 @@ def seed_demo_v5(db: Session):
         return
     p = Project(code="DEMO-05", title="Major organisational change — Branch X Terminal Unit (template example)", change_type="organisational",
                 units="Branch X TWR and APP; Regional S&Q; Regional Training Unit", sponsor="Directorate of Operations",
-                description="Created from the ARAP assessment template 'Major organisational change' (Manual Appendix D) and completed with "
+                description="Created from the NAVRAP assessment template 'Major organisational change' (Manual Appendix D) and completed with "
                             "illustrative assessments, Delphi rounds, SPI values, hazards and actions. All values are illustrative.")
     db.add(p); db.flush()
     a = Assessment(project_id=p.id, title="Safety assessment — major organisational change", created_by="assessor", scope=SCOPE, environment=ENV, assumptions=ASSUMPTIONS)

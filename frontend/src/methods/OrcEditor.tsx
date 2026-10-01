@@ -79,7 +79,7 @@ export default function OrcEditor({ model, setModel, readOnly, promote }: Editor
                           options={Object.entries<any>(item.options).map(([ok, ov]) => ({ value: ok, label: `${ov.label} (${ov.points})` }))} optionType="button" />
                       </div>))}
                     <Alert type="info" showIcon title={`Risk of collision ${rat(o).roc} + controllability ${rat(o).ctrl} = severity score ${rat(o).total}`}
-                      description="Assign the ESARR 2 severity class with the EUROCONTROL RAT look-up table (not embedded in ARAP) and record it above." />
+                      description="Assign the ESARR 2 severity class with the EUROCONTROL RAT look-up table (not embedded in NAVRAP) and record it above." />
                   </div>) },
               ]} />
               <Input.TextArea rows={2} placeholder="Notes / rationale" value={o.notes} disabled={readOnly} onChange={(e) => upd({ notes: e.target.value })} />

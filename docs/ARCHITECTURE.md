@@ -1,4 +1,4 @@
-# ARAP architecture notes (v0.9)
+# NAVRAP architecture notes (v0.9)
 
 ## Overview
 

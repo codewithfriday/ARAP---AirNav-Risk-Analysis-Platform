@@ -73,7 +73,7 @@ export default function RiskSchemePage() {
           </Col>
           <Col xs={24} xl={13}>
             <Alert type="info" showIcon style={{ marginBottom: 12 }} title="Colours follow the AirNav 5×5"
-              description="ATSB rates a potential safety issue Critical, Significant or Broadly acceptable (not a safety issue). The published cell colours are not available as text, so ARAP fills the 6×6 by the same pattern as the AirNav matrix: critical = intolerable red, significant = the two tolerable bands (near-critical amber, lower yellow), broadly acceptable = green. Every Catastrophic cell is at least significant. A safety issue rated on the AirNav 5×5 maps to the same three levels." />
+              description="ATSB rates a potential safety issue Critical, Significant or Broadly acceptable (not a safety issue). The published cell colours are not available as text, so NAVRAP fills the 6×6 by the same pattern as the AirNav matrix: critical = intolerable red, significant = the two tolerable bands (near-critical amber, lower yellow), broadly acceptable = green. Every Catastrophic cell is at least significant. A safety issue rated on the AirNav 5×5 maps to the same three levels." />
             <Table rowKey="key" size="small" pagination={false} dataSource={atsb.data.regions} columns={[
               { title: 'Level', dataIndex: 'name', render: (v, r: any) => <Tag color={r.color}>{v}</Tag> },
               { title: 'Cells', dataIndex: 'cells', render: (c: string[]) => [...c].sort().join(', ') },

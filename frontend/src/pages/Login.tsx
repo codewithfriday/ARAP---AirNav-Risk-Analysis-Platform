@@ -28,7 +28,7 @@ export default function Login() {
     <div style={{ minHeight: '100%', display: 'grid', placeItems: 'center', background: 'linear-gradient(135deg,#16324A 0%,#1F3A5F 55%,#2A7F8E 100%)', padding: 16 }}>
       <Card style={{ width: 380, maxWidth: '100%' }}>
         <div style={{ textAlign: 'center', marginBottom: 18 }}>
-          <img src="/favicon.svg" width={48} height={48} alt="" />
+          <img src="/navrap-logo.svg" width={72} height={72} alt="NAVRAP" />
           <Typography.Title level={3} style={{ margin: '8px 0 0', color: '#1F3A5F' }}>{t('login.title')}</Typography.Title>
           <Typography.Text type="secondary">{t('login.subtitle')}</Typography.Text>
         </div>

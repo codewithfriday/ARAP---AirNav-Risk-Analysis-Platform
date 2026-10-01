@@ -168,7 +168,7 @@ export default function GsnEditor({ model, setModel, readOnly }: EditorProps) {
                 <Card size="small" type="inner" title={<><LinkOutlined /> Evidence</>}>
                   <Space orientation="vertical" style={{ width: '100%' }}>
                     <Select size="small" value={n.evidence?.kind ?? 'study'} disabled={readOnly} style={{ width: 200 }} onChange={(k) => upd({ evidence: { kind: k, ref: null } })}
-                      options={[{ value: 'study', label: 'ARAP study' }, { value: 'hazard', label: 'Hazard log entry' }, { value: 'document', label: 'External document' }]} />
+                      options={[{ value: 'study', label: 'NAVRAP study' }, { value: 'hazard', label: 'Hazard log entry' }, { value: 'document', label: 'External document' }]} />
                     {(n.evidence?.kind ?? 'study') === 'study' && <Select size="small" showSearch optionFilterProp="label" allowClear value={n.evidence?.ref ?? null} disabled={readOnly} style={{ width: '100%' }}
                       onChange={(v) => upd({ evidence: { kind: 'study', ref: v } })} options={studies.map((s: any) => ({ value: s.id, label: `#${s.id} ${s.method.toUpperCase()} — ${s.title}` }))} />}
                     {n.evidence?.kind === 'hazard' && <Select size="small" showSearch optionFilterProp="label" allowClear value={n.evidence?.ref ?? null} disabled={readOnly} style={{ width: '100%' }}

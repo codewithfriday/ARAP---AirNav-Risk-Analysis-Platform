@@ -1,6 +1,6 @@
 # ARAP User Guide
 
-**AirNav Risk Analysis Platform — version 0.8**
+**AirNav Risk Analysis Platform — version 0.9**
 
 ARAP is the web application that implements the *AirNav Risk Analysis Manual*. It lets AirNav staff plan, run, review and approve safety risk assessments with twenty-six methods, keeps every hazard in one hazard log, and produces the Safety Assessment Report.
 
@@ -29,7 +29,7 @@ This guide explains how to use the application. For *why* and *when* to use each
 17. [Reports and exports](#17-reports-and-exports)
 18. [Administration](#18-administration)
 19. [Troubleshooting and FAQ](#19-troubleshooting-and-faq)
-20. [What version 0.8 does not do yet](#20-what-version-08-does-not-do-yet)
+20. [What version 0.9 does not do yet](#20-what-version-09-does-not-do-yet)
 
 ---
 
@@ -615,6 +615,27 @@ How ARAP derives the finding type: existence + influence on the occurrence or a 
 
 Demo project **DEMO-06** contains the ATSB analysis of the illustrative occurrence OCC-ILL-01: 11 events, 7 contributing and 2 other safety factors, 2 positive safety factors and 2 significant safety issues — one rated on the AirNav 5×5 (3B) and one on the ATSB 6×6 (2B).
 
+### 13.18 Investigation report and the KNKT worked example (DEMO-07)
+
+**7 · Investigation report** turns an ATSB-method study into a report with a fixed structure:
+
+1. **Executive summary** — synopsis (what, when, where, who), consequences (injuries, damage, environmental impact) and the core finding. Unless you write your own, the core finding is generated from the ORLIO analysis: the contributing factors from the occurrence back to the organisational level, and the number of safety issues.
+2. **Factual information** — the occurrence timeline (from the sequence of events list), personnel and assets (experience, equipment types, environmental configuration) and the immediate actions taken (emergency response, site preservation, stabilisation).
+3. **ORLIO analysis framework** — 3.1 occurrence events (occurrence events and technical failure mechanisms), 3.2 individual actions, 3.3 local conditions, 3.4 risk controls and 3.5 organisational influences. Each layer shows its definition, your narrative for the layer, then each factor with its codes, finding, existence and influence results, key evidence, the factor it influenced and, for safety issues, the risk. For individual actions the report shows **why the action made sense to the person at the time** — enter this in the *Define* tab (field shown for individual and positive actions). It is written without assigning blame.
+4. **Findings and contributing factors** — contributing factors in priority order (safety issues by risk level first, then from the organisational level down to the occurrence), each with its **chain** (e.g. F13 → F10 → F19 → F1 → the occurrence); then other factors that increased risk, other key findings, the safety issues and the factors considered but not included.
+5. **Safety recommendations and corrective actions** — a table with the columns *ORLIO layer · Identified deficiency · Corrective action required · Action owner · Target date*. Each action is prefixed with its level in the **hierarchy of controls** (elimination, substitution, engineering, administrative, PPE) and ordered by it. A blank target date prints as *[Date]*. A contributing factor with no action gets a flagged row (*[No corrective action recorded]*), and ARAP also lists it as a note in the checks.
+6. **Appendices** — A: photographs and diagrams you upload (PNG/JPEG up to 3 MB, with captions); B: interview summaries and witness accounts; C: the **ORLIO factor map**, drawn automatically (solid borders = contributing, dashed = other; solid arrows = established influence; SI badges = safety issues with their risk index).
+
+Corrective actions are entered in the factor's **Safety / corrective action** tab, now available for every factor (the issue status and residual-risk evaluation appear only for safety issues). Each action has a hierarchy level, a target date and a reference (for example a recommendation number).
+
+Click **Preview** to see the report beside the form, or **Word (.docx)** / **PDF** to download it. The current content is used even if it is not yet saved; downloads are recorded in the audit trail.
+
+![Report tab with preview](screenshots/v5-knkt-report-preview.png)
+
+**DEMO-07 — worked example from KNKT.24.10.22.04.** The demo project contains a complete stand-alone ORLIO analysis, using the ATSB method, of the serious incident at Kualanamu on 16 October 2024, in which an unattended lavatory service truck (LST) rolled and struck the tail of Boeing 737-800 PK-GMP at parking stand W29. Facts, findings, safety actions taken and the seven safety recommendations (04-G-2024-22.01 to .03, 04-B-2024-22.04, 04-O-2024-22.05, 04-R-2024-22.06 and .07) are taken from the KNKT final report. The evidence ratings, probability expressions, risk ratings, hierarchy levels and the actions marked *proposed (ARAP example)* are ARAP's illustration. Two judgements differ from KNKT and are explained in the factors: the vibration/engine-suction trigger and the operator's fatigue are *other* factors, because the evidence did not reach *likely* under the ATSB standard of proof. A generated report is in `docs/examples/`.
+
+![ORLIO factor map — DEMO-07](examples/DEMO-07-orlio-factor-map.png)
+
 ## 14. The hazard log
 
 ![Hazard log](screenshots/05-hazard-log.png)
@@ -672,6 +693,7 @@ Every transition is recorded in the **review and approval history** and the audi
 | Safety Assessment Report (Manual §32.3) | Assessment page → **Report (.docx)** | Word |
 | Hazard log | Hazard log → **CSV** | CSV (opens in Excel) |
 | Bowtie diagram | Bowtie editor → **PNG** / **SVG** | Image |
+| Investigation report (ATSB-method study, §13.18) | Study → **7 · Investigation report** → **Word** / **PDF** | Word, PDF |
 
 The report includes scope, methods used, hazards and their risk ratings, study results (fault tree cut sets, LOPA verdict, fatigue indicators, Bayesian network probabilities, and for the extended methods the event-tree outcomes, collision risk, HEPs, availability, simulation statistics, expert weights, occurrence classifications, the GSN argument and the investigation findings), actions, the approval history, and the versions of the risk scheme and calculation engines used.
 
@@ -713,9 +735,9 @@ Administrators can reassign cells: choose a region under **Paint region**, click
 
 ---
 
-## 20. What version 0.8 does not do yet
+## 20. What version 0.9 does not do yet
 
-Version 0.8 covers the core workflow and all twenty-six methods. The following SRS items are planned for later releases:
+Version 0.9 covers the core workflow and all twenty-six methods. The following SRS items are planned for later releases:
 
 - Single sign-on through Keycloak / SAML / OIDC with MFA. Version 0.2 uses local accounts with JWT tokens.
 - Real-time co-editing of a diagram by several users, and the offline workshop pack.
@@ -727,7 +749,7 @@ Version 0.8 covers the core workflow and all twenty-six methods. The following S
 - Linking SPI-register rows to bowtie barriers so barrier health shows the SPI status (SRS SPI-03).
 - Deleting a single assessment (only whole projects can be deleted), and a retention period after which archived projects are purged.
 - For the investigation expert system: meaning-based search with text embeddings (pgvector), network structures other than mechanism → factors (e.g. noisy-OR between factors), statistical validation reports against held-back cases, and AI drafting tested only against a simulated service in the automated tests.
-- For the ATSB analysis: rail and marine taxonomies, a report generator that writes the findings section, and administrator editing of the ATSB 6×6 cell assignment (the matrix is fixed in this version).
+- For the ATSB analysis: rail and marine taxonomies, editing the report's section wording, and administrator editing of the ATSB 6×6 cell assignment (the matrix is fixed in this version).
 - Saving an existing assessment as a new template, and administrator editing of templates (SRS TPL-05).
 - For the wildlife module: import of strike records from the occurrence system and in ICAO IBIS format.
 - For the extended methods: import of occurrences from the reporting system into the ERC/RAT module, CRM sensitivity cases, administrator editing of the CARA/HEART libraries, and restricted (need-to-know) access to security studies (SRS SRA-04).

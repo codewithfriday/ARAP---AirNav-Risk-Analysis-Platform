@@ -47,8 +47,8 @@ export const api = {
     request<{ access_token: string }>('POST', '/auth/login', { username, password }, true),
 }
 
-export async function download(path: string, filename: string) {
-  const blob: Blob = await request('GET', path)
+export async function download(path: string, filename: string, body?: unknown) {
+  const blob: Blob = await request(body === undefined ? 'GET' : 'POST', path, body)
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url

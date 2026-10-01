@@ -49,6 +49,9 @@ def init_db():
                 seed_demo_v6(db)
                 from .atsb_demo import seed_demo_atsb
                 seed_demo_atsb(db)
+            if "DEMO-07" not in gone:
+                from .knkt_demo import seed_demo_knkt
+                seed_demo_knkt(db)
 
 
 @asynccontextmanager
@@ -57,7 +60,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(title="ARAP — AirNav Risk Analysis Platform", version="0.8.0", lifespan=lifespan,
+app = FastAPI(title="ARAP — AirNav Risk Analysis Platform", version="0.9.0", lifespan=lifespan,
               docs_url="/api/docs", openapi_url="/api/openapi.json", redoc_url=None,
               description="Safety risk assessment with twenty-five methods (AirNav Risk Analysis Manual).")
 app.add_middleware(CORSMiddleware, allow_origins=[o.strip() for o in settings.cors_origins.split(",")],

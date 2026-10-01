@@ -177,6 +177,22 @@ ISSUE_STATUS = {"pending": "Safety action pending", "adequately": "Adequately ad
 PRACTICABILITY = [("risk", "Level of risk (if critical, the other factors do not apply)"), ("knowledge", "State of knowledge (incl. industry-wide)"),
                   ("means", "Availability and suitability of the means"), ("cost", "Cost relative to the risk and the organisation")]
 FOLLOW_UP_DAYS = 182
+# Hierarchy of controls (most to least effective) for corrective actions in the investigation report
+HIERARCHY = [("elimination", "Elimination", "Remove the hazard or the task (e.g. withdraw the unsafe equipment)"),
+             ("substitution", "Substitution", "Replace with something less hazardous"),
+             ("engineering", "Engineering controls", "Physical or design change (interlocks, guards, alerts)"),
+             ("administrative", "Administrative controls", "Procedures, training, checklists, supervision, oversight"),
+             ("ppe", "Personal protective equipment", "Protects the individual; least effective")]
+REPORT_LAYERS = [("E", "3.1", "Occurrence events (O)", ("OE", "TFM"),
+                  "The final physical outcomes and the specific technical failure mechanisms that triggered the accident."),
+                 ("I", "3.2", "Individual actions (I)", ("IA", "PA"),
+                  "The direct actions, omissions or decisions made by frontline operators (pilots, controllers, drivers, technicians)."),
+                 ("L", "3.3", "Local conditions (L)", ("LC",),
+                  "Environmental, situational or task-specific variables affecting human performance at the time of the event."),
+                 ("R", "3.4", "Risk controls (R)", ("RC", "PC"),
+                  "Existing safeguards, defences, barriers or safety procedures meant to intercept errors or break the accident chain."),
+                 ("O", "3.5", "Organisational influences (O)", ("OI",),
+                  "Latent systemic, corporate or policy-level choices that fostered unsafe local conditions or weakened risk controls.")]
 
 
 def taxonomy_flat() -> dict[str, dict]:
@@ -200,4 +216,6 @@ def meta() -> dict:
             "item_criteria": ITEM_CRITERIA, "set_criteria": SET_CRITERIA, "events_to_look_for": EVENTS_TO_LOOK_FOR, "level_questions": LEVEL_QUESTIONS,
             "review_checklist": [{"key": k, "group": g, "text": t} for k, g, t in REVIEW_CHECKLIST], "key_finding_kinds": KEY_FINDING_KINDS,
             "action_classes": ACTION_CLASSES, "action_kinds": ACTION_KINDS, "action_status": ACTION_STATUS, "issue_status": ISSUE_STATUS,
-            "practicability": [{"key": k, "text": t} for k, t in PRACTICABILITY], "follow_up_days": FOLLOW_UP_DAYS}
+            "practicability": [{"key": k, "text": t} for k, t in PRACTICABILITY], "follow_up_days": FOLLOW_UP_DAYS,
+            "hierarchy": [{"key": k, "name": n, "hint": h} for k, n, h in HIERARCHY],
+            "report_layers": [{"key": k, "num": n, "name": nm, "types": list(t), "definition": d} for k, n, nm, t, d in REPORT_LAYERS]}

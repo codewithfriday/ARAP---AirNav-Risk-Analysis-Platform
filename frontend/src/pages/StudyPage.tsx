@@ -89,7 +89,7 @@ export default function StudyPage() {
     }
   }
   const Editor = EDITORS[study.method]
-  const props = { model, setModel, results, setResults: setRes, readOnly, scheme: scheme?.data, template: m, promote, assessmentId: study.assessment.id }
+  const props = { model, setModel, results, setResults: setRes, readOnly, scheme: scheme?.data, template: m, promote, assessmentId: study.assessment.id, studyId: study.id }
 
   return (
     <div>

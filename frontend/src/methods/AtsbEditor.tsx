@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Alert, App, Badge, Button, Card, Checkbox, Col, Collapse, Empty, Form, Input, List, Radio, Row, Select, Space, Switch, Table, Tabs, Tag, Tooltip, TreeSelect, Typography } from 'antd'
-import { ApartmentOutlined, PlusOutlined, SendOutlined, DeleteOutlined } from '@ant-design/icons'
+import { ApartmentOutlined, PlusOutlined, SendOutlined, DeleteOutlined, FileTextOutlined } from '@ant-design/icons'
+import AtsbReport from './AtsbReport'
 import ReactECharts from 'echarts-for-react'
 import { api } from '../api'
 import { useAtsbMeta, useAtsbScheme } from '../hooks'
@@ -20,12 +21,16 @@ const LEVEL_COLOR: Record<string, string> = { critical: '#B23A3A', significant: 
 const LEVEL_NAME: Record<string, string> = { critical: 'Critical', significant: 'Significant', broadly_acceptable: 'Broadly acceptable' }
 const SEV_COLOR: Record<string, string> = { error: 'red', warning: 'orange', info: 'blue' }
 
+const toDate = (t?: string) => {
+  const m = /^(\d{4})-(\d{2})(?:-(\d{2}))?(?:[ T](\d{1,2}):(\d{2}))?/.exec(t ?? '')
+  return m ? Date.UTC(+m[1], +m[2] - 1, +(m[3] ?? 1), +(m[4] ?? 0), +(m[5] ?? 0)) : null
+}
 const toSec = (t?: string) => {
   const m = /^(\d{1,2}):(\d{2})(?::(\d{2}))?/.exec(t ?? '')
   return m ? Number(m[1]) * 3600 + Number(m[2]) * 60 + Number(m[3] ?? 0) : null
 }
 
-export default function AtsbEditor({ model, setModel, results, setResults, readOnly, scheme, promote, assessmentId }: EditorProps & { assessmentId?: number }) {
+export default function AtsbEditor({ model, setModel, results, setResults, readOnly, scheme, promote, assessmentId, studyId }: EditorProps & { assessmentId?: number; studyId?: number }) {
   const { message } = App.useApp()
   const { data: meta } = useAtsbMeta()
   const { data: atsbScheme } = useAtsbScheme()
@@ -71,7 +76,8 @@ export default function AtsbEditor({ model, setModel, results, setResults, readO
   // ---------------------------------------------------------------- tab: occurrence & sequence of events
   const events: any[] = m.events
   const themes = [...new Set(events.map((e) => e.theme || '—'))]
-  const timed = events.map((e, i) => ({ ...e, s: toSec(e.start) ?? i * 60, e2: toSec(e.end) }))
+  const dated = events.some((e) => toDate(e.start) !== null)
+  const timed = events.map((e, i) => ({ ...e, s: dated ? (toDate(e.start) ?? null) : (toSec(e.start) ?? i * 60), e2: toSec(e.end) })).filter((e) => e.s !== null)
   const evTab = <Row gutter={12}>
     <Col xs={24} xl={17}>
       <Card size="small" title="Occurrence" style={{ marginBottom: 10 }}>
@@ -89,7 +95,7 @@ export default function AtsbEditor({ model, setModel, results, setResults, readO
         <EditableTable readOnly={readOnly} rows={events} onChange={(rows) => set({ events: rows })} addLabel="Event" scrollX={1250}
           newRow={() => ({ id: nextId(events, 'E', 1), start: '', title: '', display: true })}
           columns={[
-            { key: 'start', title: 'Start', width: 100 }, { key: 'end', title: 'End', width: 90 },
+            { key: 'start', title: 'Start', width: 145 }, { key: 'end', title: 'End', width: 90 },
             { key: 'title', title: 'Title', width: 300, type: 'textarea' }, { key: 'comments', title: 'Comments', width: 190, type: 'textarea' },
             { key: 'source', title: 'Source', width: 140 }, { key: 'theme', title: 'Theme', width: 100 },
             { key: 'display', title: 'Chart', width: 55, type: 'bool' },
@@ -109,14 +115,16 @@ export default function AtsbEditor({ model, setModel, results, setResults, readO
       </Card>
       {timed.filter((e) => e.display !== false).length > 0 && <Card size="small" title="Timeline" style={{ marginTop: 10 }}>
         <ReactECharts style={{ height: 80 + themes.length * 70 }} option={{
-          grid: { left: 90, right: 30, top: 20, bottom: 30 }, tooltip: { formatter: (p: any) => `${p.data.t}<br/>${p.data.title}` },
-          xAxis: { type: 'value', scale: true, axisLabel: { formatter: (v: number) => `${String(Math.floor(v / 3600) % 24).padStart(2, '0')}:${String(Math.floor(v / 60) % 60).padStart(2, '0')}` } },
+          grid: { left: 90, right: 30, top: 20, bottom: dated ? 50 : 30 }, tooltip: { formatter: (p: any) => `${p.data.t}<br/>${p.data.title}` },
+          ...(dated ? { dataZoom: [{ type: 'slider', height: 14, bottom: 6 }, { type: 'inside' }] } : {}),
+          xAxis: dated ? { type: 'time', scale: true }
+            : { type: 'value', scale: true, axisLabel: { formatter: (v: number) => `${String(Math.floor(v / 3600) % 24).padStart(2, '0')}:${String(Math.floor(v / 60) % 60).padStart(2, '0')}` } },
           yAxis: { type: 'category', data: themes },
           series: [{ type: 'scatter', symbolSize: 12, data: timed.filter((e) => e.display !== false).map((e) => ({ value: [e.s, e.theme || '—'], t: e.start, title: e.title,
             itemStyle: { color: e.factor_id ? '#B23A3A' : '#1F3A5F' } })),
             label: { show: true, position: 'top', fontSize: 9, formatter: (p: any) => p.data.title.length > 28 ? `${p.data.title.slice(0, 27)}…` : p.data.title } }],
         }} />
-        <div className="small muted">Red: events on the safety factors list.</div>
+        <div className="small muted">Red: events on the safety factors list.{dated && ' Dated events use a calendar axis — drag the slider to zoom into the occurrence.'}</div>
       </Card>}
     </Col>
     <Col xs={24} xl={7}>
@@ -261,6 +269,7 @@ export default function AtsbEditor({ model, setModel, results, setResults, readO
       { key: 'key', label: `4 · Other key findings (${kfs.length})`, children: kfTab },
       { key: 'map', label: <span><ApartmentOutlined /> 5 · Safety factor map</span>, children: mapTab },
       { key: 'review', label: <span>6 · Review & findings {(R.check_counts?.error ?? 0) + (R.check_counts?.warning ?? 0) > 0 && <Badge count={(R.check_counts?.error ?? 0) + (R.check_counts?.warning ?? 0)} size="small" />}</span>, children: reviewTab },
+      { key: 'report', label: <span><FileTextOutlined /> 7 · Investigation report</span>, children: <AtsbReport m={m} set={set} meta={meta} readOnly={readOnly} studyId={studyId} /> },
     ]} />
   </div>
 }
@@ -354,6 +363,9 @@ function FactorForm({ f, meta, taxTree, readOnly, res, checks, probOpts, factorO
           {f.type === 'RC' && <Form.Item label="Control function" style={{ width: '50%' }}><Select allowClear value={f.control_function} options={[{ value: 'preventive', label: 'Preventive' }, { value: 'recovery', label: 'Recovery' }]} onChange={(v) => onChange({ control_function: v })} /></Form.Item>}
           {f.type === 'OI' && <Form.Item label="Influence" style={{ width: '50%' }}><Select allowClear value={f.influence_kind} options={[{ value: 'internal', label: 'Internal organisational condition' }, { value: 'external', label: 'External influence' }]} onChange={(v) => onChange({ influence_kind: v })} /></Form.Item>}
         </Space.Compact>
+        {['IA', 'PA'].includes(f.type) && <Form.Item label="Why did the action make sense to the person at the time? (local rationality — no blame)">
+          <Input.TextArea autoSize={{ minRows: 2 }} value={f.rationale} placeholder="e.g. a routine task done many times; the procedure did not ask for a check; planning the next task"
+            onChange={(e) => onChange({ rationale: e.target.value })} /></Form.Item>}
         <Space wrap style={{ marginBottom: 8 }}>
           <Tooltip title={tm.issue_allowed ? 'Characteristic of an organisation or system that can affect future operations' : 'Only local conditions, risk controls and organisational influences can be safety issues'}>
             <Checkbox disabled={readOnly || !tm.issue_allowed} checked={!!f.safety_issue} onChange={(e) => onChange({ safety_issue: e.target.checked })}>Potential safety issue</Checkbox>
@@ -432,12 +444,15 @@ function FactorForm({ f, meta, taxTree, readOnly, res, checks, probOpts, factorO
         {res.sensitivity && !res.sensitivity.error && <div className="small" style={{ marginTop: 4 }}>Alternative: <Tag color={res.sensitivity.color}>{res.sensitivity.index}</Tag>{LEVEL_NAME[res.sensitivity.issue_level]}</div>}
       </Col>
     </Row> })
-    tabs.push({ key: 'action', label: `Safety action (${actions.length})`, children: <div>
-      <Space style={{ marginBottom: 8 }} wrap>
+  }
+  if (f.further !== false) {
+    tabs.push({ key: 'action', label: `Safety / corrective action (${actions.length})`, children: <div>
+      {!f.safety_issue && <div className="small muted" style={{ marginBottom: 8 }}>Corrective actions for every contributing factor feed Section 5 of the investigation report, ranked by the hierarchy of controls.</div>}
+      {f.safety_issue && <Space style={{ marginBottom: 8 }} wrap>
         <span>Safety issue status</span>
         <Select disabled={readOnly} size="small" style={{ width: 210 }} value={f.issue_status ?? 'pending'} options={Object.entries<string>(meta.issue_status).map(([v, l]) => ({ value: v, label: l }))} onChange={(v) => onChange({ issue_status: v })} />
         {res.follow_up_due && <Tag color={res.follow_up_due < new Date().toISOString().slice(0, 10) ? 'red' : 'blue'}>follow-up due {res.follow_up_due}</Tag>}
-      </Space>
+      </Space>}
       {actions.map((a, i) => <Card key={a.id ?? i} size="small" style={{ marginBottom: 8 }} title={<Space>{a.id}<Tag>{meta.action_kinds[a.kind]?.split(' (')[0]}</Tag>{a.action_ref && <Tag color="blue">{a.action_ref}</Tag>}</Space>}
         extra={!readOnly && <Space>{!a.action_ref && <Button size="small" onClick={() => track(a, i)}>Track in Actions</Button>}
           <Button size="small" danger type="text" icon={<DeleteOutlined />} onClick={() => onChange({ actions: actions.filter((_x, j) => j !== i) })} /></Space>}>
@@ -448,6 +463,11 @@ function FactorForm({ f, meta, taxTree, readOnly, res, checks, probOpts, factorO
             <Form.Item label="Notified on" style={{ width: '20%' }}><Input value={a.notified_on} placeholder="YYYY-MM-DD" onChange={(e) => onChange({ actions: actions.map((x, j) => (j === i ? { ...x, notified_on: e.target.value } : x)) })} /></Form.Item>
             <Form.Item label="Status" style={{ width: '20%' }}><Select value={a.status} options={Object.entries<string>(meta.action_status).map(([v, l]) => ({ value: v, label: l }))} onChange={(v) => onChange({ actions: actions.map((x, j) => (j === i ? { ...x, status: v } : x)) })} /></Form.Item>
           </Space.Compact>
+          <Space.Compact block>
+            <Form.Item label="Hierarchy of controls" style={{ width: '35%' }}><Select allowClear value={a.hierarchy} options={(meta.hierarchy ?? []).map((h: any) => ({ value: h.key, label: <Tooltip title={h.hint}>{h.name}</Tooltip> }))} onChange={(v) => onChange({ actions: actions.map((x, j) => (j === i ? { ...x, hierarchy: v } : x)) })} /></Form.Item>
+            <Form.Item label="Target date" style={{ width: '20%' }}><Input value={a.target_date} placeholder="YYYY-MM-DD" onChange={(e) => onChange({ actions: actions.map((x, j) => (j === i ? { ...x, target_date: e.target.value } : x)) })} /></Form.Item>
+            <Form.Item label="Reference (e.g. recommendation number)" style={{ width: '45%' }}><Input value={a.ref} onChange={(e) => onChange({ actions: actions.map((x, j) => (j === i ? { ...x, ref: e.target.value } : x)) })} /></Form.Item>
+          </Space.Compact>
           <Form.Item label="Safety action"><Input.TextArea autoSize value={a.description} onChange={(e) => onChange({ actions: actions.map((x, j) => (j === i ? { ...x, description: e.target.value } : x)) })} /></Form.Item>
           <Form.Item label="Classification (coded at closure; several allowed)"><Select mode="multiple" value={a.classes ?? []} options={classOpts.map((c) => ({ value: c, label: c }))} onChange={(v) => onChange({ actions: actions.map((x, j) => (j === i ? { ...x, classes: v } : x)) })} /></Form.Item>
           <Form.Item label="Communication log">
@@ -457,7 +477,7 @@ function FactorForm({ f, meta, taxTree, readOnly, res, checks, probOpts, factorO
         </Form>
       </Card>)}
       {!readOnly && <Button size="small" icon={<PlusOutlined />} onClick={() => onChange({ actions: [...actions, { id: nextId(actions, 'A', 1), kind: 'org', status: 'proposed', log: [] }] })}>Safety action</Button>}
-      <Card size="small" title="Evaluate the safety action" style={{ marginTop: 10 }}>
+      {f.safety_issue && <Card size="small" title="Evaluate the safety action" style={{ marginTop: 10 }}>
         <Row gutter={12}><Col xs={24} xl={10}>
           <div className="small" style={{ marginBottom: 4 }}>Residual risk after the action</div>
           <RiskMatrix scheme={schForMatrix} value={{ severity: ev.residual?.consequence, likelihood: ev.residual?.likelihood }} disabled={readOnly} size={32}
@@ -470,7 +490,7 @@ function FactorForm({ f, meta, taxTree, readOnly, res, checks, probOpts, factorO
           {meta.practicability.map((p: any) => <Input.TextArea key={p.key} disabled={readOnly} autoSize style={{ marginBottom: 4 }} placeholder={p.text} value={ev.practicability?.[p.key]}
             onChange={(e) => onChange({ evaluation: { ...ev, practicability: { ...(ev.practicability ?? {}), [p.key]: e.target.value } } })} />)}
         </Col></Row>
-      </Card>
+      </Card>}
     </div> })
   }
   return <div>

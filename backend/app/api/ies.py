@@ -310,6 +310,38 @@ def calc_atsb(body: AtsbIn, db: Session = Depends(get_db), _: User = Depends(cur
         raise HTTPException(422, f"analysis failed: {e}")
 
 
+class InvReportIn(BaseModel):
+    model: dict | None = None
+    format: str = "json"
+
+
+@router.post("/studies/{sid}/investigation-report")
+def investigation_report(sid: int, body: InvReportIn, db: Session = Depends(get_db), u: User = Depends(current_user)):
+    """Investigation report (Executive summary · Factual information · ORLIO analysis · Findings · Corrective actions ·
+    Appendices) for an ATSB-method study, as JSON (preview), DOCX or PDF. Unsaved edits can be passed as `model`."""
+    from fastapi import Response
+    from .. import inv_report
+    s = get_or_404(db, Study, sid)
+    if s.method != "atsb":
+        raise HTTPException(422, "the investigation report is available for ATSB-method studies")
+    if body.format not in ("json", "docx", "pdf"):
+        raise HTTPException(422, "format must be json, docx or pdf")
+    model = body.model if body.model is not None else (s.model or {})
+    try:
+        analysis = atsb_engine.analyse(model, active_scheme(db))
+        p = s.assessment.project
+        rep = inv_report.build_report(model, analysis, {"code": p.code, "title": p.title})
+    except (ValueError, KeyError, TypeError) as e:
+        raise HTTPException(422, f"report failed: {e}")
+    if body.format == "json":
+        return rep
+    content = inv_report.to_docx(rep) if body.format == "docx" else inv_report.to_pdf(rep)
+    audit.record(db, u.username, "study", s.id, "export", after={"format": body.format, "kind": "investigation_report"}); db.commit()
+    mt = ("application/vnd.openxmlformats-officedocument.wordprocessingml.document" if body.format == "docx" else "application/pdf")
+    name = f"ARAP-{p.code}-S{s.id}-investigation-report.{body.format}"
+    return Response(content, media_type=mt, headers={"Content-Disposition": f'attachment; filename="{name}"'})
+
+
 class RulesIn(BaseModel):
     model: dict
 

@@ -1,4 +1,4 @@
-# ARAP architecture notes (v0.8)
+# ARAP architecture notes (v0.9)
 
 ## Overview
 
@@ -56,6 +56,10 @@ Projects are `active` or `archived`. `POST /projects/{id}/archive` and `/restore
 ### ATSB safety investigation analysis (v0.8)
 
 Study method `atsb`. Reference data (taxonomy, checklists, scales, safety action classification) in `app/atsb.py`, served by `GET /meta/atsb`; engine `app/engines/atsb.py` (`POST /calc/atsb`) derives finding types, safety-issue levels, residual evaluation and follow-up dates, and returns the checks. The ATSB 6×6 is `ATSB_SCHEME` in `app/engines/risk.py` (same structure as the AirNav scheme, so the matrix component renders both; `GET /risk/atsb-scheme`); `classify_issue()` maps either scheme to critical / significant / broadly acceptable. Everything is stored in the study model; safety issues go to the hazard log through the existing promote endpoint. Demo content: `app/atsb_demo.py`.
+
+### Investigation report (v0.9)
+
+`app/inv_report.py`: `build_report(model, analysis, project)` returns the report as sections of simple blocks (`h`, `p`, `bullets`, `numbered`, `kv`, `table`, `image`); the same structure is rendered as JSON (editor preview), DOCX (`to_docx`, python-docx) and PDF (`to_pdf`, reportlab). Appendix C is drawn by `factor_map_png` (matplotlib, ORLIO lanes, barycentre ordering to reduce crossings). Endpoint `POST /studies/{id}/investigation-report` with `{model?, format: json|docx|pdf}` (the model in the body lets unsaved edits be previewed; exports are audited). Report-only content lives in the study model under `report` (report number, consequences, personnel, assets, environment, immediate actions, interviews, layer notes, attachments as data URLs); factors gain `rationale`, actions gain `hierarchy`, `target_date` and `ref`. Reference lists `HIERARCHY` and `REPORT_LAYERS` are in `app/atsb.py`. DEMO-07 (`app/knkt_demo.py`) is the KNKT.24.10.22.04 worked example; its appendix figures are drawn with matplotlib at seeding.
 
 ### Engines
 

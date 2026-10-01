@@ -23,7 +23,7 @@ from typing import Any
 from .. import atsb as ref
 from . import risk
 
-ENGINE_VERSION = "atsb-1.0.0"
+ENGINE_VERSION = "atsb-1.1.0"
 LEVEL_ORDER = {"E": 0, "I": 1, "T": 1, "L": 2, "R": 3, "O": 4}
 
 
@@ -265,6 +265,12 @@ def analyse(model: dict, airnav: dict | None = None, today: date | None = None) 
     by_id = {f["id"]: f for f in factors}
     for f in factors:
         d = out_factors[f["id"]]
+        if f.get("type") in ("IA", "PA") and d.get("existence") and not (f.get("rationale") or "").strip():
+            checks.append(_c("info", f["id"], "rationale", f"{f['title']}: explain why the action made sense to the person at the time "
+                                                           "(local rationality) — used in the investigation report"))
+        if d.get("finding_type") == "contributing" and f.get("type") != "OE" and not f.get("actions"):
+            checks.append(_c("info", f["id"], "corrective", f"{f['title']}: contributing factor with no corrective action — "
+                                                            "the report's corrective-action table will flag it"))
         if d.get("finding_type") != "contributing" or f.get("type") == "OI":
             continue
         if not d["explained_by"] and not f.get("sufficiency_note"):

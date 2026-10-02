@@ -62,6 +62,9 @@ def init_db():
             if "DEMO-07" not in gone:
                 from .knkt_demo import seed_demo_knkt
                 seed_demo_knkt(db)
+            if "DEMO-08" not in gone:
+                from .radar_demo import seed_demo_radar
+                seed_demo_radar(db)
 
 
 @asynccontextmanager

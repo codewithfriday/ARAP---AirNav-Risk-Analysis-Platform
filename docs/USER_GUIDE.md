@@ -652,6 +652,37 @@ Click **Preview** to see the report beside the form, or **Word (.docx)** / **PDF
 
 ![ORLIO factor map — DEMO-07](examples/DEMO-07-orlio-factor-map.png)
 
+### 13.19 Worked example: surveillance radar performance degradation (DEMO-08)
+
+DEMO-08 follows one technical problem through the whole life of a change and uses every method that is relevant to each phase and each type of hazard (Manual Appendix G). The fictitious Bukit Sari MSSR, which feeds ACC Sector E3, degrades gradually: lower probability of detection in the north-east quadrant, azimuth bias, reflected false targets and Mode C garbling. Its monitoring alarms only on hard failures, so no alarm is raised. A loss of separation follows; the radar is refurbished in night outage windows and returned to service.
+
+![DEMO-08 project](screenshots/v6-radar-project.png)
+
+The project has **six assessments, one per phase**. Each assessment's scope lists its studies with the hazard types they cover: TEC technical, HUM human, PRO procedural, ORG organisational, ENV environmental, SEC security, OHS occupational.
+
+| Phase | Studies |
+|---|---|
+| P1 Concept | HAZID, FHA, bowtie, expert judgement (Cooke and Delphi) |
+| P2 Design of the degraded mode and the refurbished chain | FMEA, FTA, common cause analysis, RBD and Markov, STPA, HAZOP, security risk, CRM, LOPA, ETA, HTA, HRA |
+| P3 Implementation and transition | JHA of the tower works, SWIFT of the outage windows and return to service, real-time simulation, ATSEP fatigue |
+| P4 Operations | FRAM of work-as-done, BBN for diagnosing the cause from the symptoms |
+| P5 Occurrence investigation | ERC/RAT, ATSB analysis of OCC-RDR-01 (with the investigation report), SOAM/HFACS/Tripod |
+| P6 Monitoring and argument | SPI register, GSN safety argument linking all 26 studies |
+
+![Methods by phase and hazard type](examples/DEMO-08-method-matrix.png)
+
+Key results to look at:
+
+- **FTA:** about 9 × 10⁻⁶ per flight hour in the degraded state, and ten times less with performance thresholds.
+- **Common cause analysis and LOPA:** STCA is not credited as an independent layer, because it uses the same tracks as the controller.
+- **Markov:** finding the degradation within a week instead of two months raises in-specification availability from 0.82 to 0.96.
+- **CRM:** the parallel routes 10 NM apart need 11.7 NM without radar monitoring.
+- **Fatigue:** eight-hour nights are better than twelve-hour nights for the works crew.
+
+The hazard log holds RDR-01 to RDR-12, each with its type and phase in the *context* field, its source study and row, its controls and its actions (RDR-A01 to A08). Wildlife strike risk, the organisational function map and the expert system are not used; the project description says why.
+
+![Design phase](screenshots/v6-radar-design-phase.png)
+
 ## 14. The hazard log
 
 ![Hazard log](screenshots/05-hazard-log.png)
